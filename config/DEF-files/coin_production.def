@@ -16,9 +16,9 @@ block P.cal.etottracknorm
 block P.cal.fly.earray
 block P.cal.fly.goodAdcPulseInt
 block P.cal.pr.eplane
-block P.aero.npeSum
-block P.hgcer.npeSum
-block P.ngcer.npeSum
+block P.aero.*
+block P.hgcer.*
+block P.ngcer.*
 block P.hod.starttime
 block P.hod.fpHitsTime
 block P.hod.goodscinhit
@@ -31,12 +31,6 @@ block H.dc.x*
 block H.dc.y*
 block P.dc.x*
 block P.dc.y*
-block P.hgcer.xAtCer
-block P.hgcer.yAtCer
-block P.ngcer.xAtCer
-block P.ngcer.yAtCer
-block P.aero.xAtAero
-block P.aero.yAtAero
 block H.kin.primary.*
 block P.kin.secondary.*
 block T.coin.*

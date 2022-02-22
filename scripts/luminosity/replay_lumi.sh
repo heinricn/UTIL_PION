@@ -101,4 +101,4 @@ source trigWindows.sh -p ${RUNNUMBER}
 echo
 echo "Running lumiyield.py ${RUNNUMBER} ${MAXEVENTS}..."
 cd ${UTILPATH}/scripts/luminosity/src/
-python3 lumiyield.py ${ANATYPE}_replay_luminosity ${RUNNUMBER} ${MAXEVENTS}
+#python3 lumiyield.py ${ANATYPE}_replay_luminosity ${RUNNUMBER} ${MAXEVENTS}

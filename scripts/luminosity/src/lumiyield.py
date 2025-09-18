@@ -416,8 +416,8 @@ def pid_cuts():
     
     if (not COIN_PS == None):
         ax = f.add_subplot(338)
-        ax.hist(c.add_cut(CTime_CoinTime_RAW_ROC2,"c_Raw_total"),bins=c.setbin(CTime_CoinTime_RAW_ROC2,1600,-150,250),label='no cut',histtype='step',alpha=0.5, stacked=True, fill=True)
-        ax.hist(c.add_cut(CTime_CoinTime_RAW_ROC2,"c_Raw_inside"), bins=c.setbin(CTime_CoinTime_RAW_ROC2,1600,-150,250),label='cut',histtype='step', alpha=0.5, stacked=True, fill=True)
+        ax.hist(c.add_cut(CTime_CoinTime_RAW_ROC2,"c_Raw_total"),bins=c.setbin(CTime_CoinTime_RAW_ROC2,3200,-400,400),label='no cut',histtype='step',alpha=0.5, stacked=True, fill=True)
+        ax.hist(c.add_cut(CTime_CoinTime_RAW_ROC2,"c_Raw_inside"), bins=c.setbin(CTime_CoinTime_RAW_ROC2,3200,-400,400),label='cut',histtype='step', alpha=0.5, stacked=True, fill=True)
         plt.yscale('log')
         plt.xlabel('CTime_CoinTime_RAW_ROC2 + CoinBlocking Cut')
         plt.ylabel('Count')

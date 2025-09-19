@@ -207,9 +207,9 @@ def calc_yield():
     #uncer_rateSHMSCorr = (yield_dict["rate_SHMS3-4"]*rateSHMSSlopeUncer)**2 + (rateSHMSSlope*yield_dict["uncern_SHMS3-4_evts_scaler"])**2
     
     rateHMSCorr = (yield_dict["HMS3of4ELT"])         
-    uncer_rateHMSCorr = 0*yield_dict["HMS3of4ELT"]
+    uncer_rateHMSCorr = yield_dict["HMS3of4ELT_err"]
     rateSHMSCorr = (yield_dict["SHMS3of4ELT"])         
-    uncer_rateSHMSCorr = 0*yield_dict["SHMS3of4ELT"]
+    uncer_rateSHMSCorr = yield_dict["SHMS3of4ELT_err"]
     rateCOINCorr = 1#-(rateCOINslope*yield_dict["rate_COIN"])
     rateCOINCorrUncer = 0#(rateCOINslopeUncer)*yield_dict["rate_COIN"]
     
@@ -279,8 +279,8 @@ def calc_yield():
     
     uncern_TLT = np.sqrt(makeList("accp_edtm")/makeList("sent_edtm_PS")**2+makeList("accp_edtm")**2/makeList("sent_edtm_PS")**4)
    
-    uncern_TLT_ELT_SHMS = ((makeList("CPULT_scaler_uncern")/makeList("CPULT_scaler"))**2 + yield_dict["uncer_rateSHMSCorr"])
-    uncern_TLT_ELT_HMS = ((makeList("CPULT_scaler_uncern")/makeList("CPULT_scaler"))**2 + yield_dict["uncer_rateHMSCorr"])
+    uncern_TLT_ELT_SHMS = ((makeList("CPULT_scaler_uncern")/makeList("CPULT_scaler"))**2 + (yield_dict["uncer_rateSHMSCorr"]/yield_dict["rateSHMSCorr"])**2)
+    uncern_TLT_ELT_HMS = ((makeList("CPULT_scaler_uncern")/makeList("CPULT_scaler"))**2 + (yield_dict["uncer_rateHMSCorr"]/yield_dict["rateHMSCorr"])**2)
     uncern_TLT_ELT = (makeList("CPULT_scaler_uncern")/makeList("CPULT_scaler"))**2 + (yield_dict["uncer_rateSHMSCorr"]/yield_dict["rateSHMSCorr"])**2 + (yield_dict["uncer_rateHMSCorr"]/yield_dict["rateHMSCorr"])**2 +(yield_dict["rateCOINCorrUncer"]/yield_dict["rateCOINCorr"])**2 + (yield_dict["Uncer_CoinBlocking_Corr"]/yield_dict["CoinBlocking_Corr"])**2
 
     #uncern_TLT_ELT = np.sqrt((ELT2*(1-ELT2))/100)

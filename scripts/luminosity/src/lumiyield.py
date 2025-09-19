@@ -968,7 +968,7 @@ def main():
 
     # Import dictionaries
     scalers = scaler.scaler(PS_names, HMS_PS, SHMS_PS, COIN_PS, thres_curr, report_current, runNum, MaxEvent, s_tree) 
-    if (not (COIN_PS == None)): 
+    if ((not (COIN_PS == None) )or(not (HMS_PS == None) ) ): 
         print ("Second loop of scalers to get HMS 3 of 4 eff")
         hscalers = scaler.scaler(PS_names, HMS_PS, None, COIN_PS, thres_curr, report_current, runNum, MaxEvent, sh_tree) 
         print(hscalers["HMS3of4ELT"])
@@ -980,7 +980,7 @@ def main():
     for d in (scalers, track_info): 
         data.update(d)
     
-    if (not (COIN_PS == None)):
+    if ((not (COIN_PS == None) )or(not (HMS_PS == None) ) ):
         data["HMS3of4ELT"] = hscalers["HMS3of4ELT"]
         data["HMS3of4ELT_err"] = hscalers["HMS3of4ELT_err"]
     

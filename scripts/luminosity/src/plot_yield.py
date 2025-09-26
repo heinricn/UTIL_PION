@@ -285,7 +285,7 @@ def calc_yield():
             yield_SHMS_CPULT_track.append(1)
     else:    
             SHMS_DataRate = makeList("SHMSTRIG_scaler")/(makeList("time")*makeList("SHMS_PS"))
-            yield_SHMS_scaler = (yield_dict["SHMS_scaler_accp"])/(makeList("charge")*makeList("curr_corr")*yield_dict["ELT_3of4_SHMS"]*yield_dict["boilingCorr"])
+            yield_SHMS_scaler = (yield_dict["SHMS_scaler_accp"])/(makeList("charge")*makeList("curr_corr")*yield_dict["SHMS3of4ELT"]*yield_dict["boilingCorr"])
             yield_SHMS_notrack = (makeList("p_int_etotnorm_evts")*makeList("SHMS_PS"))/(makeList("charge")*makeList("curr_corr")*yield_dict["TLT_ELT_SHMS"]*yield_dict["boilingCorr"])
             yield_SHMS_track = (makeList("p_int_etottracknorm_evts")*makeList("SHMS_PS"))/(makeList("charge")*makeList("curr_corr")*yield_dict["TLT_ELT_SHMS"]*makeList("SHMS_track")*yield_dict["boilingCorr"])
             yield_SHMS_CPULT_notrack = (makeList("p_int_etotnorm_evts")*makeList("SHMS_PS"))/(makeList("charge")*makeList("curr_corr")*yield_dict["CPULT_phys"]*yield_dict["boilingCorr"])
@@ -455,7 +455,7 @@ def calc_yield():
     
     
     if makeList("SHMS_PS").any() >0.5:
-        uncern_yield_SHMS_scaler = np.sqrt((yield_dict["yield_SHMS_scaler"]**2)*((yield_dict["uncern_SHMS_evts_scaler"]**2)+(yield_dict["uncern_charge"]/makeList("charge"))**2+(yield_dict["uncern_ELT_3of4_SHMS"])**2 + yield_dict["uncer_boilingCorr"]))
+        uncern_yield_SHMS_scaler = np.sqrt((yield_dict["yield_SHMS_scaler"]**2)*((yield_dict["uncern_SHMS_evts_scaler"]**2)+(yield_dict["uncern_charge"]/makeList("charge"))**2+(yield_dict["SHMS3of4ELT_err"])**2 + yield_dict["uncer_boilingCorr"]))
         uncern_yield_SHMS_track = np.sqrt(abs(yield_dict["yield_SHMS_track"]**2)*((yield_dict["uncern_SHMS_evts_scaler"]**2)+(yield_dict["uncern_CPULT_phys"]**2)+(yield_dict["uncern_charge"]/makeList("charge"))**2+ yield_dict["uncer_boilingCorr"]))
         uncern_yield_SHMS_notrack = np.sqrt(abs(yield_dict["yield_SHMS_notrack"]**2)*((yield_dict["uncern_SHMS_evts_scaler"]**2)+(yield_dict["uncern_CPULT_phys"]**2)+(yield_dict["uncern_charge"]/makeList("charge"))**2+ yield_dict["uncer_boilingCorr"]))
         uncern_yield_SHMS_CPULT_track = np.sqrt((yield_dict["yield_SHMS_CPULT_track"]**2)*((yield_dict["uncern_SHMS_evts_scaler"]**2)+(yield_dict["uncern_CPULT_phys"]**2)+(yield_dict["uncern_charge"]/makeList("charge"))**2+ yield_dict["uncer_boilingCorr"]))
@@ -598,7 +598,7 @@ def calc_yield():
             yield_dict.update({"yieldRel_SHMS_CPULT_track" : yieldRel_SHMS_CPULT_track})
             
             
-            uncern_yieldRel_SHMS_scaler = np.sqrt((yield_dict["uncern_SHMS_evts_scaler"]**2)+(yield_dict["uncern_charge"]/makeList("charge"))**2 +(yield_dict["uncern_ELT_3of4_SHMS"])**2 + yield_dict["uncer_boilingCorr"])
+            uncern_yieldRel_SHMS_scaler = np.sqrt((yield_dict["uncern_SHMS_evts_scaler"]**2)+(yield_dict["uncern_charge"]/makeList("charge"))**2 +(yield_dict["SHMS3of4ELT_err"])**2 + yield_dict["uncer_boilingCorr"])
             uncern_yieldRel_SHMS_notrack = np.sqrt((yield_dict["uncern_SHMS_evts_notrack"]**2)+(yield_dict["uncern_TLT_ELT_SHMS"]**2)+(yield_dict["uncern_charge"]/makeList("charge"))**2 + yield_dict["uncer_boilingCorr"])
             uncern_yieldRel_SHMS_track =  np.sqrt((yield_dict["uncern_SHMS_evts_notrack"]**2)+(yield_dict["uncern_TLT_ELT_SHMS"]**2)+(makeList("SHMS_track_uncern")**2)+((yield_dict["uncern_charge"]/makeList("charge"))**2) + yield_dict["uncer_boilingCorr"])
             yield_dict.update({"uncern_yieldRel_SHMS_scaler" : uncern_yieldRel_SHMS_scaler})
@@ -1853,7 +1853,7 @@ def plot_yield():
         plt.errorbar(yield_data["SHMS_DataRate"],yield_data["CPULT_phys"],yerr=yield_data["CPULT_phys"]*yield_data["uncern_CPULT_phys"],color='black',linestyle='None',zorder=3,label="_nolegend_")
         plt.scatter(yield_data["SHMS_DataRate"],yield_data["CPULT_phys"],color='blue',zorder=4,label="_nolegend_")
         
-        plt.errorbar(yield_data["SHMS_DataRate"],yield_data["CPULT_TLT_SHMS"],yerr=yield_data["CPULT_TLT_SHMS"]*(yield_data["uncern_ELT_3of4_SHMS"] + yield_data["uncern_TLT"]), color='black', linestyle='None', zorder=3, label="_nolegend_")
+        plt.errorbar(yield_data["SHMS_DataRate"],yield_data["CPULT_TLT_SHMS"],yerr=yield_data["CPULT_TLT_SHMS"]*(yield_data["SHMS3of4ELT_err"] + yield_data["uncern_TLT"]), color='black', linestyle='None', zorder=3, label="_nolegend_")
         plt.scatter(yield_data["SHMS_DataRate"],yield_data["CPULT_TLT_SHMS"],color='red',zorder=4,label="_nolegend_")
     elif "HMS" in inp_name.upper():
         plt.errorbar(yield_data["HMS_DataRate"],yield_data["CPULT_phys"],yerr=yield_data["CPULT_phys"]*yield_data["uncern_CPULT_phys"],color='black',linestyle='None',zorder=3,label="_nolegend_")
@@ -1865,7 +1865,7 @@ def plot_yield():
         plt.errorbar(yield_data["SHMS_DataRate"] + yield_data["HMS_DataRate"], yield_data["CPULT_phys"], yerr=yield_data["CPULT_phys"]*yield_data["uncern_CPULT_phys"], color='black', linestyle='None', zorder=3, label="_nolegend_")
         plt.scatter(yield_data["SHMS_DataRate"] + yield_data["HMS_DataRate"],yield_data["CPULT_phys"],color='blue',zorder=4,label="_nolegend_")
 
-        plt.errorbar(yield_data["SHMS_DataRate"] + yield_data["HMS_DataRate"], yield_data["CPULT_TLT_SHMS"], yerr=yield_data["CPULT_TLT_SHMS"]*(yield_data["uncern_ELT_3of4_SHMS"] + yield_data["uncern_TLT"]), color='black', linestyle='None', zorder=3, label="_nolegend_")
+        plt.errorbar(yield_data["SHMS_DataRate"] + yield_data["HMS_DataRate"], yield_data["CPULT_TLT_SHMS"], yerr=yield_data["CPULT_TLT_SHMS"]*(yield_data["SHMS3of4ELT_err"] + yield_data["uncern_TLT"]), color='black', linestyle='None', zorder=3, label="_nolegend_")
         plt.scatter(yield_data["SHMS_DataRate"] + yield_data["HMS_DataRate"],yield_data["CPULT_TLT_SHMS"],color='red',zorder=4,label="_nolegend_")
     plt.ylabel('CPULT', fontsize=16)
     plt.xlabel('Prescaled Data Rate (Hz)', fontsize =12)

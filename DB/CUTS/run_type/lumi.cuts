@@ -70,7 +70,8 @@ c_nt_lumi_rand = current.bcm2+misc.c_noedtm+coin_time.Coin_Pion_Rand+misc.startt
 c_epi_nt_lumi_rand = current.bcm2+misc.c_noedtm+coin_time.Coin_Pion_Rand+misc.starttime+pid.p_picut_noHGC_nt+pid.h_ecut_nt
 c_ep_nt_lumi_rand = current.bcm2+misc.c_noedtm+coin_time.Coin_Pion_Rand+misc.starttime+pid.p_pcut_nt+pid.h_ecut_nt
 # no-track cut
-p_ecut_lumi_nt = current.bcm4a+pid.p_ecut_nt
+p_ecut_lumi_nt = current.bcm2+pid.p_ecut_nt
+p_ecut_lumi = pid.p_ecut+current.bcm2
 ###################
 # pid cut
 h_cal = current.bcm2+pid.h_ecut-pid.h_ecut.H_cer_npeSum+misc.h_starttime

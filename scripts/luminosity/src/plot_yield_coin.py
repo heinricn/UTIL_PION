@@ -141,6 +141,9 @@ def calc_yield():
         
         "SHMS3of4ELT" : makeList("SHMS3of4ELT"),
         "HMS3of4ELT" : makeList("HMS3of4ELT"),
+        "SHMS3of4ELT_err" : makeList("SHMS3of4ELT_err"),
+        "HMS3of4ELT_err" : makeList("HMS3of4ELT_err"),
+        
         "CoinBlocking_Corr": makeList("CoinBlocking_Corr"),
         "Uncer_CoinBlocking_Corr": np.sqrt(makeList("CoinBlocking_Corr")*(1- makeList("CoinBlocking_Corr"))/makeList("CoinBlocking_Total")),
 

@@ -26,16 +26,6 @@ TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
     Double_t *reBase1, *reX, *reEX;
     TF1 *lin1 = new TF1("lin1", "[0]+[1]*x",0,80);
 
-    PlotColors(ge1,0);
-    ge1->Fit(lin1);
-    ge1->Draw("AP");
-    
-    TLegend* l1 = new TLegend(0.5, 0.85, 0.9, 0.9);
-    Double_t reIntercept = lin1->GetParameter(0);
-
-    l1->AddEntry(lin1, Form("y = (%f #pm %f)x + (%f #pm %f)",lin1->GetParameter(1), lin1->GetParError(1),lin1->GetParameter(0), lin1->GetParError(0)));
-    l1->Draw();
-    
     reBase1 = ge1->GetY();
     int N = ge1->GetN();
     reX = ge1->GetX();
@@ -45,7 +35,7 @@ TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
     Double_t *reEX2 = new Double_t[N];
     for(int i = 0; i < N; i++)
     {
-        reBase2[i]= reBase1[i] - (reIntercept - 1);
+        //reBase2[i]= reBase1[i] - (reIntercept - 1);
         if(rate){ // conver to kHz
             reX2[i] = reX[i]/1000;
             reEX2[i] = reEX[i]/1000;
@@ -54,6 +44,29 @@ TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
             reEX2[i] = reEX[i];
         }
     }
+    TGraphErrors *ge3 = new TGraphErrors(N, reX2, reBase1, reEX2, ge1->GetEY());
+    ge3->GetXaxis()->SetTitle("Rate (kHz)");
+    if(rate){
+        ge3->GetXaxis()->SetTitle("Rate (kHz)");
+    }
+    PlotColors(ge3,0);
+    ge3->Fit(lin1);
+    ge3->Draw("AP");
+     TLegend* l1 = new TLegend(0.5, 0.85, 0.9, 0.9);
+    Double_t reIntercept = lin1->GetParameter(0);
+
+
+    for(int i = 0; i < N; i++)
+    {
+        reBase2[i]= reBase1[i] - (reIntercept - 1);
+    }
+
+   
+
+    l1->AddEntry(lin1, Form("y = (%f #pm %f)x + (%f #pm %f)",lin1->GetParameter(1), lin1->GetParError(1),lin1->GetParameter(0), lin1->GetParError(0)));
+    l1->Draw();
+    
+    
     TGraphErrors *ge2 = new TGraphErrors(N, reX2, reBase2, reEX2, ge1->GetEY());
     return ge2;
 }
@@ -222,6 +235,10 @@ void PlotCombinedLumi (TString dataType)
         int firstDot = filenames[i].First('.');
         Gf[i]->SetName(filenames[i]);
         Gf[i]->SetTitle(filenames[i]);
+        if (!rate)
+            Gf[i]->GetXaxis()->SetTitle("Current (uA)");
+        else
+            Gf[i]->GetXaxis()->SetTitle("Rate (kHz)");
         //Gf[i]->SetName((filenames[i](lastSlash,firstDot-lastSlash)).Data());
         //Gf[i]->SetTitle((filenames[i](lastSlash,firstDot-lastSlash)).Data());
         PlotColors(Gf[i], i);

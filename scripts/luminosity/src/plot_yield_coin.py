@@ -201,8 +201,8 @@ def calc_yield():
     rateSHMSSlope = 4.5/(10**7) #adhoc rate correction for 0.04%/kHz slope
     rateSHMSSlopeUncer = 0.22/(10**7)  #statistical uncertainty
     
-    rateCOINslope = 0.058750/(10**3) #based off off pass 16 coin rate slope.
-    rateCOINslopeUncer = 0.000799/(10**3)
+    rateCOINslope = 0.031027/(10**3) #based off off pass 22 coin rate slope.
+    rateCOINslopeUncer = (0.077 + 0.35)/(10**3)
 
     #rateHMSCorr = 1 - (yield_dict["rate_HMS3-4"]*(rateHMSSlope))         
     #uncer_rateHMSCorr = (yield_dict["rate_HMS3-4"]*rateHMSSlopeUncer)**2 + (rateHMSSlope*yield_dict["uncern_HMS3-4_evts_scaler"])**2
@@ -213,8 +213,8 @@ def calc_yield():
     uncer_rateHMSCorr = yield_dict["HMS3of4ELT_err"]
     rateSHMSCorr = (yield_dict["SHMS3of4ELT"])         
     uncer_rateSHMSCorr = yield_dict["SHMS3of4ELT_err"]
-    rateCOINCorr = 1#-(rateCOINslope*yield_dict["rate_COIN"])
-    rateCOINCorrUncer = 0#(rateCOINslopeUncer)*yield_dict["rate_COIN"]
+    rateCOINCorr = 1-(rateCOINslope*yield_dict["rate_COIN"])
+    rateCOINCorrUncer = (rateCOINslopeUncer)*yield_dict["rate_COIN"]
     
     #temporary to test with just boiling correction
     #rateHMSCorr = rateHMSCorr/rateHMSCorr
@@ -230,7 +230,7 @@ def calc_yield():
     yield_dict.update({"rateCOINCorrUncer": rateCOINCorrUncer})
         
     boilSlope = 2.8/10000 #boiling correction for 2.8%/100uA slope
-    boilSlopeUncer = 0.17/10000 + 0.69/10000 #statistical + systematic uncertainty
+    boilSlopeUncer = 0.17/10000 + 0.32/10000 #statistical + systematic uncertainty
     boilingCorr = 1 - (yield_dict["current"]*makeList("curr_corr")*(boilSlope)) 
     uncer_Current =  (((uncern_slope**2)+ (uncern_intercept**2/yield_dict["current"]))/slope**2)
     uncer_boilingCorr =  (yield_dict["current"]*makeList("curr_corr")*boilSlopeUncer)**2 + (boilSlope*uncer_Current)**2

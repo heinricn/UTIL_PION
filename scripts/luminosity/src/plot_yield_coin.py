@@ -201,8 +201,8 @@ def calc_yield():
     rateSHMSSlope = 4.5/(10**7) #adhoc rate correction for 0.04%/kHz slope
     rateSHMSSlopeUncer = 0.22/(10**7)  #statistical uncertainty
     
-    rateCOINslope = 0.031027/(10**3) #based off off pass 22 coin rate slope.
-    rateCOINslopeUncer = (0.077 + 0.35)/(10**3)
+    rateCOINslope = 0.031027/(10**3) #based off off pass 22 coin rate slope. 3.1%/kHz sl
+    rateCOINslopeUncer = (0.00077 + 0.0035)/(10**3)
 
     #rateHMSCorr = 1 - (yield_dict["rate_HMS3-4"]*(rateHMSSlope))         
     #uncer_rateHMSCorr = (yield_dict["rate_HMS3-4"]*rateHMSSlopeUncer)**2 + (rateHMSSlope*yield_dict["uncern_HMS3-4_evts_scaler"])**2
@@ -214,7 +214,7 @@ def calc_yield():
     rateSHMSCorr = (yield_dict["SHMS3of4ELT"])         
     uncer_rateSHMSCorr = yield_dict["SHMS3of4ELT_err"]
     rateCOINCorr = 1-(rateCOINslope*yield_dict["rate_COIN"])
-    rateCOINCorrUncer = (rateCOINslopeUncer)
+    rateCOINCorrUncer = (rateCOINslopeUncer*yield_dict["rate_COIN"])
     
     #temporary to test with just boiling correction
     #rateHMSCorr = rateHMSCorr/rateHMSCorr

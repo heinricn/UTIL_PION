@@ -260,6 +260,20 @@ void PlotCombinedLumi (TString dataType)
     mg->Fit(lin2);
     mg->Draw("AP");
     
+    TF1 *lin3 = new TF1("lin3", "[0]+[1]*x",0,80);
+    lin3->SetParameter(1,lin2->GetParameter(1)+0.00455);
+    lin3->SetParameter(0,lin2->GetParameter(0)+lin2->GetParError(0));
+    lin3->SetLineStyle(2);
+    lin3->SetLineWidth(10);
+    //lin3->Draw("sames AP");
+    
+    TF1 *lin4 = new TF1("lin4", "[0]+[1]*x",0,80);
+    lin4->SetParameter(1,lin2->GetParameter(1)-0.00455);
+    lin4->SetParameter(0,lin2->GetParameter(0)-lin2->GetParError(0));
+    lin4->SetLineStyle(4);
+    lin4->SetLineWidth(6);
+    //lin4->Draw("sames AP");
+    
     TLegend* l1 = new TLegend(0.1, 0.1, 0.4, 0.22);
     l1->AddEntry(lin2, Form("y = (%f #pm %f)x + (%f #pm %f)",lin2->GetParameter(1), lin2->GetParError(1),lin2->GetParameter(0), lin2->GetParError(0)));
     for(int i = 0; i < NFILES; i++)

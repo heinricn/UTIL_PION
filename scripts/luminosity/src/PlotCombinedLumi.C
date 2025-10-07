@@ -242,7 +242,7 @@ void PlotCombinedLumi (TString dataType)
         //Gf[i]->SetName((filenames[i](lastSlash,firstDot-lastSlash)).Data());
         //Gf[i]->SetTitle((filenames[i](lastSlash,firstDot-lastSlash)).Data());
         PlotColors(Gf[i], i);
-        
+        Gf[i]->Draw();
         if(i == 0) C[i]->Print(Form("../OUTPUTS/CombinedPlot%s.pdf(", OutFileName.Data()));
         else C[i]->Print(Form("../OUTPUTS/CombinedPlot%s.pdf", OutFileName.Data()));
         mg->Add(Gf[i]);

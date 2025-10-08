@@ -15,7 +15,7 @@ void PlotColors (TGraphErrors *g, int i)
     }else{
         g->SetMarkerColor(i+1);
     }
-    g->GetXaxis()->SetTitle("Current (uA)");
+    //g->GetXaxis()->SetTitle("Current (uA)");
     g->GetYaxis()->SetTitle("Norm. Track Yield");
 }
 
@@ -45,11 +45,14 @@ TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
         }
     }
     TGraphErrors *ge3 = new TGraphErrors(N, reX2, reBase1, reEX2, ge1->GetEY());
-    ge3->GetXaxis()->SetTitle("Rate (kHz)");
     if(rate){
         ge3->GetXaxis()->SetTitle("Rate (kHz)");
+    }else{
+        ge3->GetXaxis()->SetTitle("Current (uA)");
     }
     PlotColors(ge3,0);
+    ge3->SetTitle(ge1->GetTitle());
+    ge3->SetName(ge1->GetName());
     ge3->Fit(lin1);
     ge3->Draw("AP");
      TLegend* l1 = new TLegend(0.5, 0.85, 0.9, 0.9);
@@ -81,6 +84,7 @@ void PlotCombinedLumi (TString dataType)
     //cout << dataType;
     TString coin = "coin";
     TString coin_rate = "coin_rate";
+    TString coin_daq = "coin_daq";
     TString coin_Detrate = "coin_detrate";
     TString coinSHMSrate = "coinshmsrate";
     TString coinHMSrate = "coinhmsrate";
@@ -118,6 +122,19 @@ void PlotCombinedLumi (TString dataType)
         filenames[5] = "../OUTPUTS/sidis/yield_data_sidis2_TrvRate.csv";
         filenames[6] = "../OUTPUTS/ExclusiveLumi/yield_data_exc4_TrYvRate.csv";
         OutFileName = "CoinRate";
+    } else if (!dataType.CompareTo(coin_daq) ) {
+        cout << "running Coin vrs DAQ Rate\n";
+        rate = true;
+        NFILES = 7;
+        filenames = new TString[NFILES];
+        filenames[0] = "../OUTPUTS/ExclusiveLumi/yield_data_exc1_Daq.csv";
+        filenames[1] = "../OUTPUTS/ExclusiveLumi/yield_data_exc2_Daq.csv";
+        filenames[2] = "../OUTPUTS/ExclusiveLumi/yield_data_exc3_Daq.csv";
+        filenames[3] = "../OUTPUTS/ExclusiveLumi/yield_data_exc5_Daq.csv";
+        filenames[4] = "../OUTPUTS/sidis/yield_data_sidis1_Daq.csv";
+        filenames[5] = "../OUTPUTS/sidis/yield_data_sidis2_Daq.csv";
+        filenames[6] = "../OUTPUTS/ExclusiveLumi/yield_data_exc4_Daq.csv";
+        OutFileName = "CoinDAQRate";
     } else if (!dataType.CompareTo(coin_Detrate) ) {
         cout << "running Coin vrs Rate\n";
         rate = true;
@@ -242,7 +259,7 @@ void PlotCombinedLumi (TString dataType)
         //Gf[i]->SetName((filenames[i](lastSlash,firstDot-lastSlash)).Data());
         //Gf[i]->SetTitle((filenames[i](lastSlash,firstDot-lastSlash)).Data());
         PlotColors(Gf[i], i);
-        Gf[i]->Draw();
+        //Gi[i]->Draw();
         if(i == 0) C[i]->Print(Form("../OUTPUTS/CombinedPlot%s.pdf(", OutFileName.Data()));
         else C[i]->Print(Form("../OUTPUTS/CombinedPlot%s.pdf", OutFileName.Data()));
         mg->Add(Gf[i]);

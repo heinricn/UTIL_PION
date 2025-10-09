@@ -16,7 +16,7 @@ void PlotColors (TGraphErrors *g, int i)
         g->SetMarkerColor(i+1);
     }
     //g->GetXaxis()->SetTitle("Current (uA)");
-    g->GetYaxis()->SetTitle("Norm. Track Yield");
+    g->GetYaxis()->SetTitle("EDTM TLT");
 }
 
 void LineColors (TF1 *TFi, int i)

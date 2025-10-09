@@ -213,10 +213,10 @@ def calc_yield():
     uncer_rateHMSCorr = yield_dict["HMS3of4ELT_err"]
     rateSHMSCorr = (yield_dict["SHMS3of4ELT"])         
     uncer_rateSHMSCorr = yield_dict["SHMS3of4ELT_err"]
-    rateCOINCorr = 1-(rateCOINslope*yield_dict["rate_COIN"])
-    rateCOINCorrUncer = (rateCOINslopeUncer*yield_dict["rate_COIN"])
-    #rateCOINCorr = 1
-    #rateCOINCorrUncer = 0 
+    #rateCOINCorr = 1-(rateCOINslope*yield_dict["rate_COIN"])
+    #rateCOINCorrUncer = (rateCOINslopeUncer*yield_dict["rate_COIN"])
+    rateCOINCorr = 1
+    rateCOINCorrUncer = 0 
 
     #temporary to test with just boiling correction
     #rateHMSCorr = rateHMSCorr/rateHMSCorr
@@ -265,7 +265,7 @@ def calc_yield():
     
     TLT_ELT_SHMS = yield_dict["rateSHMSCorr"]*yield_dict["CPULT_phys"]
     TLT_ELT_HMS = yield_dict["rateHMSCorr"]*yield_dict["CPULT_phys"]
-    TLT_ELT = yield_dict["rateSHMSCorr"]*yield_dict["rateHMSCorr"]*yield_dict["CPULT_phys"]*yield_dict["rateCOINCorr"]*yield_dict["CoinBlocking_Corr"]
+    TLT_ELT = yield_dict["rateSHMSCorr"]*yield_dict["rateHMSCorr"]*yield_dict["CPULT_phys"]*yield_dict["rateCOINCorr"]
 
     CPULT_TLT_SHMS = TLT_EDTM/TLT_ELT_SHMS
     CPULT_TLT_HMS = TLT_EDTM/TLT_ELT_HMS
@@ -282,11 +282,11 @@ def calc_yield():
 
     #yield_dict.update({"TLT" : TLT})
     
-    uncern_TLT = np.sqrt(makeList("accp_edtm")/makeList("sent_edtm_PS")**2+makeList("accp_edtm")**2/makeList("sent_edtm_PS")**4)
+    uncern_TLT = np.sqrt(yield_dict["TLT"]*(1-yield_dict["TLT"])/makeList("accp_edtm"))
    
     uncern_TLT_ELT_SHMS = ((makeList("CPULT_scaler_uncern")/makeList("CPULT_scaler"))**2 + (yield_dict["uncer_rateSHMSCorr"]/yield_dict["rateSHMSCorr"])**2)
     uncern_TLT_ELT_HMS = ((makeList("CPULT_scaler_uncern")/makeList("CPULT_scaler"))**2 + (yield_dict["uncer_rateHMSCorr"]/yield_dict["rateHMSCorr"])**2)
-    uncern_TLT_ELT = (makeList("CPULT_scaler_uncern")/makeList("CPULT_scaler"))**2 + (yield_dict["uncer_rateSHMSCorr"]/yield_dict["rateSHMSCorr"])**2 + (yield_dict["uncer_rateHMSCorr"]/yield_dict["rateHMSCorr"])**2 +(yield_dict["rateCOINCorrUncer"]/yield_dict["rateCOINCorr"])**2 + (yield_dict["Uncer_CoinBlocking_Corr"]/yield_dict["CoinBlocking_Corr"])**2
+    uncern_TLT_ELT = (makeList("CPULT_scaler_uncern")/makeList("CPULT_scaler"))**2 + (yield_dict["uncer_rateSHMSCorr"]/yield_dict["rateSHMSCorr"])**2 + (yield_dict["uncer_rateHMSCorr"]/yield_dict["rateHMSCorr"])**2
 
     #uncern_TLT_ELT = np.sqrt((ELT2*(1-ELT2))/100)
     
@@ -316,7 +316,9 @@ def calc_yield():
     #yield_COIN_track = (makeList("c_int_Track_events")-(makeList("c_int_Track_Rand_events")/6))/(makeList("charge")*makeList("curr_corr")*yield_dict["TLT"]*makeList("SHMS_track")*makeList("HMS_track")*yield_dict["boilingCorr"]*yield_dict["rateHMSCorr"]*yield_dict["rateSHMSCorr"])
     
     yield_COIN_notrack = (makeList("c_int_noTrack_events")-(makeList("c_int_noTrack_Rand_events")/6))/(makeList("charge")*makeList("curr_corr")*yield_dict["TLT_ELT"]*yield_dict["boilingCorr"])
-    yield_COIN_track = (makeList("c_int_Track_events")-(makeList("c_int_Track_Rand_events")/6))/(makeList("charge")*makeList("curr_corr")*yield_dict["TLT_ELT"]*makeList("SHMS_track")*makeList("HMS_track")*yield_dict["boilingCorr"])
+    #yield_COIN_track = (makeList("c_int_Track_events")-(makeList("c_int_Track_Rand_events")/6))/(makeList("charge")*makeList("curr_corr")*yield_dict["TLT_ELT"]*yield_dict["CoinBlocking_Corr"]*makeList("SHMS_track")*makeList("HMS_track")*yield_dict["boilingCorr"])
+    yield_COIN_track = (makeList("c_int_Track_events")-(makeList("c_int_Track_Rand_events")/6))/(makeList("charge")*makeList("curr_corr")*yield_dict["TLT"]*yield_dict["CoinBlocking_Corr"]*makeList("SHMS_track")*makeList("HMS_track")*yield_dict["boilingCorr"])
+    
     print("\n\n******************")
     print("yield_COIN_notrack:")
     print(yield_COIN_notrack)
@@ -330,7 +332,7 @@ def calc_yield():
     
     uncern_yieldRel_COIN_scaler = np.sqrt((yield_dict["uncern_COIN_evts_scaler"]/makeList("COINTRIG_scaler"))**2 + (yield_dict["uncern_charge"]/makeList("charge"))**2)
     uncern_yieldRel_COIN_notrack = np.sqrt((yield_dict["uncern_COIN_evts_notrack"]/makeList("c_int_noTrack_events"))**2 + (yield_dict["uncern_charge"]/makeList("charge"))**2 + (yield_dict["uncern_TLT_ELT"]) + yield_dict["uncer_boilingCorr"] + yield_dict["uncer_rateHMSCorr"] + yield_dict["uncer_rateSHMSCorr"])
-    uncern_yieldRel_COIN_track = np.sqrt((yield_dict["uncern_COIN_evts_track"]/makeList("c_int_Track_events"))**2 + (yield_dict["uncern_charge"]/makeList("charge"))**2 + (yield_dict["uncern_TLT_ELT"]) + (makeList("SHMS_track_uncern")/makeList("SHMS_track"))**2 + (makeList("HMS_track_uncern")/makeList("HMS_track"))**2 + yield_dict["uncer_boilingCorr"]) 
+    uncern_yieldRel_COIN_track = np.sqrt((yield_dict["uncern_COIN_evts_track"]/makeList("c_int_Track_events"))**2 + (yield_dict["uncern_charge"]/makeList("charge"))**2 + (yield_dict["uncern_TLT"]/yield_dict["TLT"])**2 + (yield_dict["Uncer_CoinBlocking_Corr"]/yield_dict["CoinBlocking_Corr"])**2 + (makeList("SHMS_track_uncern")/makeList("SHMS_track"))**2 + (makeList("HMS_track_uncern")/makeList("HMS_track"))**2 + yield_dict["uncer_boilingCorr"]) 
     
     print("\n\n******************")
     print("uncern_yieldRel_COIN_track:")

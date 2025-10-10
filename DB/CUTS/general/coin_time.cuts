@@ -20,8 +20,9 @@ CT_Raw_Inside_ROC1 = {"CTime_CoinTime_RAW_ROC1" : (CTime_CoinTime_RAW_ROC1 < (CT
 CT_Raw_Total_ROC1 = {"CTime_CoinTime_RAW_ROC1" : (CTime_CoinTime_RAW_ROC1 < (CT.Raw_OutHigh)) & (CTime_CoinTime_RAW_ROC1 > (CT.Raw_OutLow))}
 CT_Raw_Inside_ROC2 = {"CTime_CoinTime_RAW_ROC2" : (CTime_CoinTime_RAW_ROC2 < (CT.Raw_InHigh)) & (CTime_CoinTime_RAW_ROC2 > (CT.Raw_InLow))}
 CT_Raw_Total_ROC2 = {"CTime_CoinTime_RAW_ROC2" : (CTime_CoinTime_RAW_ROC2 < (CT.Raw_OutHigh)) & (CTime_CoinTime_RAW_ROC2 > (CT.Raw_OutLow))}
-
+#
 CT_Raw_SysIn_ROC1 = {"CTime_CoinTime_RAW_ROC1" : (CTime_CoinTime_RAW_ROC1 < (CT.Raw_InHigh-CT.Raw_Sys)) & (CTime_CoinTime_RAW_ROC1 > (CT.Raw_InLow+CT.Raw_Sys))}
 CT_Raw_SysOut_ROC1 = {"CTime_CoinTime_RAW_ROC1" : (CTime_CoinTime_RAW_ROC1 < (CT.Raw_InHigh+CT.Raw_Sys)) & (CTime_CoinTime_RAW_ROC1 > (CT.Raw_InLow-CT.Raw_Sys))}
 CT_Raw_SysIn_ROC2 = {"CTime_CoinTime_RAW_ROC2" : (CTime_CoinTime_RAW_ROC2 < (CT.Raw_InHigh-CT.Raw_Sys)) & (CTime_CoinTime_RAW_ROC2 > (CT.Raw_InLow+CT.Raw_Sys))}
 CT_Raw_SysOut_ROC2 = {"CTime_CoinTime_RAW_ROC2" : (CTime_CoinTime_RAW_ROC2 < (CT.Raw_InHigh+CT.Raw_Sys)) & (CTime_CoinTime_RAW_ROC2 > (CT.Raw_InLow-CT.Raw_Sys))}
+#

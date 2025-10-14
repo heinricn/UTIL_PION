@@ -146,6 +146,9 @@ def calc_yield():
         
         "CoinBlocking_Corr": makeList("CoinBlocking_Corr"),
         "Uncer_CoinBlocking_Corr": np.sqrt(makeList("CoinBlocking_Corr")*(1- makeList("CoinBlocking_Corr"))/makeList("CoinBlocking_Total")),
+        "SysUncer_CoinBlocking_Corr_up":makeList("CoinBlocking_SysOut")/makeList("CoinBlocking_Total") - makeList("CoinBlocking_Corr"),
+        "SysUncer_CoinBlocking_Corr_down":makeList("CoinBlocking_SysIn")/makeList("CoinBlocking_Total") - makeList("CoinBlocking_Corr"),
+        "SysUncer_CoinBlocking_Corr":(makeList("CoinBlocking_SysOut")/makeList("CoinBlocking_Total") - makeList("CoinBlocking_SysIn")/makeList("CoinBlocking_Total"))/2,
 
         #"CPULT_phys" : (makeList("HMSTRIG_cut")*makeList("HMS_PS")+makeList("SHMSTRIG_cut")*makeList("SHMS_PS"))*makeList("CPULT_scaler"),
         "CPULT_phys" : makeList("CPULT_scaler"),
@@ -333,7 +336,7 @@ def calc_yield():
     
     uncern_yieldRel_COIN_scaler = np.sqrt((yield_dict["uncern_COIN_evts_scaler"]/makeList("COINTRIG_scaler"))**2 + (yield_dict["uncern_charge"]/makeList("charge"))**2)
     uncern_yieldRel_COIN_notrack = np.sqrt((yield_dict["uncern_COIN_evts_notrack"]/makeList("c_int_noTrack_events"))**2 + (yield_dict["uncern_charge"]/makeList("charge"))**2 + (yield_dict["uncern_TLT_ELT"]) + yield_dict["uncer_boilingCorr"] + yield_dict["uncer_rateHMSCorr"] + yield_dict["uncer_rateSHMSCorr"])
-    uncern_yieldRel_COIN_track = np.sqrt((yield_dict["uncern_COIN_evts_track"]/makeList("c_int_Track_events"))**2 + (yield_dict["uncern_charge"]/makeList("charge"))**2 + (yield_dict["uncern_TLT"]/yield_dict["TLT"])**2 + (yield_dict["Uncer_CoinBlocking_Corr"]/yield_dict["CoinBlocking_Corr"])**2 + (makeList("SHMS_track_uncern")/makeList("SHMS_track"))**2 + (makeList("HMS_track_uncern")/makeList("HMS_track"))**2 + yield_dict["uncer_boilingCorr"]) 
+    uncern_yieldRel_COIN_track = np.sqrt((yield_dict["uncern_COIN_evts_track"]/makeList("c_int_Track_events"))**2 + (yield_dict["uncern_charge"]/makeList("charge"))**2 + (yield_dict["uncern_TLT"]/yield_dict["TLT"])**2 + ((yield_dict["Uncer_CoinBlocking_Corr"] + yield_dict["SysUncer_CoinBlocking_Corr"])/yield_dict["CoinBlocking_Corr"])**2 + (makeList("SHMS_track_uncern")/makeList("SHMS_track"))**2 + (makeList("HMS_track_uncern")/makeList("HMS_track"))**2 + yield_dict["uncer_boilingCorr"]) 
     
     print("\n\n******************")
     print("uncern_yieldRel_COIN_track:")

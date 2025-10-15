@@ -286,7 +286,7 @@ def calc_yield():
     #yield_dict.update({"TLT" : TLT})
     
     # Stat + Systematic errors
-    uncern_TLT = np.sqrt(yield_dict["TLT"]*(1-yield_dict["TLT"])/makeList("accp_edtm")) + (1/2)*(0.014678*np.log(yield_dict["rate_COIN"]/1000)+0.055287)
+    uncern_TLT = np.sqrt(yield_dict["TLT"]*(1-yield_dict["TLT"])/makeList("accp_edtm") + 0.0055**2)
    
     uncern_TLT_ELT_SHMS = ((makeList("CPULT_scaler_uncern")/makeList("CPULT_scaler"))**2 + (yield_dict["uncer_rateSHMSCorr"]/yield_dict["rateSHMSCorr"])**2)
     uncern_TLT_ELT_HMS = ((makeList("CPULT_scaler_uncern")/makeList("CPULT_scaler"))**2 + (yield_dict["uncer_rateHMSCorr"]/yield_dict["rateHMSCorr"])**2)

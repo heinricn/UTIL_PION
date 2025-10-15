@@ -6,6 +6,8 @@
 
 *****************************************/
 
+TH1D *resHist;
+
 //sets graph points color and style to something
 void PlotColors (TGraphErrors *g, int i)
 {
@@ -66,13 +68,17 @@ TGraphErrors* ReBase(TGraphErrors *ge1, TF1 *&TFi, bool rate)
     ge3->Draw("AP");
     TLegend* l1 = new TLegend(0.5, 0.85, 0.9, 0.9);
     Double_t reIntercept = TFi->GetParameter(0);
-
+    for(int i = 0; i < N; i++)
+    {
+        reBase2[i]= reBase1[i] - (TFi->Eval(reX2[i]));
+        resHist->Fill(reBase2[i]);
+    }
 
     l1->AddEntry(TFi, Form("y = (%f #pm %f)log(x) + (%f #pm %f)",TFi->GetParameter(1), TFi->GetParError(1),TFi->GetParameter(0), TFi->GetParError(0)));
     l1->Draw();
     
     
-    TGraphErrors *ge2 = new TGraphErrors(N, reX2, reBase1, reEX2, ge1->GetEY());
+    TGraphErrors *ge2 = new TGraphErrors(N, reX2, reBase2, reEX2, ge1->GetEY());
     return ge2;
 }
 
@@ -107,8 +113,10 @@ void PlotCombinedTLT (TString dataType)
     TGraphErrors **Gi = new TGraphErrors*[NFILES];
     TGraphErrors **Gf = new TGraphErrors*[NFILES];
     TF1 **TFi = new TF1*[NFILES];
-    TMultiGraph *mg = new TMultiGraph(Form("%s Data Combined", OutFileName.Data()),Form("%s Data Combined", OutFileName.Data()));
+    TMultiGraph *mg = new TMultiGraph(Form("%s Residuals Combined", OutFileName.Data()),Form("%s Data Combined", OutFileName.Data()));
     
+    resHist = new TH1D("residuals","residuals",50,-0.03,0.02);
+
     for(int i = 0; i < NFILES; i++)
     {
         C[i] = new TCanvas(Form("c%d", i),Form("c%d", i),10, 10, 1000, 800);
@@ -140,12 +148,12 @@ void PlotCombinedTLT (TString dataType)
     else
         mg->GetXaxis()->SetTitle("Rate (kHz)");
         
-    mg->GetYaxis()->SetTitle("Renormalized Yield");
+    mg->GetYaxis()->SetTitle("Combined Residuals");
     
     mg->Draw("AP");
     for(int i = 0; i < NFILES; i++)
     {
-        TFi[i]->Draw("SAME C");
+        //TFi[i]->Draw("SAME C");
     }
 
     //TLegend* l2 = new TLegend(0.5, 0.85, 0.9, 0.9);
@@ -158,7 +166,13 @@ void PlotCombinedTLT (TString dataType)
     }
     l1->Draw();
     
-    cf->Print(Form("../OUTPUTS/CombinedPlot%s.pdf)", OutFileName.Data()));
+    
+    cf->Print(Form("../OUTPUTS/CombinedPlot%s.pdf", OutFileName.Data()));
+
+    TCanvas *cf2 = new TCanvas("cf2","cf2",10, 10, 1000, 800);
+    resHist->Draw();
+    cf2->Print(Form("../OUTPUTS/CombinedPlot%s.pdf)", OutFileName.Data()));
+    return;
 }
 
 

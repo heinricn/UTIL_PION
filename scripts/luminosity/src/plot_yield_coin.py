@@ -235,12 +235,18 @@ def calc_yield():
     yield_dict.update({"rateCOINCorrUncer": rateCOINCorrUncer})
         
     boilSlope = 2.8/10000 #boiling correction for 2.8%/100uA slope
-    boilSlopeUncer = 0.17/10000 + 0.32/10000 #statistical + systematic uncertainty
+    boilSlopeUncerStat = 0.17/10000 #statistical + systematic uncertainty
+    boilSlopeUncerSys = 0.32/10000 #statistical + systematic uncertainty
+    
     boilingCorr = 1 - (yield_dict["current"]*makeList("curr_corr")*(boilSlope)) 
     uncer_Current =  (((uncern_slope**2)+ (uncern_intercept**2/yield_dict["current"]))/slope**2)
-    uncer_boilingCorr =  (yield_dict["current"]*makeList("curr_corr")*boilSlopeUncer)**2 + (boilSlope*uncer_Current)**2
+    uncer_boilingCorrStat =  (yield_dict["current"]*makeList("curr_corr")*boilSlopeUncerStat)**2 + (boilSlope*uncer_Current)**2
+    uncer_boilingCorrSys =  (yield_dict["current"]*makeList("curr_corr")*boilSlopeUncerSys)**2 + (boilSlope*uncer_Current)**2
+    uncer_boilingCorr =  uncer_boilingCorrSys + uncer_boilingCorrStat
 
     yield_dict.update({"boilingCorr": boilingCorr})
+    yield_dict.update({"uncer_boilingCorrStat": uncer_boilingCorrStat})
+    yield_dict.update({"uncer_boilingCorrSys": uncer_boilingCorrSys})
     yield_dict.update({"uncer_boilingCorr": uncer_boilingCorr})
 
     gwidth = 55*(10**(-9)) #gate width == 55 nanoseconds
@@ -286,7 +292,7 @@ def calc_yield():
     #yield_dict.update({"TLT" : TLT})
     
     # Stat + Systematic errors
-    uncern_TLT = np.sqrt(yield_dict["TLT"]*(1-yield_dict["TLT"])/makeList("accp_edtm") + 0.0055**2)
+    uncern_TLT = np.sqrt(yield_dict["TLT"]*(1-yield_dict["TLT"])/makeList("accp_edtm"))
    
     uncern_TLT_ELT_SHMS = ((makeList("CPULT_scaler_uncern")/makeList("CPULT_scaler"))**2 + (yield_dict["uncer_rateSHMSCorr"]/yield_dict["rateSHMSCorr"])**2)
     uncern_TLT_ELT_HMS = ((makeList("CPULT_scaler_uncern")/makeList("CPULT_scaler"))**2 + (yield_dict["uncer_rateHMSCorr"]/yield_dict["rateHMSCorr"])**2)

@@ -23,13 +23,15 @@ void PlotColors (TGraphErrors *g, int i)
 // Yes this causes a memory leak, I don't care
 TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
 {
-    Double_t *reBase1, *reX, *reEX;
+    Double_t *reBase1, *reBaseErr1, *reX, *reEX;
     TF1 *lin1 = new TF1("lin1", "[0]+[1]*x",0,80);
 
     reBase1 = ge1->GetY();
+    reBaseErr1 = ge1->GetEY();
     int N = ge1->GetN();
     reX = ge1->GetX();
     reEX = ge1->GetEX();
+    lin1->FixParameter(1,0);
     Double_t *reBase2 = new Double_t[N];
     Double_t *reX2 = new Double_t[N];
     Double_t *reEX2 = new Double_t[N];
@@ -53,15 +55,21 @@ TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
     PlotColors(ge3,0);
     ge3->SetTitle(ge1->GetTitle());
     ge3->SetName(ge1->GetName());
-    ge3->Fit(lin1);
+    //ge3->Fit(lin1);
     ge3->Draw("AP");
-     TLegend* l1 = new TLegend(0.5, 0.85, 0.9, 0.9);
+    TLegend* l1 = new TLegend(0.5, 0.85, 0.9, 0.9);
     Double_t reIntercept = lin1->GetParameter(0);
-
+    Double_t errweightsum = 0;
+    Double_t errsum = 0;
+    for(int i = 0; i < N; i++)
+    {
+        errweightsum += reBase1[i]*reBaseErr1[i];
+        errsum += reBaseErr1[i];
+    }
 
     for(int i = 0; i < N; i++)
     {
-        reBase2[i]= reBase1[i] - (reIntercept - 1);
+        reBase2[i]= reBase1[i] - (errweightsum/errsum - 1);
     }
 
    
@@ -274,22 +282,23 @@ void PlotCombinedLumi (TString dataType)
     mg->GetYaxis()->SetTitle("Renormalized Yield");
     
     TF1 *lin2 = new TF1("lin2", "[0]+[1]*x",0,80);
+    //lin2->FixParameter(1,0);
     mg->Fit(lin2);
     mg->Draw("AP");
     
     TF1 *lin3 = new TF1("lin3", "[0]+[1]*x",0,80);
-    lin3->SetParameter(1,lin2->GetParameter(1)+0.00455);
+    lin3->SetParameter(1,lin2->GetParameter(1));
     lin3->SetParameter(0,lin2->GetParameter(0)+lin2->GetParError(0));
     lin3->SetLineStyle(2);
     lin3->SetLineWidth(10);
-    //lin3->Draw("sames AP");
+    lin3->Draw("sames AP");
     
     TF1 *lin4 = new TF1("lin4", "[0]+[1]*x",0,80);
-    lin4->SetParameter(1,lin2->GetParameter(1)-0.00455);
+    lin4->SetParameter(1,lin2->GetParameter(1));
     lin4->SetParameter(0,lin2->GetParameter(0)-lin2->GetParError(0));
     lin4->SetLineStyle(4);
     lin4->SetLineWidth(6);
-    //lin4->Draw("sames AP");
+    lin4->Draw("sames AP");
     
     TLegend* l1 = new TLegend(0.1, 0.1, 0.4, 0.22);
     l1->AddEntry(lin2, Form("y = (%f #pm %f)x + (%f #pm %f)",lin2->GetParameter(1), lin2->GetParError(1),lin2->GetParameter(0), lin2->GetParError(0)));

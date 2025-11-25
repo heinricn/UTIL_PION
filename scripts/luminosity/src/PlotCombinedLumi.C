@@ -33,6 +33,7 @@ TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
     reEX = ge1->GetEX();
     lin1->FixParameter(1,0);
     Double_t *reBase2 = new Double_t[N];
+    Double_t *reBaseErr2 = new Double_t[N];
     Double_t *reX2 = new Double_t[N];
     Double_t *reEX2 = new Double_t[N];
     for(int i = 0; i < N; i++)
@@ -55,7 +56,7 @@ TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
     PlotColors(ge3,0);
     ge3->SetTitle(ge1->GetTitle());
     ge3->SetName(ge1->GetName());
-    //ge3->Fit(lin1);
+    ge3->Fit(lin1);
     ge3->Draw("AP");
     TLegend* l1 = new TLegend(0.5, 0.85, 0.9, 0.9);
     Double_t reIntercept = lin1->GetParameter(0);
@@ -70,6 +71,10 @@ TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
     for(int i = 0; i < N; i++)
     {
         reBase2[i]= reBase1[i] - (errweightsum/errsum - 1);
+        //reBase2[i]= reBase1[i] - (reIntercept - 1);
+        //reBaseErr2[i] = reBaseErr1[i];// + 0.095;
+        //reBaseErr2[i] = sqrt(reBaseErr1[i]*reBaseErr1[i] + 0.0095*0.0095);
+        reBaseErr2[i] = reBaseErr1[i];
     }
 
    
@@ -78,7 +83,7 @@ TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
     l1->Draw();
     
     
-    TGraphErrors *ge2 = new TGraphErrors(N, reX2, reBase2, reEX2, ge1->GetEY());
+    TGraphErrors *ge2 = new TGraphErrors(N, reX2, reBase2, reEX2, reBaseErr2);
     return ge2;
 }
 
@@ -112,10 +117,10 @@ void PlotCombinedLumi (TString dataType)
         filenames[0] = "../OUTPUTS/ExclusiveLumi/yield_data_exc1_clean.csv";
         filenames[1] = "../OUTPUTS/ExclusiveLumi/yield_data_exc2_clean.csv";
         filenames[2] = "../OUTPUTS/ExclusiveLumi/yield_data_exc3_clean.csv";
-        filenames[3] = "../OUTPUTS/ExclusiveLumi/yield_data_exc5_clean.csv";
-        filenames[4] = "../OUTPUTS/sidis/yield_data_sidis1_clean.csv";
-        filenames[5] = "../OUTPUTS/sidis/yield_data_sidis2_clean.csv";
-        filenames[6] = "../OUTPUTS/ExclusiveLumi/yield_data_exc4_clean.csv";
+        filenames[3] = "../OUTPUTS/ExclusiveLumi/yield_data_exc4_clean.csv";
+        filenames[4] = "../OUTPUTS/ExclusiveLumi/yield_data_exc5_clean.csv";
+        filenames[5] = "../OUTPUTS/sidis/yield_data_sidis1_clean.csv";
+        filenames[6] = "../OUTPUTS/sidis/yield_data_sidis2_clean.csv";
         OutFileName = "Coin";
     } else if (!dataType.CompareTo(coin_rate) ) {
         cout << "running Coin vrs Rate\n";
@@ -125,10 +130,10 @@ void PlotCombinedLumi (TString dataType)
         filenames[0] = "../OUTPUTS/ExclusiveLumi/yield_data_exc1_TrYvRate.csv";
         filenames[1] = "../OUTPUTS/ExclusiveLumi/yield_data_exc2_TrYvRate.csv";
         filenames[2] = "../OUTPUTS/ExclusiveLumi/yield_data_exc3_TrYvRate.csv";
-        filenames[3] = "../OUTPUTS/ExclusiveLumi/yield_data_exc5_TrYvRate.csv";
-        filenames[4] = "../OUTPUTS/sidis/yield_data_sidis1_TrvRate.csv";
-        filenames[5] = "../OUTPUTS/sidis/yield_data_sidis2_TrvRate.csv";
-        filenames[6] = "../OUTPUTS/ExclusiveLumi/yield_data_exc4_TrYvRate.csv";
+        filenames[3] = "../OUTPUTS/ExclusiveLumi/yield_data_exc4_TrYvRate.csv";
+        filenames[4] = "../OUTPUTS/ExclusiveLumi/yield_data_exc5_TrYvRate.csv";
+        filenames[5] = "../OUTPUTS/sidis/yield_data_sidis1_TrvRate.csv";
+        filenames[6] = "../OUTPUTS/sidis/yield_data_sidis2_TrvRate.csv";
         OutFileName = "CoinRate";
     } else if (!dataType.CompareTo(coin_daq) ) {
         cout << "running Coin vrs DAQ Rate\n";
@@ -282,26 +287,30 @@ void PlotCombinedLumi (TString dataType)
     mg->GetYaxis()->SetTitle("Renormalized Yield");
     
     TF1 *lin2 = new TF1("lin2", "[0]+[1]*x",0,80);
+    //TF1 *lin2 = new TF1("lin2", "[0]",0,80);
     //lin2->FixParameter(1,0);
     mg->Fit(lin2);
     mg->Draw("AP");
-    
+    /*
     TF1 *lin3 = new TF1("lin3", "[0]+[1]*x",0,80);
     lin3->SetParameter(1,lin2->GetParameter(1));
     lin3->SetParameter(0,lin2->GetParameter(0)+lin2->GetParError(0));
     lin3->SetLineStyle(2);
     lin3->SetLineWidth(10);
-    lin3->Draw("sames AP");
+    //lin3->Draw("sames AP");
     
     TF1 *lin4 = new TF1("lin4", "[0]+[1]*x",0,80);
     lin4->SetParameter(1,lin2->GetParameter(1));
     lin4->SetParameter(0,lin2->GetParameter(0)-lin2->GetParError(0));
     lin4->SetLineStyle(4);
     lin4->SetLineWidth(6);
-    lin4->Draw("sames AP");
-    
+    //lin4->Draw("sames AP");
+    */
+    cf->Print(Form("../OUTPUTS/CombinedPlot%s.pdf", OutFileName.Data()));
     TLegend* l1 = new TLegend(0.1, 0.1, 0.4, 0.22);
     l1->AddEntry(lin2, Form("y = (%f #pm %f)x + (%f #pm %f)",lin2->GetParameter(1), lin2->GetParError(1),lin2->GetParameter(0), lin2->GetParError(0)));
+    //l1->AddEntry(lin2, Form("y = (%f #pm %f)",lin2->GetParameter(0), lin2->GetParError(0)));
+    l1->AddEntry("", Form("Reduced #Chi^2 = %f", lin2->GetChisquare()/lin2->GetNDF()));
     for(int i = 0; i < NFILES; i++)
     {
         l1->AddEntry(Gf[i], Gf[i]->GetTitle());

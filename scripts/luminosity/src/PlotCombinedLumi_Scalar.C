@@ -223,6 +223,7 @@ void PlotCombinedLumi_Scalar (TString dataType)
     mg->Fit(lin2);
     mg->Draw("AP");
     
+    cf->Print(Form("../OUTPUTS/CombinedPlot%s_Scalar.pdf", OutFileName.Data()));
     TLegend* l1 = new TLegend(0.1, 0.1, 0.4, 0.22);
     l1->AddEntry(lin2, Form("y = (%f #pm %f)x + (%f #pm %f)",lin2->GetParameter(1), lin2->GetParError(1),lin2->GetParameter(0), lin2->GetParError(0)));
     for(int i = 0; i < NFILES; i++)

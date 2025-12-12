@@ -21,9 +21,9 @@ void PlotColors (TGraphErrors *g, int i)
 
 //does fit and resets intercept to 1 at x=0 in linear fit
 // Yes this causes a memory leak, I don't care
-TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
+TGraphErrors* ReBase(TGraphErrors *ge1, TGraphErrors *TLTi, bool rate)
 {
-    Double_t *reBase1, *reBaseErr1, *reX, *reEX;
+    Double_t *reBase1, *reBaseErr1, *reX, *reEX, *TLT;
     TF1 *lin1 = new TF1("lin1", "[0]+[1]*x",0,80);
 
     reBase1 = ge1->GetY();
@@ -31,6 +31,7 @@ TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
     int N = ge1->GetN();
     reX = ge1->GetX();
     reEX = ge1->GetEX();
+    TLT = TLTi->GetY();
     lin1->FixParameter(1,0);
     Double_t *reBase2 = new Double_t[N];
     Double_t *reBaseErr2 = new Double_t[N];
@@ -68,13 +69,14 @@ TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
         errsum += reBaseErr1[i];
     }
 
+    double additionalError = 0.0095;
     for(int i = 0; i < N; i++)
     {
         reBase2[i]= reBase1[i] - (errweightsum/errsum - 1);
         //reBase2[i]= reBase1[i] - (reIntercept - 1);
         //reBaseErr2[i] = reBaseErr1[i];// + 0.095;
-        //reBaseErr2[i] = sqrt(reBaseErr1[i]*reBaseErr1[i] + 0.0095*0.0095);
-        reBaseErr2[i] = reBaseErr1[i];
+        reBaseErr2[i] = sqrt(reBaseErr1[i]*reBaseErr1[i] + (additionalError*additionalError)/(TLT[i]*TLT[i]));
+        //reBaseErr2[i] = reBaseErr1[i];
     }
 
    
@@ -92,6 +94,7 @@ void PlotCombinedLumi (TString dataType)
     gROOT->SetBatch(kTRUE);
     int NFILES;
     TString *filenames;
+    TString *filenamesTLT;
     TString OutFileName;
     dataType.ToLower();
     //cout << dataType;
@@ -108,6 +111,15 @@ void PlotCombinedLumi (TString dataType)
     TString lh2_all = "lh2_all";
     bool rate = false;
     
+    filenamesTLT = new TString[NFILES];
+    filenamesTLT[0] = "../OUTPUTS/ExclusiveLumi/TLT_exc1.csv";
+    filenamesTLT[1] = "../OUTPUTS/ExclusiveLumi/TLT_exc2.csv";
+    filenamesTLT[2] = "../OUTPUTS/ExclusiveLumi/TLT_exc3.csv";
+    filenamesTLT[3] = "../OUTPUTS/ExclusiveLumi/TLT_exc4.csv";
+    filenamesTLT[4] = "../OUTPUTS/ExclusiveLumi/TLT_exc5.csv";
+    filenamesTLT[5] = "../OUTPUTS/sidis/TLT_sidis1.csv";
+    filenamesTLT[6] = "../OUTPUTS/sidis/TLT_sidis2.csv";
+
     // This is my nifty way of handling the amount of inputfiles, so that I need only write stuff once,
     // danamically allocated arrays, a marvel to behold 
     if (!dataType.CompareTo(coin) ) {
@@ -251,6 +263,7 @@ void PlotCombinedLumi (TString dataType)
     //yes yes, needlessly complicated. At least I need only rewrite the above everytime the files change!
     TCanvas **C = new TCanvas*[NFILES]; 
     TGraphErrors **Gi = new TGraphErrors*[NFILES];
+    TGraphErrors **TLTi = new TGraphErrors*[NFILES];
     TGraphErrors **Gf = new TGraphErrors*[NFILES];
     TMultiGraph *mg = new TMultiGraph(Form("%s Data Combined", OutFileName.Data()),Form("%s Data Combined", OutFileName.Data()));
     
@@ -258,9 +271,10 @@ void PlotCombinedLumi (TString dataType)
     {
         C[i] = new TCanvas(Form("c%d", i),Form("c%d", i),10, 10, 1000, 800);
         Gi[i] = new TGraphErrors(filenames[i], "%lg, %lg, %lg");
+        TLTi[i] = new TGraphErrors(filenamesTLT[i], "%lg, %lg, %lg");
         Gi[i]->SetName(filenames[i]);
         Gi[i]->SetTitle(filenames[i]);
-        Gf[i] = ReBase(Gi[i], rate);
+        Gf[i] = ReBase(Gi[i], TLTi[i], rate);
         int lastSlash = filenames[i].Last('/');
         int firstDot = filenames[i].First('.');
         Gf[i]->SetName(filenames[i]);

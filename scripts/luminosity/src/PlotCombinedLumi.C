@@ -21,16 +21,20 @@ void PlotColors (TGraphErrors *g, int i)
 
 //does fit and resets intercept to 1 at x=0 in linear fit
 // Yes this causes a memory leak, I don't care
-TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
+TGraphErrors* ReBase(TGraphErrors *ge1, TGraphErrors *TLTi, bool rate)
 {
-    Double_t *reBase1, *reX, *reEX;
+    Double_t *reBase1, *reBaseErr1, *reX, *reEX, *TLT;
     TF1 *lin1 = new TF1("lin1", "[0]+[1]*x",0,80);
 
     reBase1 = ge1->GetY();
+    reBaseErr1 = ge1->GetEY();
     int N = ge1->GetN();
     reX = ge1->GetX();
     reEX = ge1->GetEX();
+    TLT = TLTi->GetY();
+    lin1->FixParameter(1,0);
     Double_t *reBase2 = new Double_t[N];
+    Double_t *reBaseErr2 = new Double_t[N];
     Double_t *reX2 = new Double_t[N];
     Double_t *reEX2 = new Double_t[N];
     for(int i = 0; i < N; i++)
@@ -55,13 +59,24 @@ TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
     ge3->SetName(ge1->GetName());
     ge3->Fit(lin1);
     ge3->Draw("AP");
-     TLegend* l1 = new TLegend(0.5, 0.85, 0.9, 0.9);
+    TLegend* l1 = new TLegend(0.5, 0.85, 0.9, 0.9);
     Double_t reIntercept = lin1->GetParameter(0);
-
-
+    Double_t errweightsum = 0;
+    Double_t errsum = 0;
     for(int i = 0; i < N; i++)
     {
-        reBase2[i]= reBase1[i] - (reIntercept - 1);
+        errweightsum += reBase1[i]*reBaseErr1[i];
+        errsum += reBaseErr1[i];
+    }
+
+    double additionalError = 0.0095;
+    for(int i = 0; i < N; i++)
+    {
+        reBase2[i]= reBase1[i] - (errweightsum/errsum - 1);
+        //reBase2[i]= reBase1[i] - (reIntercept - 1);
+        //reBaseErr2[i] = reBaseErr1[i];// + 0.095;
+        reBaseErr2[i] = sqrt(reBaseErr1[i]*reBaseErr1[i] + (additionalError*additionalError)/(TLT[i]*TLT[i]));
+        //reBaseErr2[i] = reBaseErr1[i];
     }
 
    
@@ -70,7 +85,7 @@ TGraphErrors* ReBase(TGraphErrors *ge1, bool rate)
     l1->Draw();
     
     
-    TGraphErrors *ge2 = new TGraphErrors(N, reX2, reBase2, reEX2, ge1->GetEY());
+    TGraphErrors *ge2 = new TGraphErrors(N, reX2, reBase2, reEX2, reBaseErr2);
     return ge2;
 }
 
@@ -79,6 +94,7 @@ void PlotCombinedLumi (TString dataType)
     gROOT->SetBatch(kTRUE);
     int NFILES;
     TString *filenames;
+    TString *filenamesTLT;
     TString OutFileName;
     dataType.ToLower();
     //cout << dataType;
@@ -95,6 +111,15 @@ void PlotCombinedLumi (TString dataType)
     TString lh2_all = "lh2_all";
     bool rate = false;
     
+    filenamesTLT = new TString[NFILES];
+    filenamesTLT[0] = "../OUTPUTS/ExclusiveLumi/TLT_exc1.csv";
+    filenamesTLT[1] = "../OUTPUTS/ExclusiveLumi/TLT_exc2.csv";
+    filenamesTLT[2] = "../OUTPUTS/ExclusiveLumi/TLT_exc3.csv";
+    filenamesTLT[3] = "../OUTPUTS/ExclusiveLumi/TLT_exc4.csv";
+    filenamesTLT[4] = "../OUTPUTS/ExclusiveLumi/TLT_exc5.csv";
+    filenamesTLT[5] = "../OUTPUTS/sidis/TLT_sidis1.csv";
+    filenamesTLT[6] = "../OUTPUTS/sidis/TLT_sidis2.csv";
+
     // This is my nifty way of handling the amount of inputfiles, so that I need only write stuff once,
     // danamically allocated arrays, a marvel to behold 
     if (!dataType.CompareTo(coin) ) {
@@ -104,10 +129,10 @@ void PlotCombinedLumi (TString dataType)
         filenames[0] = "../OUTPUTS/ExclusiveLumi/yield_data_exc1_clean.csv";
         filenames[1] = "../OUTPUTS/ExclusiveLumi/yield_data_exc2_clean.csv";
         filenames[2] = "../OUTPUTS/ExclusiveLumi/yield_data_exc3_clean.csv";
-        filenames[3] = "../OUTPUTS/ExclusiveLumi/yield_data_exc5_clean.csv";
-        filenames[4] = "../OUTPUTS/sidis/yield_data_sidis1_clean.csv";
-        filenames[5] = "../OUTPUTS/sidis/yield_data_sidis2_clean.csv";
-        filenames[6] = "../OUTPUTS/ExclusiveLumi/yield_data_exc4_clean.csv";
+        filenames[3] = "../OUTPUTS/ExclusiveLumi/yield_data_exc4_clean.csv";
+        filenames[4] = "../OUTPUTS/ExclusiveLumi/yield_data_exc5_clean.csv";
+        filenames[5] = "../OUTPUTS/sidis/yield_data_sidis1_clean.csv";
+        filenames[6] = "../OUTPUTS/sidis/yield_data_sidis2_clean.csv";
         OutFileName = "Coin";
     } else if (!dataType.CompareTo(coin_rate) ) {
         cout << "running Coin vrs Rate\n";
@@ -117,10 +142,10 @@ void PlotCombinedLumi (TString dataType)
         filenames[0] = "../OUTPUTS/ExclusiveLumi/yield_data_exc1_TrYvRate.csv";
         filenames[1] = "../OUTPUTS/ExclusiveLumi/yield_data_exc2_TrYvRate.csv";
         filenames[2] = "../OUTPUTS/ExclusiveLumi/yield_data_exc3_TrYvRate.csv";
-        filenames[3] = "../OUTPUTS/ExclusiveLumi/yield_data_exc5_TrYvRate.csv";
-        filenames[4] = "../OUTPUTS/sidis/yield_data_sidis1_TrvRate.csv";
-        filenames[5] = "../OUTPUTS/sidis/yield_data_sidis2_TrvRate.csv";
-        filenames[6] = "../OUTPUTS/ExclusiveLumi/yield_data_exc4_TrYvRate.csv";
+        filenames[3] = "../OUTPUTS/ExclusiveLumi/yield_data_exc4_TrYvRate.csv";
+        filenames[4] = "../OUTPUTS/ExclusiveLumi/yield_data_exc5_TrYvRate.csv";
+        filenames[5] = "../OUTPUTS/sidis/yield_data_sidis1_TrvRate.csv";
+        filenames[6] = "../OUTPUTS/sidis/yield_data_sidis2_TrvRate.csv";
         OutFileName = "CoinRate";
     } else if (!dataType.CompareTo(coin_daq) ) {
         cout << "running Coin vrs DAQ Rate\n";
@@ -238,6 +263,7 @@ void PlotCombinedLumi (TString dataType)
     //yes yes, needlessly complicated. At least I need only rewrite the above everytime the files change!
     TCanvas **C = new TCanvas*[NFILES]; 
     TGraphErrors **Gi = new TGraphErrors*[NFILES];
+    TGraphErrors **TLTi = new TGraphErrors*[NFILES];
     TGraphErrors **Gf = new TGraphErrors*[NFILES];
     TMultiGraph *mg = new TMultiGraph(Form("%s Data Combined", OutFileName.Data()),Form("%s Data Combined", OutFileName.Data()));
     
@@ -245,9 +271,10 @@ void PlotCombinedLumi (TString dataType)
     {
         C[i] = new TCanvas(Form("c%d", i),Form("c%d", i),10, 10, 1000, 800);
         Gi[i] = new TGraphErrors(filenames[i], "%lg, %lg, %lg");
+        TLTi[i] = new TGraphErrors(filenamesTLT[i], "%lg, %lg, %lg");
         Gi[i]->SetName(filenames[i]);
         Gi[i]->SetTitle(filenames[i]);
-        Gf[i] = ReBase(Gi[i], rate);
+        Gf[i] = ReBase(Gi[i], TLTi[i], rate);
         int lastSlash = filenames[i].Last('/');
         int firstDot = filenames[i].First('.');
         Gf[i]->SetName(filenames[i]);
@@ -274,25 +301,30 @@ void PlotCombinedLumi (TString dataType)
     mg->GetYaxis()->SetTitle("Renormalized Yield");
     
     TF1 *lin2 = new TF1("lin2", "[0]+[1]*x",0,80);
+    //TF1 *lin2 = new TF1("lin2", "[0]",0,80);
+    //lin2->FixParameter(1,0);
     mg->Fit(lin2);
     mg->Draw("AP");
-    
+    /*
     TF1 *lin3 = new TF1("lin3", "[0]+[1]*x",0,80);
-    lin3->SetParameter(1,lin2->GetParameter(1)+0.00455);
+    lin3->SetParameter(1,lin2->GetParameter(1));
     lin3->SetParameter(0,lin2->GetParameter(0)+lin2->GetParError(0));
     lin3->SetLineStyle(2);
     lin3->SetLineWidth(10);
     //lin3->Draw("sames AP");
     
     TF1 *lin4 = new TF1("lin4", "[0]+[1]*x",0,80);
-    lin4->SetParameter(1,lin2->GetParameter(1)-0.00455);
+    lin4->SetParameter(1,lin2->GetParameter(1));
     lin4->SetParameter(0,lin2->GetParameter(0)-lin2->GetParError(0));
     lin4->SetLineStyle(4);
     lin4->SetLineWidth(6);
     //lin4->Draw("sames AP");
-    
+    */
+    cf->Print(Form("../OUTPUTS/CombinedPlot%s.pdf", OutFileName.Data()));
     TLegend* l1 = new TLegend(0.1, 0.1, 0.4, 0.22);
     l1->AddEntry(lin2, Form("y = (%f #pm %f)x + (%f #pm %f)",lin2->GetParameter(1), lin2->GetParError(1),lin2->GetParameter(0), lin2->GetParError(0)));
+    //l1->AddEntry(lin2, Form("y = (%f #pm %f)",lin2->GetParameter(0), lin2->GetParError(0)));
+    l1->AddEntry("", Form("Reduced #Chi^2 = %f", lin2->GetChisquare()/lin2->GetNDF()));
     for(int i = 0; i < NFILES; i++)
     {
         l1->AddEntry(Gf[i], Gf[i]->GetTitle());

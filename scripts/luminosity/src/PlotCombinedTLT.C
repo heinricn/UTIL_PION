@@ -70,7 +70,7 @@ TGraphErrors* ReBase(TGraphErrors *ge1, TF1 *&TFi, bool rate)
     Double_t reIntercept = TFi->GetParameter(0);
     for(int i = 0; i < N; i++)
     {
-        reBase2[i]= reBase1[i] - (TFi->Eval(reX2[i]));
+        reBase2[i]= reBase1[i];// - (TFi->Eval(reX2[i]));
         resHist->Fill(reBase2[i]);
     }
 
@@ -97,13 +97,13 @@ void PlotCombinedTLT (TString dataType)
     cout << "running TLT\n";
     NFILES = 7;
     filenames = new TString[NFILES];
-    filenames[0] = "../OUTPUTS/ExclusiveLumi/TLT_exc1.csv";
-    filenames[1] = "../OUTPUTS/ExclusiveLumi/TLT_exc2.csv";
-    filenames[2] = "../OUTPUTS/ExclusiveLumi/TLT_exc3.csv";
-    filenames[3] = "../OUTPUTS/ExclusiveLumi/TLT_exc4.csv";
-    filenames[4] = "../OUTPUTS/ExclusiveLumi/TLT_exc5.csv";
-    filenames[5] = "../OUTPUTS/sidis/TLT_sidis1.csv";
-    filenames[6] = "../OUTPUTS/sidis/TLT_sidis2.csv";
+    filenames[0] = "../OUTPUTS/ExclusiveLumi/CBlock_exc1.csv";
+    filenames[1] = "../OUTPUTS/ExclusiveLumi/CBlock_exc2.csv";
+    filenames[2] = "../OUTPUTS/ExclusiveLumi/CBlock_exc3.csv";
+    filenames[3] = "../OUTPUTS/ExclusiveLumi/CBlock_exc4.csv";
+    filenames[4] = "../OUTPUTS/ExclusiveLumi/CBlock_exc5.csv";
+    filenames[5] = "../OUTPUTS/sidis/CBlock_sidis1.csv";
+    filenames[6] = "../OUTPUTS/sidis/CBlock_sidis2.csv";
     OutFileName = "TLT";
     rate = true;
     
@@ -148,7 +148,7 @@ void PlotCombinedTLT (TString dataType)
     else
         mg->GetXaxis()->SetTitle("Rate (kHz)");
         
-    mg->GetYaxis()->SetTitle("Combined Residuals");
+    mg->GetYaxis()->SetTitle("Coin Blocking Correction");
     
     mg->Draw("AP");
     for(int i = 0; i < NFILES; i++)
@@ -157,6 +157,7 @@ void PlotCombinedTLT (TString dataType)
     }
 
     //TLegend* l2 = new TLegend(0.5, 0.85, 0.9, 0.9);
+    cf->Print(Form("../OUTPUTS/CombinedPlot%s.pdf", OutFileName.Data()));
     
     TLegend* l1 = new TLegend(0.1, 0.1, 0.4, 0.22);
     //l1->AddEntry(lin2, Form("y = (%f #pm %f)log(x) + (%f #pm %f)",lin2->GetParameter(1), lin2->GetParError(1),lin2->GetParameter(0), lin2->GetParError(0)));

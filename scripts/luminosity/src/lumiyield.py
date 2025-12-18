@@ -976,6 +976,7 @@ def main():
         print ("Second loop of scalers to get HMS 3 of 4 eff")
         hscalers = scaler.scaler(PS_names, HMS_PS, None, COIN_PS, thres_curr, report_current, runNum, MaxEvent, sh_tree) 
         print(hscalers["HMS3of4ELT"])
+        print(hscalers["H_S1X"])
     
     track_info = analysis()
 
@@ -986,6 +987,7 @@ def main():
     
     if ((not (COIN_PS == None) )or(not (HMS_PS == None) ) ):
         data["HMS3of4ELT"] = hscalers["HMS3of4ELT"]
+        data["H_S1X"] = hscalers["H_S1X"]
         data["HMS3of4ELT_err"] = hscalers["HMS3of4ELT_err"]
     
     lumi_data = {i : data[i] for i in sorted(data.keys())}

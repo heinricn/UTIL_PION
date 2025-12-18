@@ -55,6 +55,8 @@ H_bcm_bcm2_AvgCurrent
 H_bcm_bcm4a_AvgCurrent
 H_bcm_bcm4b_AvgCurrent
 H_bcm_bcm4c_AvgCurrent
+CTime_ePiCoinTime_ROC2
+CTime_CoinTime_RAW_ROC2
 T_coin_pTRIG1_ROC1_tdcTimeRaw
 T_coin_pTRIG1_ROC2_tdcTimeRaw
 T_coin_pTRIG1_ROC1_tdcTime

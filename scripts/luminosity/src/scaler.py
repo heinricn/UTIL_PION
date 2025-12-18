@@ -440,9 +440,12 @@ def scaler(PS_names, HMS_PS, SHMS_PS, COIN_PS, thres_curr, report_current, runNu
     SHMSTrueRate = [0]*NRATEHODO
     SHMSDT = [0]*NRATEHODO
     SHMSLT = [0]*NRATEHODO
+    S1X_rate = 0
     #HMS_HodoRate = [0]*NRATEHODO
     for iRATE in range(0, NRATEHODO): #iRATE is the number is the hodoscope plane
         SHMS_HodoRate[iRATE] =  SHMS_Hodo_rate_sum[iRATE]/time_sum[bcm_ix]
+        if(iRATE == 0):
+            S1X_RATE = SHMS_HodoRate[iRATE]
         #HMS_HodoRate[iRATE] =  HMS_Hodo_rate_sum[iRATE]/time_sum[bcm_ix]
         
         SHMSTrueRate[iRATE] = SHMS_HodoRate[iRATE]/(1 - HODOGATEWIDTH*SHMS_HodoRate[iRATE]) 
@@ -459,6 +462,8 @@ def scaler(PS_names, HMS_PS, SHMS_PS, COIN_PS, thres_curr, report_current, runNu
         HMS3of4ELT_err = math.sqrt((SHMSDT[0]*SHMSDT[1]*SHMSDT[2]*SHMSDT[3] + SHMSLT[0]*SHMSDT[1]*SHMSDT[2]*SHMSDT[3] + SHMSDT[0]*SHMSLT[1]*SHMSDT[2]*SHMSDT[3] + SHMSDT[0]*SHMSDT[1]*SHMSLT[2]*SHMSDT[3] + SHMSDT[0]*SHMSDT[1]*SHMSDT[2]*SHMSLT[3])/(SHMS_Hodo_rate_sum[0]*SHMS_Hodo_rate_sum[1]*SHMS_Hodo_rate_sum[2]*SHMS_Hodo_rate_sum[3]))
         SHMS3of4ELT = -1
         SHMS3of4ELT_err = 0
+        P_S1X = -1
+        H_S1X = S1X_RATE
         print("\nHodo plane Livetimes...")
         print("HMS_Hodo_rate_sum S1X %s" % SHMS_Hodo_rate_sum[0], "HMS_Hodo_rate_sum S1Y %s" % SHMS_Hodo_rate_sum[1], "HMS_Hodo_rate_sum S2X %s" % SHMS_Hodo_rate_sum[2], "HMS_Hodo_rate_sum S2Y %s" % SHMS_Hodo_rate_sum[3])    
         print("HMS 4/3: %s" % HMS3of4ELT, " +- %s" % HMS3of4ELT_err)
@@ -467,6 +472,8 @@ def scaler(PS_names, HMS_PS, SHMS_PS, COIN_PS, thres_curr, report_current, runNu
         SHMS3of4ELT_err = math.sqrt((SHMSDT[0]*SHMSDT[1]*SHMSDT[2]*SHMSDT[3] + SHMSLT[0]*SHMSDT[1]*SHMSDT[2]*SHMSDT[3] + SHMSDT[0]*SHMSLT[1]*SHMSDT[2]*SHMSDT[3] + SHMSDT[0]*SHMSDT[1]*SHMSLT[2]*SHMSDT[3] + SHMSDT[0]*SHMSDT[1]*SHMSDT[2]*SHMSLT[3])/(SHMS_Hodo_rate_sum[0]*SHMS_Hodo_rate_sum[1]*SHMS_Hodo_rate_sum[2]*SHMS_Hodo_rate_sum[3]))
         HMS3of4ELT = -1
         HMS3of4ELT_err = 0
+        P_S1X = S1X_RATE
+        H_S1X = -1
         print("\nHodo plane Livetimes...")
         print("SHMS_Hodo_rate_sum S1X %s" % SHMS_Hodo_rate_sum[0], "SHMS_Hodo_rate_sum S1Y %s" % SHMS_Hodo_rate_sum[1], "SHMS_Hodo_rate_sum S2X %s" % SHMS_Hodo_rate_sum[2], "SHMS_Hodo_rate_sum S2Y %s" % SHMS_Hodo_rate_sum[3])    
         print("SHMS 4/3: %s" % SHMS3of4ELT, " +- %s" % SHMS3of4ELT_err)
@@ -475,6 +482,8 @@ def scaler(PS_names, HMS_PS, SHMS_PS, COIN_PS, thres_curr, report_current, runNu
     scalers.update({"SHMS3of4ELT_err": SHMS3of4ELT_err})
     scalers.update({"HMS3of4ELT": HMS3of4ELT})
     scalers.update({"HMS3of4ELT_err": HMS3of4ELT_err})
+    scalers.update({"P_S1X": P_S1X})
+    scalers.update({"H_S1X": H_S1X})
 
     print("\nPre-scale values...")
     print("SHMS_PS : %s" % SHMS_PS, " HMS_PS : %s" % HMS_PS," COIN_PS : %s" % COIN_PS )

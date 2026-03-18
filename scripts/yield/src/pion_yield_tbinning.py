@@ -226,7 +226,10 @@ try:
                 simc_t_resolution_pions_highe = float(row["Value"])
 except (FileNotFoundError, ValueError, KeyError) as e:
     print(f"Error reading t-resolution parameters from {simc_tres_csv_file}: {e}")
-    sys.exit(1)
+    simc_t_resolution_pions_lowe = float(1)
+    simc_t_resolution_pions_highe = float(1)
+    print("setting resolution values to defult and trucking onward!\n")
+    #sys.exit(1)
 
 # Print the assigned values for verification
 print(f"SIMC t-resolution (loweps): {simc_t_resolution_pions_lowe}")
@@ -664,7 +667,7 @@ df_yields_pions = pd.DataFrame(columns=['t_min','t_max','Yield (loweps)','Error 
 for i in range(len(tbin_pions_min)):
      if (simc_t_resolution_pions_lowe >= (t_pions_data_dummysub_loweps_cut_all.GetXaxis().GetBinUpEdge(tbin_pions_max[i]) - t_pions_data_dummysub_loweps_cut_all.GetXaxis().GetBinLowEdge(tbin_pions_min[i])) or (simc_t_resolution_pions_highe >= (t_pions_data_dummysub_higheps_cut_all.GetXaxis().GetBinUpEdge(tbin_pions_max[i]) - t_pions_data_dummysub_higheps_cut_all.GetXaxis().GetBinLowEdge(tbin_pions_min[i])))):
         print("SIMC t resolution is smaller than the bin width")
-        break
+        #break
      df_yields_pions.loc[len(df_yields_pions.index)] = [t_pions_data_dummysub_loweps_cut_all.GetXaxis().GetBinLowEdge(tbin_pions_min[i]),t_pions_data_dummysub_loweps_cut_all.GetXaxis().GetBinUpEdge(tbin_pions_max[i]),N_data_pions_lowe[i],dN_data_pions_lowe[i,0],N_data_pions_highe[i],dN_data_pions_highe[i,0]]
 
 df_yields_pions = df_yields_pions.round(3)

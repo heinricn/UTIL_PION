@@ -1,4 +1,6 @@
 #! /bin/bash
+#SBATCH -e /farm_out/%u/slurm/slurm-%j.err
+#SBATCH -o /farm_out/%u/slurm/slurm-%j.out
 
 #
 # Description:
@@ -13,6 +15,9 @@
 ##################################################################################
 # Created - 10/July/2021, Author - Muhammad Junaid, University of Regina, Canada
 ##################################################################################
+
+#b_flag = "false"
+b_flag="true"
 
 while getopts 'hcmdetpsra' flag; do
     case "${flag}" in
@@ -41,6 +46,7 @@ while getopts 'hcmdetpsra' flag; do
         echo "        comp -> Flag=-p RunType=arg1-(Prod) RunList=arg2 MaxEvents=arg3-(Optional)"
         echo "    -a, run script to calculate average kinematics and yields for LTSep analysis "
         echo "        comp -> Flag=-a RunType=arg1-(Prod) RunList=arg2 MaxEvents=arg3-(Optional)"
+        echo "    -b, Batch Mode, don't ask for conformation "
         exit 0
         ;;
         c) c_flag='true' ;;
@@ -110,11 +116,11 @@ HOST=`echo ${PATHFILE_INFO} | cut -d ','  -f15`
 cd $REPLAYPATH
 # Input Arguments for Cut Implementation Script
 inputFile="${REPLAYPATH}/UTIL_BATCH/InputRunLists/PionLT_2021_2022/${RunList}"
-PHY_SETTING=$(echo "${RunList}" | awk -F'_' '{print $1 "_" $2 "_" $3 "_" $4 "_" $5}')
+PHY_SETTING=$(echo "${RunList}" | awk -F'_' '{print $1 "_" $2 "_" $3 "_" $4}')
 ROOTPREFIX_CUT=${ANATYPE}LT_ProdCoin_replay_production
 
 # Input Arguments for Background Subtraction and MMP Cut Determination Script
-SIMC_SETTING=$(echo "${RunList}" | awk -F'_' '{print $1 $2 $3 "_" $4 $5}')
+SIMC_SETTING=$(echo "${RunList}" | awk -F'_' '{print $1 $2 "_" $3 $4}')
 DATA_Suffix=ProdCoin_Analysed_Data
 DUMMY_Suffix=ProdCoin_Analysed_Dummy_Data
 SIMC_Suffix="Prod_Coin_${SIMC_SETTING}"
@@ -125,7 +131,7 @@ CSV_FILE=PionLT_coin_production_Prod_efficiency_data_2025_11_21
 
 # Input Arguments for t-resolution and t-binning Scripts
 PHY_SETTING_C=$(echo "${RunList}" | awk -F'_' '{print $1 "_" $2 "_" $3}')
-SIMC_SETTING_C=$(echo "${RunList}" | awk -F'_' '{print $1 $2 $3}')
+SIMC_SETTING_C=$(echo "${RunList}" | awk -F'_' '{print $1 $2}')
 SIMC_Suffix_C="Prod_Coin_${SIMC_SETTING_C}"
 RUN_LIST_C=${PHY_SETTING_C}_Runlist
 
@@ -178,10 +184,16 @@ done
 
 ################################################################################################################################                                                                                   
 
+
+
 # Section for Pion Physics Analysis Script
 if [[ $c_flag == "true" ]]; then
-    while true; do
-        read -p "Do you wish to analyse root files with runlist ${inputFile}? (Please answer yes or no) " yn
+     while true; do
+        if [ "$b_flag" != "true" ]; then
+            read -p "Do you wish to analyse root files with runlist ${inputFile}? (Please answer yes or no) " yn
+        else 
+            yn="y"
+        fi
         case $yn in
             [Yy]* )
                 i=-1
@@ -221,7 +233,7 @@ if [[ $c_flag == "true" ]]; then
           	)
                 break;;
             [Nn]* )
-                exit;;
+               exit;;
             * ) echo "Please answer yes or no.";;
         esac
     done
@@ -232,8 +244,12 @@ sleep 3
 
 # Section for MM Cut Check script
 elif [[ $m_flag == "true" ]]; then
-    while true; do
-        read -p "Do you wish to do Missing Mass cut check for physics setting ${PHY_SETTING}? (Please answer yes or no) " yn
+      while true; do
+        if [ "$b_flag" != "true" ]; then
+            read -p "Do you wish to do Missing Mass cut check for physics setting ${PHY_SETTING}? (Please answer yes or no) " yn
+        else 
+            yn="y"
+        fi
         case $yn in
             [Yy]* )
                 # Processing logic for Pion physics plotting
@@ -278,8 +294,12 @@ sleep 3
 
 # Section for Diamond Cut script
 elif [[ $d_flag == "true" ]]; then
-    while true; do
-        read -p "Do you wish to do Diamond cut check for physics setting ${PHY_SETTING}? (Please answer yes or no) " yn
+      while true; do
+        if [ "$b_flag" != "true" ]; then
+            read -p "Do you wish to do Diamond cut check for physics setting ${PHY_SETTING}? (Please answer yes or no) " yn
+        else 
+            yn="y"
+        fi
         case $yn in
             [Yy]* )
                 # Processing logic for Pion physics plotting
@@ -324,8 +344,12 @@ sleep 3
 
 # Section for  t-resolution script
 elif [[ $e_flag == "true" ]]; then
-    while true; do
-        read -p "Do you wish to do t-resolution for physics setting ${PHY_SETTING_C}? (Please answer yes or no) " yn
+      while true; do
+        if [ "$b_flag" != "true" ]; then
+            read -p "Do you wish to do t-resolution for physics setting ${PHY_SETTING_C}? (Please answer yes or no) " yn
+        else 
+            yn="y"
+        fi
         case $yn in
             [Yy]* )
                 # Processing logic for Pion physics plotting
@@ -370,8 +394,12 @@ sleep 3
 
 # Section for t-binning script
 elif [[ $t_flag == "true" ]]; then
-    while true; do
-        read -p "Do you wish to do t-binning for physics setting ${PHY_SETTING_C}? (Please answer yes or no) " yn
+      while true; do
+        if [ "$b_flag" != "true" ]; then
+            read -p "Do you wish to do t-binning for physics setting ${PHY_SETTING_C}? (Please answer yes or no) " yn
+        else 
+            yn="y"
+        fi
         case $yn in
             [Yy]* )
                 # Processing logic for Pion physics plotting
@@ -416,8 +444,12 @@ sleep 3
 
 # Section for phi-bining and physics yield calculation Script
 elif [[ $p_flag == "true" ]]; then
-    while true; do
-        read -p "Do you wish to do phi binning and calculate yields for physics setting ${PHY_SETTING}? (Please answer yes or no) " yn
+      while true; do
+        if [ "$b_flag" != "true" ]; then
+            read -p "Do you wish to do phi binning and calculate yields for physics setting ${PHY_SETTING}? (Please answer yes or no) " yn
+        else 
+            yn="y"
+        fi
         case $yn in
             [Yy]* )
                 i=-1
@@ -463,8 +495,12 @@ sleep 3
 
 # Section for phi-bining and simc yield calculation Script
 elif [[ $s_flag == "true" ]]; then
-    while true; do
-        read -p "Do you wish to do t & phi binning and calculate yields for simc setting ${PHY_SETTING}? (Please answer yes or no) " yn
+      while true; do
+        if [ "$b_flag" != "true" ]; then
+            read -p "Do you wish to do t & phi binning and calculate yields for simc setting ${PHY_SETTING}? (Please answer yes or no) " yn
+        else 
+            yn="y"
+        fi
         case $yn in
             [Yy]* )
                 i=-1
@@ -507,8 +543,12 @@ sleep 3
 #################################################################################################################################
 # Section for Data and SIMC comparison Script
 elif [[ $r_flag == "true" ]]; then
-    while true; do
-        read -p "Do you wish to do Data & SIMC comparison and plotting for physics setting ${PHY_SETTING}? (Please answer yes or no) " yn
+      while true; do
+        if [ "$b_flag" != "true" ]; then
+            read -p "Do you wish to do Data & SIMC comparison and plotting for physics setting ${PHY_SETTING}? (Please answer yes or no) " yn
+        else 
+            yn="y"
+        fi
         case $yn in
             [Yy]* )
                 i=-1
@@ -552,8 +592,12 @@ sleep 3
 #################################################################################################################################
 # Section for Average Kinematics and Yield Calculation Script
 elif [[ $a_flag == "true" ]]; then
-    while true; do
-        read -p "Do you wish to calculate average kinematics and yields for physics setting ${PHY_SETTING_C}? (Please answer yes or no) " yn
+      while true; do
+        if [ "$b_flag" != "true" ]; then
+            read -p "Do you wish to calculate average kinematics and yields for physics setting ${PHY_SETTING_C}? (Please answer yes or no) " yn
+        else 
+            yn="y"
+        fi
         case $yn in
             [Yy]* )
                 i=-1

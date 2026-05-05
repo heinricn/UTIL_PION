@@ -527,6 +527,10 @@ dN_simc_MMP = array.array('d', [0.0])
 N_data_MMP = P_kin_MMpi_pions_normdummysub_data_cut_all.IntegralAndError(1,nbins_p,dN_data_MMP,"")
 N_simc_MMP = MMpi_pions_simc_cut_all.IntegralAndError(1,nbins_p,dN_simc_MMP,"")
 
+N_data_MMPi = P_kin_MMpi_pions_normdummysub_data_cut_all.Integral(math.floor((0.9/2.2)*nbins_p), math.floor((1.05/2.2)*nbins_p))
+N_simc_MMPi = MMpi_pions_simc_cut_all.Integral(math.floor((0.9/2.2)*nbins_p), math.floor((1.05/2.2)*nbins_p))
+MMpiSimcRatio = N_data_MMPi/N_simc_MMP
+
 # Physics Yield Calculations
 physics_yield_MMP = N_data_MMP
 
@@ -637,6 +641,7 @@ def fit_gaussian(hist, x_min, x_max, dtype):
 
 # Missing Mass cut check
 
+
 # Removes stat box
 ROOT.gStyle.SetOptStat(0)
 
@@ -653,6 +658,7 @@ b_mean_err_MMpi_data = tmp_b_mean_MMpi_data[1]
 MMpi_pions_simc_cut_all.GetXaxis().SetRangeUser(0.0, 2.2)
 MMpi_pions_simc_cut_all.SetLineColor(kRed)
 MMpi_pions_simc_cut_all.SetMarkerColor(kRed)
+MMpi_pions_simc_cut_all.Scale(MMpiSimcRatio)
 MMpi_pions_simc_cut_all.Draw("E1")
 P_kin_MMpi_pions_normdummysub_data_cut_all.GetXaxis().SetRangeUser(0.0, 2.2)
 P_kin_MMpi_pions_normdummysub_data_cut_all.SetLineColor(kBlue)

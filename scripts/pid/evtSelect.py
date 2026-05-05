@@ -16,6 +16,7 @@ import ROOT as r
 from ROOT import TCanvas,TH1F,TH2D,RDataFrame,TChain,TFile,TString,TLegend,TStyle,TText,TLine,TArrow,TF1,TGraph,TGraphErrors,TFitResultPtr,TLatex,gStyle,TCutG
 from ctypes import c_double
 import uncertainties as u
+import os.path
 
 np.bool = bool
 np.float = float
@@ -72,8 +73,11 @@ print("-"*40)
 ### ====== add all the ROOT trees to the TChain for Data    
 ch_data =  TChain("T")
 for run in data_runs:
-    ch_data.AddFile(f'{REPLAYPATH}/PionLT_ProdCoin_replay_production_{run}_-1.root')
-    print(f'{run}')
+    if(os.path.isfile(f'{REPLAYPATH}/PionLT_ProdCoin_replay_production_{run}_-1.root')):
+        ch_data.AddFile(f'{REPLAYPATH}/PionLT_ProdCoin_replay_production_{run}_-1.root')
+        print(f'{run}')
+    else:
+        print(f"skipping adding {run}")  
 
 if ch_data is None:
     print("something went wrong! abort!")
@@ -112,13 +116,13 @@ P_kcut_P_hgcer = 1.5
 P_kcut_P_aero = 1.5
 H_ecut_H_cal = 0.7
 P_kcut_H_cer = 1.5
-KRFHigh = 1.5
-KRFLow = 0.1
+KRFHigh = 3.4
+KRFLow = 1.2
 
 ### === corrected RF time
 RFtimeDist_corr = f'RFTime.SHMS_RFtimeDist+(3.05*P.gtr.th)'
 
-pidCuts = f'(H.cal.etottracknorm > {H_ecut_H_cal}) && (H.cer.npeSum > {P_kcut_H_cer}) && (({RFtimeDist_corr} < {KRFHigh}) && ({RFtimeDist_corr} > {KRFLow}))'
+pidCuts = f'(H.cal.etottracknorm > {H_ecut_H_cal}) && (P.aero.npeSum > {P_kcut_P_aero}) && (H.cer.npeSum > {P_kcut_H_cer}) && (({RFtimeDist_corr} < {KRFHigh}) && ({RFtimeDist_corr} > {KRFLow}))'
 
 ### ===== PID ===== end
 
@@ -139,15 +143,15 @@ randomCut = f'((CTime.ePiCoinTime_ROC1 > {random_min1}) && (CTime.ePiCoinTime_RO
 
 ### ================ pion cuts to subtract from kaon missing mass later
 ## -- pion pid cuts
-pion_cut = f'({acceptCuts_data} && H.cal.etottracknorm > {H_ecut_H_cal}) && (({RFtimeDist_corr} < {KRFHigh}) && ({RFtimeDist_corr} > {KRFLow}))'
+pion_cut = f'({acceptCuts_data} && H.cal.etottracknorm > {H_ecut_H_cal}) && (P.aero.npeSum > {P_kcut_P_aero}) && (({RFtimeDist_corr} < {KRFHigh}) && ({RFtimeDist_corr} > {KRFLow}))'
 
 ## --- Coin Time for pions
-prompt_pi_min = -0.5
-prompt_pi_max = 1.5
-random_pi_min1 = -12.5
-random_pi_max1 = -6.5
-random_pi_min2 = 7.5
-random_pi_max2 = 13.5
+prompt_pi_min = -2.004
+prompt_pi_max = 2.004
+random_pi_min1 = -18.036
+random_pi_max1 = -6.012
+random_pi_min2 =  6.012
+random_pi_max2 = 18.036
 # prompt_pi_min = -1.0
 # prompt_pi_max = 1.0
 # random_pi_min1 = -13.0
@@ -178,7 +182,7 @@ c_HcalEtottracknorm.SaveAs(f'{OUTPATH}/{dataSet}/c_HcalEtottracknorm_{dataSet}.r
 c_HcalEtottracknorm.SaveAs(f'{OUTPATH}/{dataSet}/c_HcalEtottracknorm_{dataSet}.pdf')
 
 ## --- electron selection using electron aerogel cherenkov
-cuts_noHcer = f'(({acceptCuts_data}) && H.cal.etottracknorm > {H_ecut_H_cal}) && (({RFtimeDist_corr} < {KRFHigh}) && ({RFtimeDist_corr} > {KRFLow})) && {promptCut}'
+cuts_noHcer = f'(({acceptCuts_data}) && (P.aero.npeSum > {P_kcut_P_aero}) && H.cal.etottracknorm > {H_ecut_H_cal}) && (({RFtimeDist_corr} < {KRFHigh}) && ({RFtimeDist_corr} > {KRFLow})) && {promptCut}'
 c_HcerNpeSum = TCanvas("c_HcerNpeSum","c_HcerNpeSum",900,600)
 c_HcerNpeSum.cd()
 c_HcerNpeSum.SetLogy()
@@ -196,7 +200,7 @@ c_HcerNpeSum.SaveAs(f'{OUTPATH}/{dataSet}/c_HcerNpeSum_{dataSet}.pdf')
 
 ## --- RF time cut to select kaons
 ## RFTime.SHMS_RFtimeDist = (RFTime − StartTime + RF_Offset)%Bunch_Spacing
-cuts_noRF = f'(({acceptCuts_data}) && (H.cal.etottracknorm > {H_ecut_H_cal}) && (H.cer.npeSum > {P_kcut_H_cer}) && {promptCut})'
+cuts_noRF = f'(({acceptCuts_data}) && (P.aero.npeSum > {P_kcut_P_aero}) && (H.cal.etottracknorm > {H_ecut_H_cal}) && (H.cer.npeSum > {P_kcut_H_cer}) && {promptCut})'
 c_RFtimeDistVsMmk = TCanvas("c_RFtimeDistVsMmk","c_RFtimeDistVsMmk",900,600)
 c_RFtimeDistVsMmk.cd()
 h_RFtimeDistVsMmk = rdf.Define("RFtimeDist_corr", f'{RFtimeDist_corr}').Filter(cuts_noRF).Histo2D(("h_RFtimeDistVsMmk", ";P.kin.secondary.MMpi;RFTime.SHMS_RFtimeDist_corr", 600, 0.85, 1.42, 600, 0.0, 4.008), "P.kin.secondary.MMpi","RFtimeDist_corr")
@@ -227,7 +231,7 @@ c_ekCoinTimeVsmmpi.SaveAs(f'{OUTPATH}/{dataSet}/c_ekCoinTimeVsmmpi_{dataSet}.roo
 c_ekCoinTimeVsmmpi.SaveAs(f'{OUTPATH}/{dataSet}/c_ekCoinTimeVsmmpi_{dataSet}.pdf')
 
 ## --- Coin Time for lambda region
-cuts_lambda = f'{cuts} && (P.kin.secondary.MMpi>1.10) && (P.kin.secondary.MMpi<1.14)'
+cuts_lambda = f'{cuts} && (P.kin.secondary.MMpi>0.9) && (P.kin.secondary.MMpi<1.1)'
 c_ekCoinTime_lambda = TCanvas("c_ekCoinTime_lambda","c_ekCoinTime_lambda",900,600)
 c_ekCoinTime_lambda.cd()
 h_ekCoinTime_lambda = rdf.Filter(cuts_lambda).Histo1D(("h_CoinTime_lambda", ";CTime.ePiCoinTime_ROC1;Counts", 600, -20, 20), "CTime.ePiCoinTime_ROC1")

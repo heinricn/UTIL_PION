@@ -45,7 +45,13 @@ if len(sys.argv)-1!=8:
     sys.exit(1)
 
 ##################################################################################################################################################
+# Set ploting ranges for histograms
+QHist_low = 4
+QHist_high = 6
+WHist_low = 2.7
+WHist_high = 3.2
 
+##################################################################################################################################################
 # Input params - run number and max number of events
 PHY_SETTING = sys.argv[1]
 MaxEvent = sys.argv[2]
@@ -232,47 +238,47 @@ nbins = 200
 # Histograms having Cuts (Acceptance + PID + RF)
 W_pions_data_cut_all = ROOT.TH1D("W_pions_data_cut_all", "W Distribution; W; Counts", nbins, 0, 10.0)
 Q2_pions_data_cut_all = ROOT.TH1D("Q2_pions_data_cut_all", "Q2 Distribution; Q^{2}; Counts", nbins, 0, 10.0)
-Q2_vs_W_pions_data_cut_all = ROOT.TH2D("Q2_vs_W_pions_data_cut_all", "Q^{2} vs W Distribution; Q^{2}; W", nbins, 3.0, 5.0, nbins, 2.0, 3.0)
+Q2_vs_W_pions_data_cut_all = ROOT.TH2D("Q2_vs_W_pions_data_cut_all", "Q^{2} vs W Distribution; Q^{2}; W", nbins, QHist_low, QHist_high, nbins, WHist_low, WHist_high)
 
 # Histograms Having Cuts (Acceptance + PID + RF + Prompt Selection) Data
 W_pions_data_prompt_cut_all = ROOT.TH1D("W_pions_data_prompt_cut_all", "W Distribution; W; Counts", nbins, 0, 10.0)
 Q2_pions_data_prompt_cut_all = ROOT.TH1D("Q2_pions_data_prompt_cut_all", "Q2 Distribution; Q^{2}; Counts", nbins, 0, 10.0)
-Q2_vs_W_pions_data_prompt_cut_all = ROOT.TH2D("Q2_vs_W_pions_data_prompt_cut_all", "Q^{2} vs W Distribution; Q^{2}; W", nbins, 3.0, 5.0, nbins, 2.0, 3.0)
+Q2_vs_W_pions_data_prompt_cut_all = ROOT.TH2D("Q2_vs_W_pions_data_prompt_cut_all", "Q^{2} vs W Distribution; Q^{2}; W", nbins, QHist_low, QHist_high, nbins, WHist_low, WHist_high)
 
 # Histograms Having Cuts (Acceptance + PID + RF + Random Selection) Data
 W_pions_data_random_cut_all = ROOT.TH1D("W_pions_data_random_cut_all", "W Distribution; W; Counts", nbins, 0, 10.0)
 Q2_pions_data_random_cut_all = ROOT.TH1D("Q2_pions_data_random_cut_all", "Q2 Distribution; Q^{2}; Counts", nbins, 0, 10.0)
-Q2_vs_W_pions_data_random_cut_all = ROOT.TH2D("Q2_vs_W_pions_data_random_cut_all", "Q^{2} vs W Distribution; Q^{2}; W", nbins, 3.0, 5.0, nbins, 2.0, 3.0)
+Q2_vs_W_pions_data_random_cut_all = ROOT.TH2D("Q2_vs_W_pions_data_random_cut_all", "Q^{2} vs W Distribution; Q^{2}; W", nbins, QHist_low, QHist_high, nbins, WHist_low, WHist_high)
 
 # Histograms Having Cuts (Acceptance + PID + RF + Prompt Selection) Dummy
 W_pions_dummy_prompt_cut_all = ROOT.TH1D("W_pions_dummy_prompt_cut_all", "W Distribution; W; Counts", nbins, 0, 10.0)
 Q2_pions_dummy_prompt_cut_all = ROOT.TH1D("Q2_pions_dummy_prompt_cut_all", "Q2 Distribution; Q^{2}; Counts", nbins, 0, 10.0)
-Q2_vs_W_pions_dummy_prompt_cut_all = ROOT.TH2D("Q2_vs_W_pions_dummy_prompt_cut_all", "Q^{2} vs W Distribution; Q^{2}; W", nbins, 3.0, 5.0, nbins, 2.0, 3.0)
+Q2_vs_W_pions_dummy_prompt_cut_all = ROOT.TH2D("Q2_vs_W_pions_dummy_prompt_cut_all", "Q^{2} vs W Distribution; Q^{2}; W", nbins, QHist_low, QHist_high, nbins, WHist_low, WHist_high)
 
 # Histograms Having Cuts (Acceptance + PID + RF + Random Selection) Dummy
 W_pions_dummy_random_cut_all = ROOT.TH1D("W_pions_dummy_random_cut_all", "W Distribution; W; Counts", nbins, 0, 10.0)
 Q2_pions_dummy_random_cut_all = ROOT.TH1D("Q2_pions_dummy_random_cut_all", "Q2 Distribution; Q^{2}; Counts", nbins, 0, 10.0)
-Q2_vs_W_pions_dummy_random_cut_all = ROOT.TH2D("Q2_vs_W_pions_dummy_random_cut_all", "Q^{2} vs W Distribution; Q^{2}; W", nbins, 3.0, 5.0, nbins, 2.0, 3.0)
+Q2_vs_W_pions_dummy_random_cut_all = ROOT.TH2D("Q2_vs_W_pions_dummy_random_cut_all", "Q^{2} vs W Distribution; Q^{2}; W", nbins, QHist_low, QHist_high, nbins, WHist_low, WHist_high)
 
 # Histograms having Cuts (Acceptance + PID + RF + RandSub) Data
 W_pions_randsub_data_cut_all = ROOT.TH1D("W_pions_randsub_data_cut_all", "W Distribution; W; Counts", nbins, 0, 10.0)
 Q2_pions_randsub_data_cut_all = ROOT.TH1D("Q2_pions_randsub_data_cut_all", "Q2 Distribution; Q^{2}; Counts", nbins, 0, 10.0)
-Q2_vs_W_pions_randsub_data_cut_all = ROOT.TH2D("Q2_vs_W_pions_randsub_data_cut_all", "Q^{2} vs W Distribution; Q^{2}; W", nbins, 3.0, 5.0, nbins, 2.0, 3.0)
+Q2_vs_W_pions_randsub_data_cut_all = ROOT.TH2D("Q2_vs_W_pions_randsub_data_cut_all", "Q^{2} vs W Distribution; Q^{2}; W", nbins, QHist_low, QHist_high, nbins, WHist_low, WHist_high)
 
 # Histograms having Cuts (Acceptance + PID + RF + RandSub) Dummy
 W_pions_randsub_dummy_cut_all = ROOT.TH1D("W_pions_randsub_dummy_cut_all", "W Distribution; W; Counts", nbins, 0, 10.0)
 Q2_pions_randsub_dummy_cut_all = ROOT.TH1D("Q2_pions_randsub_dummy_cut_all", "Q2 Distribution; Q^{2}; Counts", nbins, 0, 10.0)
-Q2_vs_W_pions_randsub_dummy_cut_all = ROOT.TH2D("Q2_vs_W_pions_randsub_dummy_cut_all", "Q^{2} vs W Distribution; Q^{2}; W", nbins, 3.0, 5.0, nbins, 2.0, 3.0)
+Q2_vs_W_pions_randsub_dummy_cut_all = ROOT.TH2D("Q2_vs_W_pions_randsub_dummy_cut_all", "Q^{2} vs W Distribution; Q^{2}; W", nbins, QHist_low, QHist_high, nbins, WHist_low, WHist_high)
 
 # Histograms having Cuts (Acceptance + PID + RF + RandSub + DummySub)
 W_pions_dummysub_data_cut_all = ROOT.TH1D("W_pions_dummysub_data_cut_all", "W Distribution; W; Counts", nbins, 0, 10.0)
 Q2_pions_dummysub_data_cut_all = ROOT.TH1D("Q2_pions_dummysub_data_cut_all", "Q2 Distribution; Q^{2}; Counts", nbins, 0, 10.0)
-Q2_vs_W_pions_dummysub_data_cut_all = ROOT.TH2D("Q2_vs_W_pions_dummysub_data_cut_all", "Q^{2} vs W (Accpt+PID+RF+RandDummySub) Distribution; Q^{2}; W", nbins, 3.0, 5.0, nbins, 2.0, 3.0)
+Q2_vs_W_pions_dummysub_data_cut_all = ROOT.TH2D("Q2_vs_W_pions_dummysub_data_cut_all", "Q^{2} vs W (Accpt+PID+RF+RandDummySub) Distribution; Q^{2}; W", nbins, QHist_low, QHist_high, nbins, WHist_low, WHist_high)
 
 # SIMC Histograms with Cuts
 Q2_pions_simc_cut_all = ROOT.TH1D("Q2_pions_simc_cut_all", "#Q^2 Distribution; #Q^2; Counts", nbins, 0, 10)
 W_pions_simc_cut_all = ROOT.TH1D("W_pions_simc_cut_all", "W Distribution; W; Counts", nbins, 0, 10.0)
-Q2_vs_W_pions_simc_cut_all = ROOT.TH2D("Q2_vs_W_pions_simc_cut_all", "Q^{2} vs W SIMC Distribution; Q^{2}; W", nbins, 3.0, 5.0, nbins, 2.0, 3.0)
+Q2_vs_W_pions_simc_cut_all = ROOT.TH2D("Q2_vs_W_pions_simc_cut_all", "Q^{2} vs W SIMC Distribution; Q^{2}; W", nbins, QHist_low, QHist_high, nbins, WHist_low, WHist_high)
 
 ##########################################################################################################################################################################################################
 
@@ -438,10 +444,10 @@ print(f"Q2 distribution starts at: {Q2_start}, ends at: {Q2_end}")
 print(f"W distribution starts at: {W_start}, ends at: {W_end}")
 
 # Hardcoded vertices for the diamond cut
-vertex1 = [3.780, 2.600]  # bottom-left
-vertex2 = [3.180, 2.775]  # top-left
-vertex3 = [3.902, 2.642]  # top-right
-vertex4 = [4.520, 2.452]  # bottom-right
+vertex1 = [4.901, 2.935]  # bottom-left
+vertex2 = [4.177, 3.115]  # top-left
+vertex3 = [5.045, 2.969]  # top-right
+vertex4 = [5.775, 2.785]  # bottom-right
 
 # Print vertices
 print("Vertices of the populated area:")
@@ -453,7 +459,7 @@ print(f"Vertex 4 (bottom-right): {vertex4}")
 ###########################################################################################################################################
 
 # Diamond Cut Test
-Q2_vs_W_pions_diamond_cut_all = ROOT.TH2D("Q2_vs_W_pions_diamond_cut_all", "Q^{2} vs W Diamond Cut Distribution; Q^{2}; W", nbins, 3.0, 5.0, nbins, 2.0, 3.0)
+Q2_vs_W_pions_diamond_cut_all = ROOT.TH2D("Q2_vs_W_pions_diamond_cut_all", "Q^{2} vs W Diamond Cut Distribution; Q^{2}; W", nbins, QHist_low, QHist_high, nbins, WHist_low, WHist_high)
 # Define the diamond cut
 cutg_diamond_simc = ROOT.TCutG("cutg_diamond_simc", 5)
 cutg_diamond_simc.SetVarX("Q2")
@@ -494,13 +500,13 @@ for c1_delta_text in c1_delta_text_lines:
     c1_delta_text.Draw()
 c1_delta.cd(2)
 ROOT.gPad.SetLogz()
-Q2_vs_W_pions_diamond_cut_all.GetXaxis().SetRangeUser(3.0, 4.8)
-Q2_vs_W_pions_diamond_cut_all.GetYaxis().SetRangeUser(2.4, 2.8)
+Q2_vs_W_pions_diamond_cut_all.GetXaxis().SetRangeUser(QHist_low, QHist_high)
+Q2_vs_W_pions_diamond_cut_all.GetYaxis().SetRangeUser(WHist_low, WHist_high)
 Q2_vs_W_pions_diamond_cut_all.Draw("colz")
 c1_delta.cd(3)
 ROOT.gPad.SetLogz()
-Q2_vs_W_pions_dummysub_data_cut_all.GetXaxis().SetRangeUser(3.0, 4.8)
-Q2_vs_W_pions_dummysub_data_cut_all.GetYaxis().SetRangeUser(2.4, 2.8)
+Q2_vs_W_pions_dummysub_data_cut_all.GetXaxis().SetRangeUser(QHist_low, QHist_high)
+Q2_vs_W_pions_dummysub_data_cut_all.GetYaxis().SetRangeUser(WHist_low, WHist_high)
 Q2_vs_W_pions_dummysub_data_cut_all.Draw("colz")
 # Draw lines to visualize the diamond cuts
 line1 = ROOT.TLine(vertex1[0], vertex1[1], vertex2[0], vertex2[1])
@@ -522,8 +528,8 @@ line3.Draw("same")
 line4.Draw("same")
 c1_delta.cd(4)
 ROOT.gPad.SetLogz()
-Q2_vs_W_pions_simc_cut_all.GetXaxis().SetRangeUser(3.0, 4.8)
-Q2_vs_W_pions_simc_cut_all.GetYaxis().SetRangeUser(2.4, 2.8)
+Q2_vs_W_pions_simc_cut_all.GetXaxis().SetRangeUser(QHist_low, QHist_high)
+Q2_vs_W_pions_simc_cut_all.GetYaxis().SetRangeUser(WHist_low, WHist_high)
 Q2_vs_W_pions_simc_cut_all.Draw("colz")
 # Draw lines to visualize the diamond cuts
 line1_simc = ROOT.TLine(vertex1[0], vertex1[1], vertex2[0], vertex2[1])

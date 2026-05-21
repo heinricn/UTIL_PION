@@ -130,10 +130,13 @@ DUMMY_RUN_LIST=${PHY_SETTING}_dummy
 CSV_FILE=PionLT_coin_production_Prod_efficiency_data_2025_11_21
 
 # Input Arguments for t-resolution and t-binning Scripts
-PHY_SETTING_C=$(echo "${RunList}" | awk -F'_' '{print $1 "_" $2 "_" $3}')
+PHY_SETTING_D=$(echo "${RunList}" | awk -F'_' '{print $1 "_" $2 "_" $3}')
+PHY_SETTING_D=$(echo "${RunList}" | awk -F'_' '{print $1 "_" $2}')
 SIMC_SETTING_C=$(echo "${RunList}" | awk -F'_' '{print $1 $2}')
 SIMC_Suffix_C="Prod_Coin_${SIMC_SETTING_C}"
-RUN_LIST_C=${PHY_SETTING_C}_Runlist
+RUN_LIST_C=${PHY_SETTING_D}
+
+PHY_SETTING_NoEps=$(echo "${RunList}" | awk -F'_' '{print $1 "_" $2}')
 
 # Input Arguments for avergae kinematics and yields calculation Script
 DATA_YIELD_CSV=Physics_Data_Yield
@@ -144,15 +147,15 @@ SIMC_AVG_KIN_CSV=Physics_Avg_SIMC_Kinematics
 #----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Create directories to store CSVs if it doesn't exist
-AVG_KIN_DIR=${UTILPATH}/LTSep_CSVs/avg_kinematics_csv/${PHY_SETTING_C}_std
-RATIO_DIR=${UTILPATH}/LTSep_CSVs/datasimc_ratios_csv/${PHY_SETTING_C}_std
-DIAMOND_DIR=${UTILPATH}/LTSep_CSVs/diamond_cut_csv/${PHY_SETTING_C}_std
-INPUT_DIR=${UTILPATH}/LTSep_CSVs/ltsep_input_csv/${PHY_SETTING_C}_std
-MM_OFFSET_DIR=${UTILPATH}/LTSep_CSVs/mm_offset_cut_csv/${PHY_SETTING_C}_std
-PHYSICS_YIELDS_DIR=${UTILPATH}/LTSep_CSVs/physics_yields_csv/${PHY_SETTING_C}_std
-SIMC_YIELDS_DIR=${UTILPATH}/LTSep_CSVs/simc_yields_csv/${PHY_SETTING_C}_std
-T_BINNING_DIR=${UTILPATH}/LTSep_CSVs/t_binning_csv/${PHY_SETTING_C}_std
-T_RESOLUTION_DIR=${UTILPATH}/LTSep_CSVs/t_resolution_csv/${PHY_SETTING_C}_std
+AVG_KIN_DIR=${UTILPATH}/LTSep_CSVs/avg_kinematics_csv/${PHY_SETTING_D}_std
+RATIO_DIR=${UTILPATH}/LTSep_CSVs/datasimc_ratios_csv/${PHY_SETTING_D}_std
+DIAMOND_DIR=${UTILPATH}/LTSep_CSVs/diamond_cut_csv/${PHY_SETTING_D}_std
+INPUT_DIR=${UTILPATH}/LTSep_CSVs/ltsep_input_csv/${PHY_SETTING_D}_std
+MM_OFFSET_DIR=${UTILPATH}/LTSep_CSVs/mm_offset_cut_csv/${PHY_SETTING_D}_std
+PHYSICS_YIELDS_DIR=${UTILPATH}/LTSep_CSVs/physics_yields_csv/${PHY_SETTING_D}_std
+SIMC_YIELDS_DIR=${UTILPATH}/LTSep_CSVs/simc_yields_csv/${PHY_SETTING_D}_std
+T_BINNING_DIR=${UTILPATH}/LTSep_CSVs/t_binning_csv/${PHY_SETTING_D}_std
+T_RESOLUTION_DIR=${UTILPATH}/LTSep_CSVs/t_resolution_csv/${PHY_SETTING_D}_std
 
 directories=("${AVG_KIN_DIR}" "${RATIO_DIR}" "${DIAMOND_DIR}" "${INPUT_DIR}" "${MM_OFFSET_DIR}" "${PHYSICS_YIELDS_DIR}" "${SIMC_YIELDS_DIR}" "${T_BINNING_DIR}" "${T_RESOLUTION_DIR}")
 # Create all directories
@@ -169,7 +172,7 @@ SIMC_Suffix_File=Prod_Coin_${SIMC_SETTING_C}
 simc_dirs=("${VOLATILEPATH}/worksim" "${VOLATILEPATH}/OUTPUT/Analysis/SIMC")
 # Move SIMC files to standard directories
 for base_dir in "${simc_dirs[@]}"; do
-    dest_dir="${base_dir}/${PHY_SETTING_C}_std"
+    dest_dir="${base_dir}/${PHY_SETTING_D}_std"
     # Create destination directory if it doesn't exist
     if [ ! -d "$dest_dir" ]; then
         mkdir -p "$dest_dir"
@@ -207,7 +210,7 @@ if [[ $c_flag == "true" ]]; then
                     python3 pion_yield_cuts.py ${ROOTPREFIX_CUT} $line ${MAXEVENTS}
                 done < "$inputFile"
                 cd $REPLAYPATH/OUTPUT/Analysis/PionLT/
-                dir_name="${PHY_SETTING_C}_runbyrun"
+                dir_name="${PHY_SETTING_D}_runbyrun"
                 # Check if the directory exists
                 if [ ! -d "$dir_name" ]; then
                    # If it doesn't exist, create it
@@ -346,26 +349,26 @@ sleep 3
 elif [[ $e_flag == "true" ]]; then
       while true; do
         if [ "$b_flag" != "true" ]; then
-            read -p "Do you wish to do t-resolution for physics setting ${PHY_SETTING_C}? (Please answer yes or no) " yn
+            read -p "Do you wish to do t-resolution for physics setting ${PHY_SETTING_D}? (Please answer yes or no) " yn
         else 
             yn="y"
         fi
         case $yn in
             [Yy]* )
                 # Processing logic for Pion physics plotting
-                output_file="${UTILPATH}/OUTPUT/Analysis/PionLT/${PHY_SETTING_C}_${MAXEVENTS}_ProdCoin_tresolution_Data.root"
+                output_file="${UTILPATH}/OUTPUT/Analysis/PionLT/${PHY_SETTING_NoEps}_${MAXEVENTS}_ProdCoin_tresolution_Data.root"
 
                 if [ -f "$output_file" ]; then
                     read -p "Pion coin output plots file already exists, do you want to reprocess it? <Y/N> " option2
                     if [[ $option2 =~ ^[Yy](es)?$ ]]; then
                         rm "$output_file"
                         echo "Reprocessing"
-                        python3 ${UTILPATH}/scripts/yield/src/pion_simc_t_resol.py ${PHY_SETTING_C} ${SIMC_SETTING_C}
+                        python3 ${UTILPATH}/scripts/yield/src/pion_simc_t_resol.py ${PHY_SETTING_NoEps} ${SIMC_SETTING_C}
                     else
                         echo "Skipping python t-resolution script step"
                     fi
                 else
-                    python3 ${UTILPATH}/scripts/yield/src/pion_simc_t_resol.py ${PHY_SETTING_C} ${SIMC_SETTING_C}
+                    python3 ${UTILPATH}/scripts/yield/src/pion_simc_t_resol.py ${PHY_SETTING_NoEps} ${SIMC_SETTING_C}
                 fi
 
                 # Directory setup
@@ -396,26 +399,26 @@ sleep 3
 elif [[ $t_flag == "true" ]]; then
       while true; do
         if [ "$b_flag" != "true" ]; then
-            read -p "Do you wish to do t-binning for physics setting ${PHY_SETTING_C}? (Please answer yes or no) " yn
+            read -p "Do you wish to do t-binning for physics setting ${PHY_SETTING_D}? (Please answer yes or no) " yn
         else 
             yn="y"
         fi
         case $yn in
             [Yy]* )
                 # Processing logic for Pion physics plotting
-                output_file="${UTILPATH}/OUTPUT/Analysis/PionLT/${PHY_SETTING_C}_${MAXEVENTS}_ProdCoin_tbinning_Data.root"
+                output_file="${UTILPATH}/OUTPUT/Analysis/PionLT/${PHY_SETTING_D}_${MAXEVENTS}_ProdCoin_tbinning_Data.root"
 
                 if [ -f "$output_file" ]; then
                     read -p "Pion coin output plots file already exists, do you want to reprocess it? <Y/N> " option2
                     if [[ $option2 =~ ^[Yy](es)?$ ]]; then
                         rm "$output_file"
                         echo "Reprocessing"
-                        python3 ${UTILPATH}/scripts/yield/src/pion_yield_tbinning.py ${PHY_SETTING_C} ${MAXEVENTS} ${DATA_Suffix} ${DUMMY_Suffix} ${RUN_LIST_C}
+                        python3 ${UTILPATH}/scripts/yield/src/pion_yield_tbinning.py ${PHY_SETTING_D} ${MAXEVENTS} ${DATA_Suffix} ${DUMMY_Suffix} ${RUN_LIST_C}
                     else
                         echo "Skipping python t-binning script step"
                     fi
                 else
-                    python3 ${UTILPATH}/scripts/yield/src/pion_yield_tbinning.py ${PHY_SETTING_C} ${MAXEVENTS} ${DATA_Suffix} ${DUMMY_Suffix} ${RUN_LIST_C}
+                    python3 ${UTILPATH}/scripts/yield/src/pion_yield_tbinning.py ${PHY_SETTING_D} ${MAXEVENTS} ${DATA_Suffix} ${DUMMY_Suffix} ${RUN_LIST_C}
                 fi
 
                 # Directory setup
@@ -522,7 +525,7 @@ elif [[ $s_flag == "true" ]]; then
                 # Directory setup for ROOT files
                 cd $REPLAYPATH/OUTPUT/Analysis/PionLT/
                 simc_dir_yield="simc_yield"
-                simc_dir_iter="${PHY_SETTING_C}_std"
+                simc_dir_iter="${PHY_SETTING_D}_std"
                 if [ ! -d "$simc_dir_yield/$simc_dir_iter" ]; then
                     mkdir -p "$simc_dir_yield/$simc_dir_iter"
                     echo "Directory '$simc_dir_yield/$simc_dir_iter' created."
@@ -571,7 +574,7 @@ elif [[ $r_flag == "true" ]]; then
                 # Directory setup for ROOT files
                 cd $REPLAYPATH/OUTPUT/Analysis/PionLT/
                 ratio_dir="ratios"
-                ratio_dir_iter="${PHY_SETTING_C}_std"
+                ratio_dir_iter="${PHY_SETTING_D}_std"
                 if [ ! -d "$ratio_dir/$ratio_dir_iter" ]; then
                     mkdir -p "$ratio_dir/$ratio_dir_iter"
                     echo "Directory '$ratio_dir/$ratio_dir_iter' created."
@@ -594,7 +597,7 @@ sleep 3
 elif [[ $a_flag == "true" ]]; then
       while true; do
         if [ "$b_flag" != "true" ]; then
-            read -p "Do you wish to calculate average kinematics and yields for physics setting ${PHY_SETTING_C}? (Please answer yes or no) " yn
+            read -p "Do you wish to calculate average kinematics and yields for physics setting ${PHY_SETTING_D}? (Please answer yes or no) " yn
         else 
             yn="y"
         fi
@@ -603,24 +606,24 @@ elif [[ $a_flag == "true" ]]; then
                 i=-1
                 (
                 # Section for Pion physics ploting script
-                if [ -f "${UTILPATH}/OUTPUT/Analysis/PionLT/${PHY_SETTING_C}_${MAXEVENTS}_ProdCoin_Yield_Data.root" ]; then
+                if [ -f "${UTILPATH}/OUTPUT/Analysis/PionLT/${PHY_SETTING_D}_${MAXEVENTS}_ProdCoin_Yield_Data.root" ]; then
                     read -p "Pion coin output plots file already exists, do you want to reprocess it? <Y/N> " option2
                     if [[ $option2 == "y" || $option2 == "Y" || $option2 == "yes" || $option2 == "Yes" ]]; then
-                        rm "${UTILPATH}/OUTPUT/Analysis/PionLT/${PHY_SETTING_C}_${MAXEVENTS}_ProdCoin_Yield_Data.root"
+                        rm "${UTILPATH}/OUTPUT/Analysis/PionLT/${PHY_SETTING_D}_${MAXEVENTS}_ProdCoin_Yield_Data.root"
                         echo "Reprocessing"
-                        python3 ${UTILPATH}/scripts/yield/src/pion_yield_avg_kin.py ${PHY_SETTING_C} ${MAXEVENTS} ${DATA_YIELD_CSV} ${DATA_AVG_KIN_CSV} ${SIMC_YIELD_CSV} ${SIMC_AVG_KIN_CSV}
+                        python3 ${UTILPATH}/scripts/yield/src/pion_yield_avg_kin.py ${PHY_SETTING_D} ${MAXEVENTS} ${DATA_YIELD_CSV} ${DATA_AVG_KIN_CSV} ${SIMC_YIELD_CSV} ${SIMC_AVG_KIN_CSV}
                     else
                         echo "Skipping  Data & SIMC comparison and plotting script step"
                     fi
-                elif [ ! -f  "${UTILPATH}/OUTPUT/Analysis/PionLT/${PHY_SETTING_C}_${MAXEVENTS}_ProdCoin_Yield_Data.root" ]; then
-                       python3 ${UTILPATH}/scripts/yield/src/pion_yield_avg_kin.py ${PHY_SETTING_C} ${MAXEVENTS} ${DATA_YIELD_CSV} ${DATA_AVG_KIN_CSV} ${SIMC_YIELD_CSV} ${SIMC_AVG_KIN_CSV}
+                elif [ ! -f  "${UTILPATH}/OUTPUT/Analysis/PionLT/${PHY_SETTING_D}_${MAXEVENTS}_ProdCoin_Yield_Data.root" ]; then
+                       python3 ${UTILPATH}/scripts/yield/src/pion_yield_avg_kin.py ${PHY_SETTING_D} ${MAXEVENTS} ${DATA_YIELD_CSV} ${DATA_AVG_KIN_CSV} ${SIMC_YIELD_CSV} ${SIMC_AVG_KIN_CSV}
                 else echo "Pion coin output plots file already found in ${UTILPATH}/OUTPUT/Analysis/PionLT/ - Skipped python plotting script step"
                 fi
 	        )
                 # Directory setup for ROOT files
                 cd $REPLAYPATH/OUTPUT/Analysis/PionLT/
                 avgkin_dir="avg_kin"
-                avg_kin_dir_iter="${PHY_SETTING_C}_std"
+                avg_kin_dir_iter="${PHY_SETTING_D}_std"
                 if [ ! -d "$avgkin_dir/$avg_kin_dir_iter" ]; then
                     mkdir -p "$avgkin_dir/$avg_kin_dir_iter"
                     echo "Directory '$avgkin_dir/$avg_kin_dir_iter' created."

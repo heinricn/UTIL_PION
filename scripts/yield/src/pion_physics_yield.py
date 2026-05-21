@@ -83,7 +83,7 @@ DCUT_CSV    = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/d
 TBINCSVPATH = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/t_binning_csv" % (USER)
 
 # Extract the first three words from PHY_SETTING for the CSV file name
-setting_name = "_".join(PHY_SETTING.split("_")[:3])
+setting_name = "_".join(PHY_SETTING.split("_")[:2])
 physet_dir_name = "%s_std" % (setting_name)
 
 #################################################################################################################################################

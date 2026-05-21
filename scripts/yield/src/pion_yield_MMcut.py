@@ -81,7 +81,8 @@ EFF_CSV     = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/efficiencies
 
 # Define paths SIMC
 # Extract the first three words from PHY_SETTING for the CSV file name
-setting_name = "_".join(PHY_SETTING.split("_")[:3])
+setting_name = "_".join(PHY_SETTING.split("_")[:2])
+print(setting_name)
 physet_dir_name = "%s_std" % (setting_name)
 SIMCPATH = "/volatile/hallc/c-pionlt/%s/OUTPUT/Analysis/SIMC/%s/" % (USER, physet_dir_name)
 
@@ -95,6 +96,7 @@ Pion_Analysis_Distributions = "%s/%s_%s_ProdCoin_Pion_Analysis_MMcut_Distributio
 rootFile_DATA = "%s/%s_%s_%s.root" % (OUTPATH, PHY_SETTING, MaxEvent, DATA_Suffix)
 rootFile_DUMMY = "%s/%s_%s_%s.root" % (OUTPATH, PHY_SETTING, MaxEvent, DUMMY_Suffix)
 rootFile_SIMC = "%s/%s.root" % (SIMCPATH, SIMC_Suffix)
+print(rootFile_SIMC)
 data_run_list = "%s/%s" % (RUNLISTPATH, DATA_RUN_LIST)
 dummy_run_list = "%s/%s" % (RUNLISTPATH, DUMMY_RUN_LIST)
 csv_file = "%s/%s.csv" % (EFF_CSV, CSV_FILE)

@@ -66,6 +66,12 @@ if PHY_SETTING == "Q3p85_W2p62_t0p21":
     pol = +1
     theta_c = +0.000
     ntbins = 7
+elif PHY_SETTING == "Q5p00_W2p95":
+    loweps = "0.292"
+    higheps = "0.779"
+    pol = +1
+    theta_c = +0.000
+    ntbins = 7
 else:
     print("!!!!! Please declare low/mid/high epsilon values of you physics setting !!!!!")
 

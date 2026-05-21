@@ -84,7 +84,7 @@ MMCUT_CSV   = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/m
 EFF_CSV     = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/efficiencies" % (USER)
 
 # Extract the first three words from PHY_SETTING for the CSV file name
-setting_name = "_".join(PHY_SETTING.split("_")[:3])
+setting_name = "_".join(PHY_SETTING.split("_")[:2])
 physet_dir_name = "%s_std" % (setting_name)
 SIMCPATH = "/volatile/hallc/c-pionlt/%s/OUTPUT/Analysis/SIMC/%s/" % (USER, physet_dir_name)
 
@@ -445,8 +445,8 @@ print(f"W distribution starts at: {W_start}, ends at: {W_end}")
 
 # Hardcoded vertices for the diamond cut
 vertex1 = [4.901, 2.935]  # bottom-left
-vertex2 = [4.177, 3.115]  # top-left
-vertex3 = [5.045, 2.969]  # top-right
+vertex2 = [4.3, 3.085]  # top-left
+vertex3 = [5.02, 2.965]  # top-right
 vertex4 = [5.775, 2.785]  # bottom-right
 
 # Print vertices

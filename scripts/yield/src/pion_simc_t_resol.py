@@ -51,6 +51,8 @@ SIMC_SETTING = sys.argv[2]
 #SIMC_Suffix_lowepsright = "Prod_Coin_{SIMC_SETTING}_lowepsright"
 SIMC_Suffix_lowepscenter = "Prod_Coin_{}_lowepscenter".format(SIMC_SETTING)
 SIMC_Suffix_lowepsleft = "Prod_Coin_{}_lowepsleft".format(SIMC_SETTING)
+SIMC_Suffix_midepscenter = "Prod_Coin_{}_midepscenter".format(SIMC_SETTING)
+SIMC_Suffix_midepsleft = "Prod_Coin_{}_midepsleft".format(SIMC_SETTING)
 SIMC_Suffix_highepsright = "Prod_Coin_{}_highepsright".format(SIMC_SETTING)
 SIMC_Suffix_highepscenter = "Prod_Coin_{}_highepscenter".format(SIMC_SETTING)
 SIMC_Suffix_highepsleft = "Prod_Coin_{}_highepsleft".format(SIMC_SETTING)
@@ -77,8 +79,16 @@ DCUT_CSV    = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/d
 
 # Extract the first three words from PHY_SETTING for the CSV file name
 setting_name = "_".join(PHY_SETTING.split("_")[:3])
-physet_dir_name = "%s_std" % (setting_name)
-SIMCPATH = "/volatile/hallc/c-pionlt/%s/worksim/%s/" % (USER, physet_dir_name)
+#print(setting_name)
+physet_dir_name_low = "%s_loweps_std" % (setting_name)
+physet_dir_name_mid = "%s_mideps_std" % (setting_name)
+physet_dir_name_high = "%s_higheps_std" % (setting_name)
+SIMCPATH_low = "/volatile/hallc/c-pionlt/%s/worksim/" % (USER)
+SIMCPATH_mid = "/volatile/hallc/c-pionlt/%s/worksim/" % (USER)
+SIMCPATH_high = "/volatile/hallc/c-pionlt/%s/worksim/" % (USER)
+#SIMCPATH_low = "/volatile/hallc/c-pionlt/%s/OUTPUT/Analysis/SIMC/%s_loweps_std/" % (USER, setting_name)
+#SIMCPATH_mid = "/volatile/hallc/c-pionlt/%s/OUTPUT/Analysis/SIMC/%s_mideps_std/" % (USER, setting_name)
+#SIMCPATH_high = "/volatile/hallc/c-pionlt/%s/OUTPUT/Analysis/SIMC/%s_higheps_std/" % (USER, setting_name)
 
 #################################################################################################################################################
 
@@ -88,16 +98,18 @@ Pion_Analysis_Distributions = "%s/%s_SIMC_Pion_Analysis_tresolution_Distribution
 
 # Extract the first three words from PHY_SETTING for the CSV file name
 setting_name = "_".join(PHY_SETTING.split("_")[:3])
-mmcut_csv_file = "%s/%s/%s_mm_offsets_cuts_parameters.csv" % (MMCUT_CSV, physet_dir_name, setting_name)
-dcut_csv_file = "%s/%s/%s_diamond_cut_parameters.csv" % (DCUT_CSV, physet_dir_name, setting_name)
+mmcut_csv_file = "%s/%s/%s_loweps_mm_offsets_cuts_parameters.csv" % (MMCUT_CSV, physet_dir_name_low, setting_name)
+dcut_csv_file = "%s/%s/%s_loweps_diamond_cut_parameters.csv" % (DCUT_CSV, physet_dir_name_low, setting_name)
 
 # Input file location and variables taking
 #rootFile_SIMC_lowepsright = "%s/%s.root" % (SIMCPATH, SIMC_Suffix_lowepsright)
-rootFile_SIMC_lowepscenter = "%s/%s.root" % (SIMCPATH, SIMC_Suffix_lowepscenter)
-rootFile_SIMC_lowepsleft = "%s/%s.root" % (SIMCPATH, SIMC_Suffix_lowepsleft)
-rootFile_SIMC_highepsright = "%s/%s.root" % (SIMCPATH, SIMC_Suffix_highepsright)
-rootFile_SIMC_highepscenter = "%s/%s.root" % (SIMCPATH, SIMC_Suffix_highepscenter)
-rootFile_SIMC_highepsleft = "%s/%s.root" % (SIMCPATH, SIMC_Suffix_highepsleft)
+rootFile_SIMC_lowepscenter = "%s/%s.root" % (SIMCPATH_low, SIMC_Suffix_lowepscenter)
+rootFile_SIMC_lowepsleft = "%s/%s.root" % (SIMCPATH_low, SIMC_Suffix_lowepsleft)
+rootFile_SIMC_midepscenter = "%s/%s.root" % (SIMCPATH_mid, SIMC_Suffix_midepscenter)
+rootFile_SIMC_midepsleft = "%s/%s.root" % (SIMCPATH_mid, SIMC_Suffix_midepsleft)
+rootFile_SIMC_highepsright = "%s/%s.root" % (SIMCPATH_high, SIMC_Suffix_highepsright)
+rootFile_SIMC_highepscenter = "%s/%s.root" % (SIMCPATH_high, SIMC_Suffix_highepscenter)
+rootFile_SIMC_highepsleft = "%s/%s.root" % (SIMCPATH_high, SIMC_Suffix_highepsleft)
 
 ###################################################################################################################################################
 
@@ -170,7 +182,12 @@ Diamond_Cut = lambda event: (cutg_diamond_simc.IsInside(event.Q2, event.W))
 # Grabs simc number of events and normalizaton factor
 # Function to extract simc number of events and normalization factor
 def extract_simc_factors(simc_suffix):
-    simc_hist = "%s/%s.hist" % (SIMCPATH, simc_suffix)
+    if ("low" in simc_suffix):
+        simc_hist = "%s/%s.hist" % (SIMCPATH_low, simc_suffix)
+    if ("mid" in simc_suffix):
+        simc_hist = "%s/%s.hist" % (SIMCPATH_mid, simc_suffix)
+    if ("high" in simc_suffix):
+        simc_hist = "%s/%s.hist" % (SIMCPATH_high, simc_suffix)
     try:
         with open(simc_hist) as f_simc:
             for line in f_simc:
@@ -194,6 +211,8 @@ def extract_simc_factors(simc_suffix):
 simc_suffixes = {
     "lowepscenter": SIMC_Suffix_lowepscenter,
     "lowepsleft": SIMC_Suffix_lowepsleft,
+    "midepscenter": SIMC_Suffix_midepscenter,
+    "midepsleft": SIMC_Suffix_midepsleft,
     "highepsright": SIMC_Suffix_highepsright,
     "highepscenter": SIMC_Suffix_highepscenter,
     "highepsleft": SIMC_Suffix_highepsleft
@@ -210,18 +229,21 @@ for key, suffix in simc_suffixes.items():
 
 ###################################################################################################################################################
 nbins = 400
-min = -0.2
-max = 0.2
+min = -0.25
+max = 0.25
 
 # Defining Histograms for Pions
 # Histograms for SIMC
 t_ti_resol_pions_simc_lowepscenter_cut_all = ROOT.TH1D("t_ti_resol_pions_simc_lowepscenter_cut_all", "t - ti Distribution loweps_center; t - ti; Counts", nbins, min, max)
 t_ti_resol_pions_simc_lowepsleft_cut_all = ROOT.TH1D("t_ti_resol_pions_simc_lowepsleft_cut_all", "t - ti Distribution loweps_left; t - ti; Counts", nbins, min, max)
+t_ti_resol_pions_simc_midepscenter_cut_all = ROOT.TH1D("t_ti_resol_pions_simc_midepscenter_cut_all", "t - ti Distribution mideps_center; t - ti; Counts", nbins, min, max)
+t_ti_resol_pions_simc_midepsleft_cut_all = ROOT.TH1D("t_ti_resol_pions_simc_midepsleft_cut_all", "t - ti Distribution mideps_left; t - ti; Counts", nbins, min, max)
 t_ti_resol_pions_simc_highepsright_cut_all = ROOT.TH1D("t_ti_resol_pions_simc_highepsright_cut_all", "t - ti Distribution higheps_right; t - ti; Counts", nbins, min, max)
 t_ti_resol_pions_simc_highepscenter_cut_all = ROOT.TH1D("t_ti_resol_pions_simc_highepscenter_cut_all", "t - ti Distribution higheps_center; t - ti; Counts", nbins, min, max)
 t_ti_resol_pions_simc_highepsleft_cut_all = ROOT.TH1D("t_ti_resol_pions_simc_highepsleft_cut_all", "t - ti Distribution higheps_left; t - ti; Counts", nbins, min, max)
 
 t_ti_resol_pions_simc_loweps_cut_all = ROOT.TH1D("t_ti_resol_pions_simc_loweps_cut_all", "t - ti Distribution loweps; t - ti; Counts", nbins, min, max)
+t_ti_resol_pions_simc_mideps_cut_all = ROOT.TH1D("t_ti_resol_pions_simc_mideps_cut_all", "t - ti Distribution mideps; t - ti; Counts", nbins, min, max)
 t_ti_resol_pions_simc_higheps_cut_all = ROOT.TH1D("t_ti_resol_pions_simc_higheps_cut_all", "t - ti Distribution higheps; t - ti; Counts", nbins, min, max)
 
 ##########################################################################################################################################################################################################
@@ -230,12 +252,16 @@ t_ti_resol_pions_simc_higheps_cut_all = ROOT.TH1D("t_ti_resol_pions_simc_higheps
 #infile_SIMC_lowepsright = ROOT.TFile.Open(rootFile_SIMC_lowepsright, "READ")
 infile_SIMC_lowepscenter = ROOT.TFile.Open(rootFile_SIMC_lowepscenter, "READ")
 infile_SIMC_lowepsleft = ROOT.TFile.Open(rootFile_SIMC_lowepsleft, "READ")
+infile_SIMC_midepscenter = ROOT.TFile.Open(rootFile_SIMC_midepscenter, "READ")
+infile_SIMC_midepsleft = ROOT.TFile.Open(rootFile_SIMC_midepsleft, "READ")
 infile_SIMC_highepsright = ROOT.TFile.Open(rootFile_SIMC_highepsright, "READ")
 infile_SIMC_highepscenter = ROOT.TFile.Open(rootFile_SIMC_highepscenter, "READ")
 infile_SIMC_highepsleft = ROOT.TFile.Open(rootFile_SIMC_highepsleft, "READ")
 
 Uncut_Pion_Events_SIMC_lowepscenter_tree = infile_SIMC_lowepscenter.Get("h10")
 Uncut_Pion_Events_SIMC_lowepsleft_tree = infile_SIMC_lowepsleft.Get("h10")
+Uncut_Pion_Events_SIMC_midepscenter_tree = infile_SIMC_midepscenter.Get("h10")
+Uncut_Pion_Events_SIMC_midepsleft_tree = infile_SIMC_midepsleft.Get("h10")
 Uncut_Pion_Events_SIMC_highepsright_tree = infile_SIMC_highepsright.Get("h10")
 Uncut_Pion_Events_SIMC_highepscenter_tree = infile_SIMC_highepscenter.Get("h10")
 Uncut_Pion_Events_SIMC_highepsleft_tree = infile_SIMC_highepsleft.Get("h10")
@@ -244,15 +270,33 @@ Uncut_Pion_Events_SIMC_highepsleft_tree = infile_SIMC_highepsleft.Get("h10")
 
 
 # Fill histograms from SIMC ROOT File
+i = 0
 for event in Uncut_Pion_Events_SIMC_lowepscenter_tree:
     # Define the acceptance cuts
     if HMS_Acceptance(event) & SHMS_Acceptance(event) & SIMC_MMpi_Cut(event) & Diamond_Cut(event):        
         t_ti_resol_pions_simc_lowepscenter_cut_all.Fill(event.t - event.ti, event.Weight)
+        if(i%1000 == 0):
+            print("event t, ti, weight:")
+            print(event.t)
+            print(event.ti)
+            print(event.Weight)
+            print("\n")
+            i=i+1
 
 for event in Uncut_Pion_Events_SIMC_lowepsleft_tree:
     # Define the acceptance cuts
     if HMS_Acceptance(event) & SHMS_Acceptance(event) & SIMC_MMpi_Cut(event) & Diamond_Cut(event):        
         t_ti_resol_pions_simc_lowepsleft_cut_all.Fill(event.t - event.ti, event.Weight)
+
+for event in Uncut_Pion_Events_SIMC_midepscenter_tree:
+    # Define the acceptance cuts
+    if HMS_Acceptance(event) & SHMS_Acceptance(event) & SIMC_MMpi_Cut(event) & Diamond_Cut(event):        
+        t_ti_resol_pions_simc_midepscenter_cut_all.Fill(event.t - event.ti, event.Weight)
+
+for event in Uncut_Pion_Events_SIMC_midepsleft_tree:
+    # Define the acceptance cuts
+    if HMS_Acceptance(event) & SHMS_Acceptance(event) & SIMC_MMpi_Cut(event) & Diamond_Cut(event):        
+        t_ti_resol_pions_simc_midepsleft_cut_all.Fill(event.t - event.ti, event.Weight)
 
 for event in Uncut_Pion_Events_SIMC_highepsright_tree:
     # Define the acceptance cuts
@@ -278,6 +322,8 @@ print("####################################\n")
 # SIMC Normalization
 normfac_simc_lowepscenter = normfac_simc_dict["lowepscenter"]
 normfac_simc_lowepsleft = normfac_simc_dict["lowepsleft"]
+normfac_simc_midepscenter = normfac_simc_dict["midepscenter"]
+normfac_simc_midepsleft = normfac_simc_dict["midepsleft"]
 normfac_simc_highepsright = normfac_simc_dict["highepsright"]
 normfac_simc_highepscenter = normfac_simc_dict["highepscenter"]
 normfac_simc_highepsleft = normfac_simc_dict["highepsleft"]
@@ -285,6 +331,8 @@ normfac_simc_highepsleft = normfac_simc_dict["highepsleft"]
 # Normalizing histograms
 t_ti_resol_pions_simc_lowepscenter_cut_all.Scale(normfac_simc_lowepscenter)
 t_ti_resol_pions_simc_lowepsleft_cut_all.Scale(normfac_simc_lowepsleft)
+t_ti_resol_pions_simc_midepscenter_cut_all.Scale(normfac_simc_midepscenter)
+t_ti_resol_pions_simc_midepsleft_cut_all.Scale(normfac_simc_midepsleft)
 t_ti_resol_pions_simc_highepsright_cut_all.Scale(normfac_simc_highepsright)
 t_ti_resol_pions_simc_highepscenter_cut_all.Scale(normfac_simc_highepscenter)
 t_ti_resol_pions_simc_highepsleft_cut_all.Scale(normfac_simc_highepsleft)
@@ -294,6 +342,7 @@ t_ti_resol_pions_simc_highepsleft_cut_all.Scale(normfac_simc_highepsleft)
 # Resolution Histograms
 # Adding left right and center settings for both low and high epsilon
 t_ti_resol_pions_simc_loweps_cut_all.Add(t_ti_resol_pions_simc_lowepscenter_cut_all, t_ti_resol_pions_simc_lowepsleft_cut_all, 1, 1)
+t_ti_resol_pions_simc_mideps_cut_all.Add(t_ti_resol_pions_simc_midepscenter_cut_all, t_ti_resol_pions_simc_midepsleft_cut_all, 1, 1)
 t_ti_resol_pions_simc_higheps_cut_all.Add(t_ti_resol_pions_simc_highepsright_cut_all, t_ti_resol_pions_simc_highepscenter_cut_all, 1, 1)
 t_ti_resol_pions_simc_higheps_cut_all.Add(t_ti_resol_pions_simc_highepsleft_cut_all, 1)
 
@@ -303,12 +352,12 @@ t_ti_resol_pions_simc_higheps_cut_all.Add(t_ti_resol_pions_simc_highepsleft_cut_
 ROOT.gStyle.SetOptStat(0)
 
 # Fit ranges for the t-t_i resolution histograms
-fit_range_low = -0.008
-fit_range_high = 0.008
+fit_range_low = -0.03
+fit_range_high = 0.03
 
 # Saving histograms in PDF
 c1_delta = TCanvas("c1_delta", "Variables Distributions", 100, 0, 1400, 1400)
-c1_delta.Divide(1,2)
+c1_delta.Divide(1,3)
 # Add PHY_SETTING to the left of the plots
 phy_setting_text = ROOT.TLatex()
 phy_setting_text.SetTextSize(0.05)
@@ -330,6 +379,21 @@ loweps_t_ti_resol = ROOT.TLegend(0.7, 0.7, 0.9, 0.9)
 loweps_t_ti_resol.AddEntry(t_ti_resol_pions_simc_loweps_cut_all, "low #epsilon", "l")
 loweps_t_ti_resol.Draw()
 c1_delta.cd(2)
+t_ti_resol_pions_simc_mideps_cut_all.Draw("hist")
+t_ti_resol_pions_simc_mideps_cut_all.Fit("gaus", "Q", "", fit_range_low, fit_range_high)
+fit_t_ti_mideps = t_ti_resol_pions_simc_mideps_cut_all.GetFunction('gaus')
+fit_t_ti_mideps.SetLineColor(ROOT.kRed)
+fit_t_ti_mideps.Draw("same")
+mideps_sigma = ROOT.TLatex()
+mideps_sigma.SetTextSize(0.05)
+mideps_sigma.SetTextAlign(13)
+mideps_sigma.SetNDC()
+mideps_sigma.DrawLatex(0.6, 0.5, f'#color[2]{{#sigma}} = {fit_t_ti_mideps.GetParameter(2):.5f}#pm{fit_t_ti_mideps.GetParError(2):.5f}')
+phy_setting_text.DrawLatex(0.13, 0.7, f"#color[1]{{Setting: {PHY_SETTING}}}")
+mideps_t_ti_resol = ROOT.TLegend(0.7, 0.7, 0.9, 0.9)
+mideps_t_ti_resol.AddEntry(t_ti_resol_pions_simc_mideps_cut_all, "mid #epsilon", "l")
+mideps_t_ti_resol.Draw()
+c1_delta.cd(3)
 t_ti_resol_pions_simc_higheps_cut_all.Draw("hist")
 t_ti_resol_pions_simc_higheps_cut_all.Fit("gaus", "Q", "", fit_range_low, fit_range_high)
 fit_t_ti_higheps = t_ti_resol_pions_simc_higheps_cut_all.GetFunction('gaus')
@@ -348,11 +412,22 @@ c1_delta.Print(Pion_Analysis_Distributions)
 #############################################################################################################################################
 
 # Writing the vertices to the CSV file
-csv_output_path = "%s/LTSep_CSVs/t_resolution_csv/%s/%s_simc_t_resolution_parameters.csv" % (UTILPATH, physet_dir_name, setting_name)
+csv_output_path = "%s/LTSep_CSVs/t_resolution_csv/%s_simc_t_resolution_parameters.csv" % (UTILPATH, setting_name)
+
+loweps_value = 0
+loweps_error = 0
+mideps_value = 0
+mideps_error = 0
+higheps_value = 0
+higheps_error = 0
 
 # Extract the fit parameters for low epsilon
 loweps_value = fit_t_ti_loweps.GetParameter(2)
 loweps_error = fit_t_ti_loweps.GetParError(2)
+
+# Extract the fit parameters for mid epsilon
+mideps_value = fit_t_ti_mideps.GetParameter(2)
+mideps_error = fit_t_ti_mideps.GetParError(2)
 
 # Extract the fit parameters for high epsilon
 higheps_value = fit_t_ti_higheps.GetParameter(2)
@@ -365,6 +440,8 @@ with open(csv_output_path, mode='w', newline='') as csv_file:
     csv_writer.writerow(["Setting", "Value", "Error"])
     # Write the data for low epsilon
     csv_writer.writerow(["loweps", f"{loweps_value:.5f}", f"{loweps_error:.5f}"])
+    # Write the data for low epsilon
+    csv_writer.writerow(["mideps", f"{mideps_value:.5f}", f"{mideps_error:.5f}"])
     # Write the data for high epsilon
     csv_writer.writerow(["higheps", f"{higheps_value:.5f}", f"{higheps_error:.5f}"])
 
@@ -380,10 +457,13 @@ d_Cut_Pion_Events_SIMC_Cut_All = outHistFile.mkdir("Cut_Pion_Events_SIMC_Cut_All
 d_Cut_Pion_Events_SIMC_Cut_All.cd()
 t_ti_resol_pions_simc_lowepscenter_cut_all.Write()
 t_ti_resol_pions_simc_lowepsleft_cut_all.Write()
+t_ti_resol_pions_simc_midepscenter_cut_all.Write()
+t_ti_resol_pions_simc_midepsleft_cut_all.Write()
 t_ti_resol_pions_simc_highepsright_cut_all.Write()
 t_ti_resol_pions_simc_highepscenter_cut_all.Write()
 t_ti_resol_pions_simc_highepsleft_cut_all.Write()
 t_ti_resol_pions_simc_loweps_cut_all.Write()
+t_ti_resol_pions_simc_mideps_cut_all.Write()
 t_ti_resol_pions_simc_higheps_cut_all.Write()
 
 print("####################################")
@@ -392,6 +472,8 @@ print("####################################\n")
 
 infile_SIMC_lowepscenter.Close()
 infile_SIMC_lowepsleft.Close()
+infile_SIMC_midepscenter.Close()
+infile_SIMC_midepsleft.Close()
 infile_SIMC_highepsright.Close()
 infile_SIMC_highepscenter.Close()
 infile_SIMC_highepsleft.Close()

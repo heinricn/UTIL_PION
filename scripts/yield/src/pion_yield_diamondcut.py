@@ -46,10 +46,10 @@ if len(sys.argv)-1!=8:
 
 ##################################################################################################################################################
 # Set ploting ranges for histograms
-QHist_low = 4
-QHist_high = 6
-WHist_low = 2.7
-WHist_high = 3.2
+QHist_low = 4.7
+QHist_high = 7.3
+WHist_low = 2.95
+WHist_high = 3.45
 
 ##################################################################################################################################################
 # Input params - run number and max number of events
@@ -444,10 +444,10 @@ print(f"Q2 distribution starts at: {Q2_start}, ends at: {Q2_end}")
 print(f"W distribution starts at: {W_start}, ends at: {W_end}")
 
 # Hardcoded vertices for the diamond cut
-vertex1 = [4.901, 2.935]  # bottom-left
-vertex2 = [4.3, 3.085]  # top-left
-vertex3 = [5.02, 2.965]  # top-right
-vertex4 = [5.775, 2.785]  # bottom-right
+vertex1 = [5.897, 3.18]  # bottom-left
+vertex2 = [5.1, 3.35]  # top-left
+vertex3 = [6.05, 3.2]  # top-right
+vertex4 = [6.92, 3.02]  # bottom-right
 
 # Print vertices
 print("Vertices of the populated area:")

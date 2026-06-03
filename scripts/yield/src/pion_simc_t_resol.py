@@ -78,17 +78,17 @@ MMCUT_CSV   = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/m
 DCUT_CSV    = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/diamond_cut_csv" % (USER)
 
 # Extract the first three words from PHY_SETTING for the CSV file name
-setting_name = "_".join(PHY_SETTING.split("_")[:3])
+setting_name = "_".join(PHY_SETTING.split("_")[:2])
 #print(setting_name)
-physet_dir_name_low = "%s_loweps_std" % (setting_name)
-physet_dir_name_mid = "%s_mideps_std" % (setting_name)
-physet_dir_name_high = "%s_higheps_std" % (setting_name)
-SIMCPATH_low = "/volatile/hallc/c-pionlt/%s/worksim/" % (USER)
-SIMCPATH_mid = "/volatile/hallc/c-pionlt/%s/worksim/" % (USER)
-SIMCPATH_high = "/volatile/hallc/c-pionlt/%s/worksim/" % (USER)
-#SIMCPATH_low = "/volatile/hallc/c-pionlt/%s/OUTPUT/Analysis/SIMC/%s_loweps_std/" % (USER, setting_name)
-#SIMCPATH_mid = "/volatile/hallc/c-pionlt/%s/OUTPUT/Analysis/SIMC/%s_mideps_std/" % (USER, setting_name)
-#SIMCPATH_high = "/volatile/hallc/c-pionlt/%s/OUTPUT/Analysis/SIMC/%s_higheps_std/" % (USER, setting_name)
+physet_dir_name_low = "%s_std" % (setting_name)
+physet_dir_name_mid = "%s_std" % (setting_name)
+physet_dir_name_high = "%s_std" % (setting_name)
+#SIMCPATH_low = "/volatile/hallc/c-pionlt/%s/worksim/" % (USER)
+#SIMCPATH_mid = "/volatile/hallc/c-pionlt/%s/worksim/" % (USER)
+#SIMCPATH_high = "/volatile/hallc/c-pionlt/%s/worksim/" % (USER)
+SIMCPATH_low = "/volatile/hallc/c-pionlt/%s/OUTPUT/Analysis/SIMC/%s_std/" % (USER, setting_name)
+SIMCPATH_mid = "/volatile/hallc/c-pionlt/%s/OUTPUT/Analysis/SIMC/%s_std/" % (USER, setting_name)
+SIMCPATH_high = "/volatile/hallc/c-pionlt/%s/OUTPUT/Analysis/SIMC/%s_std/" % (USER, setting_name)
 
 #################################################################################################################################################
 
@@ -97,9 +97,9 @@ print("Running as %s on %s, hallc_replay_lt path assumed as %s" % (USER, HOST, R
 Pion_Analysis_Distributions = "%s/%s_SIMC_Pion_Analysis_tresolution_Distributions.pdf" % (OUTPATH, PHY_SETTING)
 
 # Extract the first three words from PHY_SETTING for the CSV file name
-setting_name = "_".join(PHY_SETTING.split("_")[:3])
-mmcut_csv_file = "%s/%s/%s_loweps_mm_offsets_cuts_parameters.csv" % (MMCUT_CSV, physet_dir_name_low, setting_name)
-dcut_csv_file = "%s/%s/%s_loweps_diamond_cut_parameters.csv" % (DCUT_CSV, physet_dir_name_low, setting_name)
+setting_name = "_".join(PHY_SETTING.split("_")[:2])
+mmcut_csv_file = "%s/%s/%s_mm_offsets_cuts_parameters.csv" % (MMCUT_CSV, physet_dir_name_low, setting_name)
+dcut_csv_file = "%s/%s/%s_diamond_cut_parameters.csv" % (DCUT_CSV, physet_dir_name_low, setting_name)
 
 # Input file location and variables taking
 #rootFile_SIMC_lowepsright = "%s/%s.root" % (SIMCPATH, SIMC_Suffix_lowepsright)
@@ -274,7 +274,7 @@ i = 0
 for event in Uncut_Pion_Events_SIMC_lowepscenter_tree:
     # Define the acceptance cuts
     if HMS_Acceptance(event) & SHMS_Acceptance(event) & SIMC_MMpi_Cut(event) & Diamond_Cut(event):        
-        t_ti_resol_pions_simc_lowepscenter_cut_all.Fill(event.t - event.ti, event.Weight)
+        t_ti_resol_pions_simc_lowepscenter_cut_all.Fill(event.t + event.ti, event.Weight)
         if(i%1000 == 0):
             print("event t, ti, weight:")
             print(event.t)
@@ -286,32 +286,32 @@ for event in Uncut_Pion_Events_SIMC_lowepscenter_tree:
 for event in Uncut_Pion_Events_SIMC_lowepsleft_tree:
     # Define the acceptance cuts
     if HMS_Acceptance(event) & SHMS_Acceptance(event) & SIMC_MMpi_Cut(event) & Diamond_Cut(event):        
-        t_ti_resol_pions_simc_lowepsleft_cut_all.Fill(event.t - event.ti, event.Weight)
+        t_ti_resol_pions_simc_lowepsleft_cut_all.Fill(event.t + event.ti, event.Weight)
 
 for event in Uncut_Pion_Events_SIMC_midepscenter_tree:
     # Define the acceptance cuts
     if HMS_Acceptance(event) & SHMS_Acceptance(event) & SIMC_MMpi_Cut(event) & Diamond_Cut(event):        
-        t_ti_resol_pions_simc_midepscenter_cut_all.Fill(event.t - event.ti, event.Weight)
+        t_ti_resol_pions_simc_midepscenter_cut_all.Fill(event.t + event.ti, event.Weight)
 
 for event in Uncut_Pion_Events_SIMC_midepsleft_tree:
     # Define the acceptance cuts
     if HMS_Acceptance(event) & SHMS_Acceptance(event) & SIMC_MMpi_Cut(event) & Diamond_Cut(event):        
-        t_ti_resol_pions_simc_midepsleft_cut_all.Fill(event.t - event.ti, event.Weight)
+        t_ti_resol_pions_simc_midepsleft_cut_all.Fill(event.t + event.ti, event.Weight)
 
 for event in Uncut_Pion_Events_SIMC_highepsright_tree:
     # Define the acceptance cuts
     if HMS_Acceptance(event) & SHMS_Acceptance(event) & SIMC_MMpi_Cut(event) & Diamond_Cut(event):        
-        t_ti_resol_pions_simc_highepsright_cut_all.Fill(event.t - event.ti, event.Weight)
+        t_ti_resol_pions_simc_highepsright_cut_all.Fill(event.t + event.ti, event.Weight)
 
 for event in Uncut_Pion_Events_SIMC_highepscenter_tree:
     # Define the acceptance cuts
     if HMS_Acceptance(event) & SHMS_Acceptance(event) & SIMC_MMpi_Cut(event) & Diamond_Cut(event):        
-        t_ti_resol_pions_simc_highepscenter_cut_all.Fill(event.t - event.ti, event.Weight)
+        t_ti_resol_pions_simc_highepscenter_cut_all.Fill(event.t + event.ti, event.Weight)
 
 for event in Uncut_Pion_Events_SIMC_highepsleft_tree:
     # Define the acceptance cuts
     if HMS_Acceptance(event) & SHMS_Acceptance(event) & SIMC_MMpi_Cut(event) & Diamond_Cut(event):        
-        t_ti_resol_pions_simc_highepsleft_cut_all.Fill(event.t - event.ti, event.Weight)
+        t_ti_resol_pions_simc_highepsleft_cut_all.Fill(event.t + event.ti, event.Weight)
 
 print("####################################")
 print("###### Histogram filling done ######")

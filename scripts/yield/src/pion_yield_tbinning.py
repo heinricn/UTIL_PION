@@ -57,7 +57,7 @@ DATA_Suffix_lowepscenter = "{}_loweps_center".format(PHY_SETTING)
 DATA_Suffix_lowepsleft = "{}_loweps_left".format(PHY_SETTING)
 DATA_Suffix_midepscenter = "{}_mideps_center".format(PHY_SETTING)
 DATA_Suffix_midepsleft = "{}_mideps_left".format(PHY_SETTING)
-DATA_Suffix_midepsright = "{}_mideps_right".format(PHY_SETTING)
+#DATA_Suffix_midepsright = "{}_mideps_right".format(PHY_SETTING)
 DATA_Suffix_highepsright = "{}_higheps_right".format(PHY_SETTING)
 DATA_Suffix_highepscenter = "{}_higheps_center".format(PHY_SETTING)
 DATA_Suffix_highepsleft = "{}_higheps_left".format(PHY_SETTING)
@@ -85,6 +85,7 @@ ANATYPE=lt.ANATYPE
 OUTPATH=lt.OUTPATH
 RUNLISTPATH = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_BATCH/InputRunLists/PionLT_2021_2022" % (USER)
 MMCUT_CSV   = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/mm_offset_cut_csv" % (USER)
+TSHIFT_CSV   = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/t_shift" % (USER)
 DCUT_CSV    = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/diamond_cut_csv" % (USER)
 SIMC_tRES_CSV = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/t_resolution_csv" % (USER)
 
@@ -96,6 +97,7 @@ Pion_Analysis_Distributions = "%s/%s_%s_ProdCoin_Pion_Analysis_tbinning_Distribu
 
 # Extract the first three words from PHY_SETTING for the CSV file name
 mmcut_csv_file = "%s/%s/%s_mm_offsets_cuts_parameters.csv" % (MMCUT_CSV, physet_dir_name, setting_name)
+tshift_csv_file = "%s/%s/%s_toffsets.csv" % (TSHIFT_CSV, physet_dir_name, setting_name)
 print("missing mass cut csv")
 print(mmcut_csv_file)
 dcut_csv_file = "%s/%s/%s_diamond_cut_parameters.csv" % (DCUT_CSV, physet_dir_name, setting_name)
@@ -106,7 +108,7 @@ rootFile_DATA_lowepscenter = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_lowepsce
 rootFile_DATA_lowepsleft = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_lowepsleft, MaxEvent, DATA_Suffix)
 rootFile_DATA_midepscenter = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_midepscenter, MaxEvent, DATA_Suffix)
 rootFile_DATA_midepsleft = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_midepsleft, MaxEvent, DATA_Suffix)
-rootFile_DATA_midepsright = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_midepsright, MaxEvent, DATA_Suffix)
+#rootFile_DATA_midepsright = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_midepsright, MaxEvent, DATA_Suffix)
 rootFile_DATA_highepsright = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_highepsright, MaxEvent, DATA_Suffix)
 rootFile_DATA_highepscenter = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_highepscenter, MaxEvent, DATA_Suffix)
 rootFile_DATA_highepsleft = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_highepsleft, MaxEvent, DATA_Suffix)
@@ -115,7 +117,7 @@ rootFile_DUMMY_lowepscenter = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_lowepsc
 rootFile_DUMMY_lowepsleft = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_lowepsleft, MaxEvent, DUMMY_Suffix)
 rootFile_DUMMY_midepscenter = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_midepscenter, MaxEvent, DUMMY_Suffix)
 rootFile_DUMMY_midepsleft = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_midepsleft, MaxEvent, DUMMY_Suffix)
-rootFile_DUMMY_midepsright = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_midepsright, MaxEvent, DUMMY_Suffix)
+#rootFile_DUMMY_midepsright = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_midepsright, MaxEvent, DUMMY_Suffix)
 rootFile_DUMMY_highepsright = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_highepsright, MaxEvent, DUMMY_Suffix)
 rootFile_DUMMY_highepscenter = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_highepscenter, MaxEvent, DUMMY_Suffix)
 rootFile_DUMMY_highepsleft = "%s/%s_%s_%s.root" % (OUTPATH, DATA_Suffix_highepsleft, MaxEvent, DUMMY_Suffix)
@@ -202,8 +204,8 @@ try:
                 MM_Offset_midepsleft = float(row["MM_Offset"])
             elif row[csv_reader.fieldnames[0]].strip() == DATA_Suffix_midepscenter:
                 MM_Offset_midepscenter = float(row["MM_Offset"])
-            elif row[csv_reader.fieldnames[0]].strip() == DATA_Suffix_midepsright:
-                MM_Offset_midepsright = float(row["MM_Offset"])
+            #elif row[csv_reader.fieldnames[0]].strip() == DATA_Suffix_midepsright:
+                #MM_Offset_midepsright = float(row["MM_Offset"])
             elif row[csv_reader.fieldnames[0]].strip() == DATA_Suffix_highepsright:
                 MM_Offset_highepsright = float(row["MM_Offset"])
             elif row[csv_reader.fieldnames[0]].strip() == DATA_Suffix_highepscenter:
@@ -238,7 +240,7 @@ DATA_MMpi_Cut_lowepscenter = lambda event: (MM_Cut_lowvalue <= (event.MMpi + MM_
 DATA_MMpi_Cut_lowepsleft = lambda event: (MM_Cut_lowvalue <= (event.MMpi + MM_Offset_lowepsleft) <= MM_Cut_highvalue)
 DATA_MMpi_Cut_midepscenter = lambda event: (MM_Cut_lowvalue <= (event.MMpi + MM_Offset_midepscenter) <= MM_Cut_highvalue)
 DATA_MMpi_Cut_midepsleft = lambda event: (MM_Cut_lowvalue <= (event.MMpi + MM_Offset_midepsleft) <= MM_Cut_highvalue)
-DATA_MMpi_Cut_midepsright = lambda event: (MM_Cut_lowvalue <= (event.MMpi + MM_Offset_midepsright) <= MM_Cut_highvalue)
+#DATA_MMpi_Cut_midepsright = lambda event: (MM_Cut_lowvalue <= (event.MMpi + MM_Offset_midepsright) <= MM_Cut_highvalue)
 DATA_MMpi_Cut_highepsright = lambda event: (MM_Cut_lowvalue <= (event.MMpi + MM_Offset_highepsright) <= MM_Cut_highvalue)
 DATA_MMpi_Cut_highepscenter = lambda event: (MM_Cut_lowvalue <= (event.MMpi + MM_Offset_highepscenter) <= MM_Cut_highvalue)
 DATA_MMpi_Cut_highepsleft = lambda event: (MM_Cut_lowvalue <= (event.MMpi + MM_Offset_highepsleft) <= MM_Cut_highvalue)
@@ -268,68 +270,47 @@ except (FileNotFoundError, ValueError, KeyError) as e:
 print(f"SIMC t-resolution (loweps): {simc_t_resolution_pions_lowe}")
 print(f"SIMC t-resolution (higheps): {simc_t_resolution_pions_highe}")
 
+#####################################################################
+####  load in the t-offsets, THese need to be set manually - NH  ####
+#####################################################################
+
+try:
+    with open(tshift_csv_file, mode='r') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        for row in csv_reader:
+            if row[csv_reader.fieldnames[0]].strip() == DATA_Suffix_lowepscenter:
+                t_Offset_lowepscenter = float(row["t_shift"])
+            elif row[csv_reader.fieldnames[0]].strip() == DATA_Suffix_lowepsleft:
+                t_Offset_lowepsleft = float(row["t_shift"])
+            elif row[csv_reader.fieldnames[0]].strip() == DATA_Suffix_midepsleft:
+                t_Offset_midepsleft = float(row["t_shift"])
+            elif row[csv_reader.fieldnames[0]].strip() == DATA_Suffix_midepscenter:
+                t_Offset_midepscenter = float(row["t_shift"])
+            #elif row[csv_reader.fieldnames[0]].strip() == DATA_Suffix_midepsright:
+                #t_Offset_midepsright = float(row["t_shift"])
+            elif row[csv_reader.fieldnames[0]].strip() == DATA_Suffix_highepsright:
+                t_Offset_highepsright = float(row["t_shift"])
+            elif row[csv_reader.fieldnames[0]].strip() == DATA_Suffix_highepscenter:
+                t_Offset_highepscenter = float(row["t_shift"])
+            elif row[csv_reader.fieldnames[0]].strip() == DATA_Suffix_highepsleft:
+                t_Offset_highepsleft = float(row["t_shift"])
+except (FileNotFoundError, ValueError, KeyError) as e:
+    print(f"Error reading t_shift values from {tshift_csv_file}: {e}")
+    print("This probably means that you did not make it, which must be done manually!\nSetting Offsets to zero!\n")
+    t_Offset_lowepscenter = 0
+    t_Offset_lowepsleft = 0
+    t_Offset_midepsleft = 0
+    t_Offset_midepscenter = 0
+    t_Offset_midepsright = 0
+    t_Offset_highepsleft = 0
+    t_Offset_highepscenter = 0
+    t_Offset_highepsright = 0
+    
+
 
 ###################################################################################################################################################
-
-# Section for grabing Prompt/Random selection parameters from PARAM filePARAMPATH = UTILPATH+"/DB/PARAM"
-# Function to read run numbers from a given run list file
-def read_run_numbers(run_list_file):
-    try:
-        with open(run_list_file, 'r') as f:
-            return [int(line.strip()) for line in f if line.strip().isdigit()]
-    except FileNotFoundError:
-        print(f"!!!!! ERROR !!!!!\nRun list file not found: {run_list_file}\n!!!!! ERROR !!!!!")
-        sys.exit(2)
-
-# Read run numbers from the specified files
-run_numbers = read_run_numbers(run_list)
-
-# Section for grabbing Prompt/Random selection parameters from PARAM file
-PARAMPATH = UTILPATH+"/DB/PARAM/PionLT"
-TimingCutFile = "%s/PionLT_Timing_Parameters.csv" % PARAMPATH # This should match the param file actually being used!
-
-TimingCutf = open(TimingCutFile)
-try:
-    TimingCutFile
-except NameError:
-    print("!!!!! ERRROR !!!!!\n One (or more) of the cut files not found!\n!!!!! ERRORR !!!!!")
-    sys.exit(2)
-print("Reading timing cuts from %s" % TimingCutFile)
-
-PromptWindow = [0, 0]
-RandomWindows = [0, 0, 0, 0]
-linenum = 0 # Count line number we're on
-TempPar = -1 # To check later
-for line in TimingCutf: # Read all lines in the cut file
-    linenum += 1 # Add one to line number at start of loop
-    if(linenum > 1): # Skip first line
-        line = line.partition('#')[0] # Treat anything after a # as a comment and ignore it
-        line = line.rstrip()
-        array_list = line.split(",") # Convert line into an array_list, anything after a comma is a new entry
-
-        # Check if any of the run numbers are within the specified range
-        if any(run_num in range(int(array_list[0]), int(array_list[1]) + 1) for run_num in run_numbers):
-            TempPar += 2  # If run number is in range, set to non -1 value
-            BunchSpacing = float(array_list[2])
-            CoinOffset = float(array_list[3])  # Coin offset value
-            nSkip = float(array_list[4])  # Number of random windows skipped
-            nWindows = float(array_list[5])  # Total number of random windows
-            PromptPeak = float(array_list[6])  # Pion CT prompt peak position
-
-if(TempPar == -1): # If value is still -1, run number provided din't match any ranges specified so exit
-    print("!!!!! ERROR !!!!!\n Run number specified does not fall within a set of runs for which cuts are defined in %s\n!!!!! ERROR !!!!!" % TimingCutFile)
-    sys.exit(3)
-elif(TempPar > 1):
-    print("!!! WARNING!!! Run number was found within the range of two (or more) line entries of %s !!! WARNING !!!" % TimingCutFile)
-    print("The last matching entry will be treated as the input, you should ensure this is what you want")
-
-# From our values from the file, reconstruct our windows
-PromptWindow[0] = PromptPeak - (BunchSpacing/2) - CoinOffset
-PromptWindow[1] = PromptPeak + (BunchSpacing/2) + CoinOffset
-RandomWindows[0] = PromptPeak - (BunchSpacing/2) - CoinOffset - (nSkip*BunchSpacing) - ((nWindows/2)*BunchSpacing)
-RandomWindows[1] = PromptPeak - (BunchSpacing/2) - CoinOffset - (nSkip*BunchSpacing)
-RandomWindows[2] = PromptPeak + (BunchSpacing/2) + CoinOffset + (nSkip*BunchSpacing) 
-RandomWindows[3] = PromptPeak + (BunchSpacing/2) + CoinOffset + (nSkip*BunchSpacing) + ((nWindows/2)*BunchSpacing)
+# I deleted this whole section in favor of manually setting the nWindows
+nWindows=6
 
 ###################################################################################################################################################
 nbins = 500
@@ -490,7 +471,7 @@ infile_DATA_lowepscenter = ROOT.TFile.Open(rootFile_DATA_lowepscenter, "READ")
 infile_DATA_lowepsleft = ROOT.TFile.Open(rootFile_DATA_lowepsleft, "READ")
 infile_DATA_midepscenter = ROOT.TFile.Open(rootFile_DATA_midepscenter, "READ")
 infile_DATA_midepsleft = ROOT.TFile.Open(rootFile_DATA_midepsleft, "READ")
-infile_DATA_midepsright = ROOT.TFile.Open(rootFile_DATA_midepsright, "READ")
+#infile_DATA_midepsright = ROOT.TFile.Open(rootFile_DATA_midepsright, "READ")
 infile_DATA_highepsright = ROOT.TFile.Open(rootFile_DATA_highepsright, "READ")
 infile_DATA_highepscenter = ROOT.TFile.Open(rootFile_DATA_highepscenter, "READ")
 infile_DATA_highepsleft = ROOT.TFile.Open(rootFile_DATA_highepsleft, "READ")
@@ -499,7 +480,7 @@ infile_DUMMY_lowepscenter = ROOT.TFile.Open(rootFile_DUMMY_lowepscenter, "READ")
 infile_DUMMY_lowepsleft = ROOT.TFile.Open(rootFile_DUMMY_lowepsleft, "READ")
 infile_DUMMY_midepscenter = ROOT.TFile.Open(rootFile_DUMMY_midepscenter, "READ")
 infile_DUMMY_midepsleft = ROOT.TFile.Open(rootFile_DUMMY_midepsleft, "READ")
-infile_DUMMY_midepsright = ROOT.TFile.Open(rootFile_DUMMY_midepsright, "READ")
+#infile_DUMMY_midepsright = ROOT.TFile.Open(rootFile_DUMMY_midepsright, "READ")
 infile_DUMMY_highepsright = ROOT.TFile.Open(rootFile_DUMMY_highepsright, "READ")
 infile_DUMMY_highepscenter = ROOT.TFile.Open(rootFile_DUMMY_highepscenter, "READ")
 infile_DUMMY_highepsleft = ROOT.TFile.Open(rootFile_DUMMY_highepsleft, "READ")
@@ -513,8 +494,8 @@ Cut_Pion_Events_Prompt_Data_midepscenter_tree = infile_DATA_midepscenter.Get("Cu
 Cut_Pion_Events_Random_Data_midepscenter_tree = infile_DATA_midepscenter.Get("Cut_Pion_Events_Random")
 Cut_Pion_Events_Prompt_Data_midepsleft_tree = infile_DATA_midepsleft.Get("Cut_Pion_Events_Prompt")
 Cut_Pion_Events_Random_Data_midepsleft_tree = infile_DATA_midepsleft.Get("Cut_Pion_Events_Random")
-Cut_Pion_Events_Prompt_Data_midepsright_tree = infile_DATA_midepsright.Get("Cut_Pion_Events_Prompt")
-Cut_Pion_Events_Random_Data_midepsright_tree = infile_DATA_midepsright.Get("Cut_Pion_Events_Random")
+#Cut_Pion_Events_Prompt_Data_midepsright_tree = infile_DATA_midepsright.Get("Cut_Pion_Events_Prompt")
+#Cut_Pion_Events_Random_Data_midepsright_tree = infile_DATA_midepsright.Get("Cut_Pion_Events_Random")
 Cut_Pion_Events_Prompt_Data_highepsright_tree = infile_DATA_highepsright.Get("Cut_Pion_Events_Prompt")
 Cut_Pion_Events_Random_Data_highepsright_tree = infile_DATA_highepsright.Get("Cut_Pion_Events_Random")
 Cut_Pion_Events_Prompt_Data_highepscenter_tree = infile_DATA_highepscenter.Get("Cut_Pion_Events_Prompt")
@@ -530,8 +511,8 @@ Cut_Pion_Events_Prompt_Dummy_midepscenter_tree = infile_DUMMY_midepscenter.Get("
 Cut_Pion_Events_Random_Dummy_midepscenter_tree = infile_DUMMY_midepscenter.Get("Cut_Pion_Events_Random")
 Cut_Pion_Events_Prompt_Dummy_midepsleft_tree = infile_DUMMY_midepsleft.Get("Cut_Pion_Events_Prompt")
 Cut_Pion_Events_Random_Dummy_midepsleft_tree = infile_DUMMY_midepsleft.Get("Cut_Pion_Events_Random")
-Cut_Pion_Events_Prompt_Dummy_midepsright_tree = infile_DUMMY_midepsright.Get("Cut_Pion_Events_Prompt")
-Cut_Pion_Events_Random_Dummy_midepsright_tree = infile_DUMMY_midepsright.Get("Cut_Pion_Events_Random")
+#Cut_Pion_Events_Prompt_Dummy_midepsright_tree = infile_DUMMY_midepsright.Get("Cut_Pion_Events_Prompt")
+#Cut_Pion_Events_Random_Dummy_midepsright_tree = infile_DUMMY_midepsright.Get("Cut_Pion_Events_Random")
 Cut_Pion_Events_Prompt_Dummy_highepsright_tree = infile_DUMMY_highepsright.Get("Cut_Pion_Events_Prompt")
 Cut_Pion_Events_Random_Dummy_highepsright_tree = infile_DUMMY_highepsright.Get("Cut_Pion_Events_Random")
 Cut_Pion_Events_Prompt_Dummy_highepscenter_tree = infile_DUMMY_highepscenter.Get("Cut_Pion_Events_Prompt")
@@ -544,163 +525,163 @@ Cut_Pion_Events_Random_Dummy_highepsleft_tree = infile_DUMMY_highepsleft.Get("Cu
 #Fill histograms for Cut All Data
 for event in Cut_Pion_Events_Prompt_Data_lowepscenter_tree:
     if DATA_MMpi_Cut_lowepscenter(event) & Diamond_Cut(event):
-        t_pions_data_prompt_lowepscenter_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_prompt_lowepscenter_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_data_prompt_lowepscenter_cut_all.Fill(-event.MandelT+t_Offset_lowepscenter)
+        phi_vs_t_data_prompt_lowepscenter_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_lowepscenter)
 
 for event in Cut_Pion_Events_Prompt_Data_lowepsleft_tree:
     if DATA_MMpi_Cut_lowepsleft(event) & Diamond_Cut(event):
-        t_pions_data_prompt_lowepsleft_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_prompt_lowepsleft_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_data_prompt_lowepsleft_cut_all.Fill(-event.MandelT+t_Offset_lowepsleft)
+        phi_vs_t_data_prompt_lowepsleft_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_lowepsleft)
 
 for event in Cut_Pion_Events_Prompt_Data_midepscenter_tree:
     if DATA_MMpi_Cut_midepscenter(event) & Diamond_Cut(event):
-        t_pions_data_prompt_midepscenter_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_prompt_midepscenter_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_data_prompt_midepscenter_cut_all.Fill(-event.MandelT+t_Offset_midepscenter)
+        phi_vs_t_data_prompt_midepscenter_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_midepscenter)
 
 for event in Cut_Pion_Events_Prompt_Data_midepsleft_tree:
     if DATA_MMpi_Cut_midepsleft(event) & Diamond_Cut(event):
-        t_pions_data_prompt_midepsleft_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_prompt_midepsleft_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_data_prompt_midepsleft_cut_all.Fill(-event.MandelT+t_Offset_midepsleft)
+        phi_vs_t_data_prompt_midepsleft_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_midepsleft)
 
-for event in Cut_Pion_Events_Prompt_Data_midepsright_tree:
-    if DATA_MMpi_Cut_midepsright(event) & Diamond_Cut(event):
-        t_pions_data_prompt_midepsright_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_prompt_midepsright_cut_all.Fill(event.ph_q, -event.MandelT)
+#for event in Cut_Pion_Events_Prompt_Data_midepsright_tree:
+#    if DATA_MMpi_Cut_midepsright(event) & Diamond_Cut(event):
+#        t_pions_data_prompt_midepsright_cut_all.Fill(-event.MandelT+t_Offset_midepsright)
+#        phi_vs_t_data_prompt_midepsright_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_midepsright)
 
 for event in Cut_Pion_Events_Prompt_Data_highepsright_tree:
     if DATA_MMpi_Cut_highepsright(event) & Diamond_Cut(event):
-        t_pions_data_prompt_highepsright_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_prompt_highepsright_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_data_prompt_highepsright_cut_all.Fill(-event.MandelT+t_Offset_highepsright)
+        phi_vs_t_data_prompt_highepsright_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_highepsright)
 
 for event in Cut_Pion_Events_Prompt_Data_highepscenter_tree:
     if DATA_MMpi_Cut_highepscenter(event) & Diamond_Cut(event):
-        t_pions_data_prompt_highepscenter_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_prompt_highepscenter_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_data_prompt_highepscenter_cut_all.Fill(-event.MandelT+t_Offset_highepscenter)
+        phi_vs_t_data_prompt_highepscenter_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_highepscenter)
 
 for event in Cut_Pion_Events_Prompt_Data_highepsleft_tree:
     if DATA_MMpi_Cut_highepsleft(event) & Diamond_Cut(event):
-        t_pions_data_prompt_highepsleft_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_prompt_highepsleft_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_data_prompt_highepsleft_cut_all.Fill(-event.MandelT+t_Offset_highepsleft)
+        phi_vs_t_data_prompt_highepsleft_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_highepsleft)
 
 for event in Cut_Pion_Events_Random_Data_lowepscenter_tree:
     if DATA_MMpi_Cut_lowepscenter(event) & Diamond_Cut(event):
-        t_pions_data_random_lowepscenter_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_random_lowepscenter_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_data_random_lowepscenter_cut_all.Fill(-event.MandelT+t_Offset_lowepscenter)
+        phi_vs_t_data_random_lowepscenter_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_lowepscenter)
 
 for event in Cut_Pion_Events_Random_Data_lowepsleft_tree:
     if DATA_MMpi_Cut_lowepsleft(event) & Diamond_Cut(event):
-        t_pions_data_random_lowepsleft_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_random_lowepsleft_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_data_random_lowepsleft_cut_all.Fill(-event.MandelT+t_Offset_lowepsleft)
+        phi_vs_t_data_random_lowepsleft_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_lowepsleft)
 
 for event in Cut_Pion_Events_Random_Data_midepscenter_tree:
     if DATA_MMpi_Cut_midepscenter(event) & Diamond_Cut(event):
-        t_pions_data_random_midepscenter_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_random_midepscenter_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_data_random_midepscenter_cut_all.Fill(-event.MandelT+t_Offset_midepscenter)
+        phi_vs_t_data_random_midepscenter_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_midepscenter)
 
 for event in Cut_Pion_Events_Random_Data_midepsleft_tree:
     if DATA_MMpi_Cut_midepsleft(event) & Diamond_Cut(event):
-        t_pions_data_random_midepsleft_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_random_midepsleft_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_data_random_midepsleft_cut_all.Fill(-event.MandelT+t_Offset_midepsleft)
+        phi_vs_t_data_random_midepsleft_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_midepsleft)
 
-for event in Cut_Pion_Events_Random_Data_midepsright_tree:
-    if DATA_MMpi_Cut_midepsright(event) & Diamond_Cut(event):
-        t_pions_data_random_midepsright_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_random_midepsright_cut_all.Fill(event.ph_q, -event.MandelT)
+#for event in Cut_Pion_Events_Random_Data_midepsright_tree:
+#    if DATA_MMpi_Cut_midepsright(event) & Diamond_Cut(event):
+#        t_pions_data_random_midepsright_cut_all.Fill(-event.MandelT+t_Offset_midepsright)
+#        phi_vs_t_data_random_midepsright_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_midepsright)
 
 for event in Cut_Pion_Events_Random_Data_highepsright_tree:
     if DATA_MMpi_Cut_highepsright(event) & Diamond_Cut(event):
-        t_pions_data_random_highepsright_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_random_highepsright_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_data_random_highepsright_cut_all.Fill(-event.MandelT+t_Offset_highepsright)
+        phi_vs_t_data_random_highepsright_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_highepsright)
 
 for event in Cut_Pion_Events_Random_Data_highepscenter_tree:
     if DATA_MMpi_Cut_highepscenter(event) & Diamond_Cut(event):
-        t_pions_data_random_highepscenter_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_random_highepscenter_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_data_random_highepscenter_cut_all.Fill(-event.MandelT+t_Offset_highepscenter)
+        phi_vs_t_data_random_highepscenter_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_highepscenter)
 
 for event in Cut_Pion_Events_Random_Data_highepsleft_tree:
     if DATA_MMpi_Cut_highepsleft(event) & Diamond_Cut(event):
-        t_pions_data_random_highepsleft_cut_all.Fill(-event.MandelT)
-        phi_vs_t_data_random_highepsleft_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_data_random_highepsleft_cut_all.Fill(-event.MandelT+t_Offset_highepsleft)
+        phi_vs_t_data_random_highepsleft_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_highepsleft)
 
 for event in Cut_Pion_Events_Prompt_Dummy_lowepscenter_tree:
     if DATA_MMpi_Cut_lowepscenter(event) & Diamond_Cut(event):
-        t_pions_dummy_prompt_lowepscenter_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_prompt_lowepscenter_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_dummy_prompt_lowepscenter_cut_all.Fill(-event.MandelT+t_Offset_lowepscenter)
+        phi_vs_t_dummy_prompt_lowepscenter_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_lowepscenter)
 
 for event in Cut_Pion_Events_Prompt_Dummy_lowepsleft_tree:
     if DATA_MMpi_Cut_lowepsleft(event) & Diamond_Cut(event):
-        t_pions_dummy_prompt_lowepsleft_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_prompt_lowepsleft_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_dummy_prompt_lowepsleft_cut_all.Fill(-event.MandelT+t_Offset_lowepsleft)
+        phi_vs_t_dummy_prompt_lowepsleft_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_lowepsleft)
 
 for event in Cut_Pion_Events_Prompt_Dummy_midepscenter_tree:
     if DATA_MMpi_Cut_midepscenter(event) & Diamond_Cut(event):
-        t_pions_dummy_prompt_midepscenter_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_prompt_midepscenter_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_dummy_prompt_midepscenter_cut_all.Fill(-event.MandelT+t_Offset_midepscenter)
+        phi_vs_t_dummy_prompt_midepscenter_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_midepscenter)
 
 for event in Cut_Pion_Events_Prompt_Dummy_midepsleft_tree:
     if DATA_MMpi_Cut_midepsleft(event) & Diamond_Cut(event):
-        t_pions_dummy_prompt_midepsleft_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_prompt_midepsleft_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_dummy_prompt_midepsleft_cut_all.Fill(-event.MandelT+t_Offset_midepsleft)
+        phi_vs_t_dummy_prompt_midepsleft_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_midepsleft)
 
-for event in Cut_Pion_Events_Prompt_Dummy_midepsright_tree:
-    if DATA_MMpi_Cut_midepsright(event) & Diamond_Cut(event):
-        t_pions_dummy_prompt_midepsright_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_prompt_midepsright_cut_all.Fill(event.ph_q, -event.MandelT)
+#for event in Cut_Pion_Events_Prompt_Dummy_midepsright_tree:
+#    if DATA_MMpi_Cut_midepsright(event) & Diamond_Cut(event):
+#        t_pions_dummy_prompt_midepsright_cut_all.Fill(-event.MandelT+t_Offset_midepsright)
+#        phi_vs_t_dummy_prompt_midepsright_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_midepsright)
 
 for event in Cut_Pion_Events_Prompt_Dummy_highepsright_tree:
     if DATA_MMpi_Cut_highepsright(event) & Diamond_Cut(event):
-        t_pions_dummy_prompt_highepsright_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_prompt_highepsright_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_dummy_prompt_highepsright_cut_all.Fill(-event.MandelT+t_Offset_highepsright)
+        phi_vs_t_dummy_prompt_highepsright_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_highepsright)
 
 for event in Cut_Pion_Events_Prompt_Dummy_highepscenter_tree:
     if DATA_MMpi_Cut_highepscenter(event) & Diamond_Cut(event):
-        t_pions_dummy_prompt_highepscenter_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_prompt_highepscenter_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_dummy_prompt_highepscenter_cut_all.Fill(-event.MandelT+t_Offset_highepscenter)
+        phi_vs_t_dummy_prompt_highepscenter_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_highepscenter)
 
 for event in Cut_Pion_Events_Prompt_Dummy_highepsleft_tree:
     if DATA_MMpi_Cut_highepsleft(event) & Diamond_Cut(event):
-        t_pions_dummy_prompt_highepsleft_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_prompt_highepsleft_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_dummy_prompt_highepsleft_cut_all.Fill(-event.MandelT+t_Offset_highepsleft)
+        phi_vs_t_dummy_prompt_highepsleft_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_highepsleft)
 
 for event in Cut_Pion_Events_Random_Dummy_lowepscenter_tree:
     if DATA_MMpi_Cut_lowepscenter(event) & Diamond_Cut(event):
-        t_pions_dummy_random_lowepscenter_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_random_lowepscenter_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_dummy_random_lowepscenter_cut_all.Fill(-event.MandelT+t_Offset_lowepscenter)
+        phi_vs_t_dummy_random_lowepscenter_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_lowepscenter)
 
 for event in Cut_Pion_Events_Random_Dummy_lowepsleft_tree:
     if DATA_MMpi_Cut_lowepsleft(event) & Diamond_Cut(event):
-        t_pions_dummy_random_lowepsleft_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_random_lowepsleft_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_dummy_random_lowepsleft_cut_all.Fill(-event.MandelT+t_Offset_lowepsleft)
+        phi_vs_t_dummy_random_lowepsleft_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_lowepsleft)
 
 for event in Cut_Pion_Events_Random_Dummy_midepscenter_tree:
     if DATA_MMpi_Cut_midepscenter(event) & Diamond_Cut(event):
-        t_pions_dummy_random_midepscenter_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_random_midepscenter_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_dummy_random_midepscenter_cut_all.Fill(-event.MandelT+t_Offset_midepscenter)
+        phi_vs_t_dummy_random_midepscenter_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_midepscenter)
 
 for event in Cut_Pion_Events_Random_Dummy_midepsleft_tree:
     if DATA_MMpi_Cut_midepsleft(event) & Diamond_Cut(event):
-        t_pions_dummy_random_midepsleft_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_random_midepsleft_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_dummy_random_midepsleft_cut_all.Fill(-event.MandelT+t_Offset_midepsleft)
+        phi_vs_t_dummy_random_midepsleft_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_midepsleft)
 
-for event in Cut_Pion_Events_Random_Dummy_midepsright_tree:
-    if DATA_MMpi_Cut_midepsright(event) & Diamond_Cut(event):
-        t_pions_dummy_random_midepsright_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_random_midepsright_cut_all.Fill(event.ph_q, -event.MandelT)
+#for event in Cut_Pion_Events_Random_Dummy_midepsright_tree:
+#    if DATA_MMpi_Cut_midepsright(event) & Diamond_Cut(event):
+#        t_pions_dummy_random_midepsright_cut_all.Fill(-event.MandelT+t_Offset_midepsright)
+#        phi_vs_t_dummy_random_midepsright_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_midepsright)
 
 for event in Cut_Pion_Events_Random_Dummy_highepsright_tree:
     if DATA_MMpi_Cut_highepsright(event) & Diamond_Cut(event):
-        t_pions_dummy_random_highepsright_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_random_highepsright_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_dummy_random_highepsright_cut_all.Fill(-event.MandelT+t_Offset_highepsright)
+        phi_vs_t_dummy_random_highepsright_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_highepsright)
 
 for event in Cut_Pion_Events_Random_Dummy_highepscenter_tree:
     if DATA_MMpi_Cut_highepscenter(event) & Diamond_Cut(event):
-        t_pions_dummy_random_highepscenter_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_random_highepscenter_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_dummy_random_highepscenter_cut_all.Fill(-event.MandelT+t_Offset_highepscenter)
+        phi_vs_t_dummy_random_highepscenter_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_highepscenter)
 
 for event in Cut_Pion_Events_Random_Dummy_highepsleft_tree:
     if DATA_MMpi_Cut_highepsleft(event) & Diamond_Cut(event):
-        t_pions_dummy_random_highepsleft_cut_all.Fill(-event.MandelT)
-        phi_vs_t_dummy_random_highepsleft_cut_all.Fill(event.ph_q, -event.MandelT)
+        t_pions_dummy_random_highepsleft_cut_all.Fill(-event.MandelT+t_Offset_highepsleft)
+        phi_vs_t_dummy_random_highepsleft_cut_all.Fill(event.ph_q, -event.MandelT+t_Offset_highepsleft)
 
 print("####################################")
 print("###### Histogram filling done ######")
@@ -713,7 +694,7 @@ t_pions_data_random_lowepscenter_cut_all.Scale(1.0/nWindows)
 t_pions_data_random_lowepsleft_cut_all.Scale(1.0/nWindows)
 t_pions_data_random_midepscenter_cut_all.Scale(1.0/nWindows)
 t_pions_data_random_midepsleft_cut_all.Scale(1.0/nWindows)
-t_pions_data_random_midepsright_cut_all.Scale(1.0/nWindows)
+#t_pions_data_random_midepsright_cut_all.Scale(1.0/nWindows)
 t_pions_data_random_highepsright_cut_all.Scale(1.0/nWindows)
 t_pions_data_random_highepscenter_cut_all.Scale(1.0/nWindows)
 t_pions_data_random_highepsleft_cut_all.Scale(1.0/nWindows)
@@ -721,7 +702,7 @@ phi_vs_t_data_random_lowepscenter_cut_all.Scale(1.0/nWindows)
 phi_vs_t_data_random_lowepsleft_cut_all.Scale(1.0/nWindows)
 phi_vs_t_data_random_midepscenter_cut_all.Scale(1.0/nWindows)
 phi_vs_t_data_random_midepsleft_cut_all.Scale(1.0/nWindows)
-phi_vs_t_data_random_midepsright_cut_all.Scale(1.0/nWindows)
+#phi_vs_t_data_random_midepsright_cut_all.Scale(1.0/nWindows)
 phi_vs_t_data_random_highepsright_cut_all.Scale(1.0/nWindows)
 phi_vs_t_data_random_highepscenter_cut_all.Scale(1.0/nWindows)
 phi_vs_t_data_random_highepsleft_cut_all.Scale(1.0/nWindows)
@@ -730,7 +711,7 @@ t_pions_data_randsub_lowepscenter_cut_all.Add(t_pions_data_prompt_lowepscenter_c
 t_pions_data_randsub_lowepsleft_cut_all.Add(t_pions_data_prompt_lowepsleft_cut_all, t_pions_data_random_lowepsleft_cut_all, 1, -1)
 t_pions_data_randsub_midepscenter_cut_all.Add(t_pions_data_prompt_midepscenter_cut_all, t_pions_data_random_midepscenter_cut_all, 1, -1)
 t_pions_data_randsub_midepsleft_cut_all.Add(t_pions_data_prompt_midepsleft_cut_all, t_pions_data_random_midepsleft_cut_all, 1, -1)
-t_pions_data_randsub_midepsright_cut_all.Add(t_pions_data_prompt_midepsright_cut_all, t_pions_data_random_midepsright_cut_all, 1, -1)
+#t_pions_data_randsub_midepsright_cut_all.Add(t_pions_data_prompt_midepsright_cut_all, t_pions_data_random_midepsright_cut_all, 1, -1)
 t_pions_data_randsub_highepsright_cut_all.Add(t_pions_data_prompt_highepsright_cut_all, t_pions_data_random_highepsright_cut_all, 1, -1)
 t_pions_data_randsub_highepscenter_cut_all.Add(t_pions_data_prompt_highepscenter_cut_all, t_pions_data_random_highepscenter_cut_all, 1, -1)
 t_pions_data_randsub_highepsleft_cut_all.Add(t_pions_data_prompt_highepsleft_cut_all, t_pions_data_random_highepsleft_cut_all, 1, -1)
@@ -738,19 +719,19 @@ phi_vs_t_data_randsub_lowepscenter_cut_all.Add(phi_vs_t_data_prompt_lowepscenter
 phi_vs_t_data_randsub_lowepsleft_cut_all.Add(phi_vs_t_data_prompt_lowepsleft_cut_all, phi_vs_t_data_random_lowepsleft_cut_all, 1, -1)
 phi_vs_t_data_randsub_midepscenter_cut_all.Add(phi_vs_t_data_prompt_midepscenter_cut_all, phi_vs_t_data_random_midepscenter_cut_all, 1, -1)
 phi_vs_t_data_randsub_midepsleft_cut_all.Add(phi_vs_t_data_prompt_midepsleft_cut_all, phi_vs_t_data_random_midepsleft_cut_all, 1, -1)
-phi_vs_t_data_randsub_midepsright_cut_all.Add(phi_vs_t_data_prompt_midepsright_cut_all, phi_vs_t_data_random_midepsright_cut_all, 1, -1)
+#phi_vs_t_data_randsub_midepsright_cut_all.Add(phi_vs_t_data_prompt_midepsright_cut_all, phi_vs_t_data_random_midepsright_cut_all, 1, -1)
 phi_vs_t_data_randsub_highepsright_cut_all.Add(phi_vs_t_data_prompt_highepsright_cut_all, phi_vs_t_data_random_highepsright_cut_all, 1, -1)
 phi_vs_t_data_randsub_highepscenter_cut_all.Add(phi_vs_t_data_prompt_highepscenter_cut_all, phi_vs_t_data_random_highepscenter_cut_all, 1, -1)
 phi_vs_t_data_randsub_highepsleft_cut_all.Add(phi_vs_t_data_prompt_highepsleft_cut_all, phi_vs_t_data_random_highepsleft_cut_all, 1, -1)
 print(("integral after rand sub (left):  ", t_pions_data_randsub_midepsleft_cut_all.Integral(0,nbins_loweps)))
-print(("integral after rand sub (right):  ", t_pions_data_randsub_midepsright_cut_all.Integral(0,nbins_loweps)))
+#print(("integral after rand sub (right):  ", t_pions_data_randsub_midepsright_cut_all.Integral(0,nbins_loweps)))
 print(("integral after loweps rand sub:  ", t_pions_data_randsub_lowepsleft_cut_all.Integral(0,nbins_loweps)))
 
 t_pions_dummy_random_lowepscenter_cut_all.Scale(1.0/nWindows)
 t_pions_dummy_random_lowepsleft_cut_all.Scale(1.0/nWindows)
 t_pions_dummy_random_midepscenter_cut_all.Scale(1.0/nWindows)
 t_pions_dummy_random_midepsleft_cut_all.Scale(1.0/nWindows)
-t_pions_dummy_random_midepsright_cut_all.Scale(1.0/nWindows)
+#t_pions_dummy_random_midepsright_cut_all.Scale(1.0/nWindows)
 t_pions_dummy_random_highepsright_cut_all.Scale(1.0/nWindows)
 t_pions_dummy_random_highepscenter_cut_all.Scale(1.0/nWindows)
 t_pions_dummy_random_highepsleft_cut_all.Scale(1.0/nWindows)
@@ -758,7 +739,7 @@ phi_vs_t_dummy_random_lowepscenter_cut_all.Scale(1.0/nWindows)
 phi_vs_t_dummy_random_lowepsleft_cut_all.Scale(1.0/nWindows)
 phi_vs_t_dummy_random_midepscenter_cut_all.Scale(1.0/nWindows)
 phi_vs_t_dummy_random_midepsleft_cut_all.Scale(1.0/nWindows)
-phi_vs_t_dummy_random_midepsright_cut_all.Scale(1.0/nWindows)
+#phi_vs_t_dummy_random_midepsright_cut_all.Scale(1.0/nWindows)
 phi_vs_t_dummy_random_highepsright_cut_all.Scale(1.0/nWindows)
 phi_vs_t_dummy_random_highepscenter_cut_all.Scale(1.0/nWindows)
 phi_vs_t_dummy_random_highepsleft_cut_all.Scale(1.0/nWindows)
@@ -767,7 +748,7 @@ t_pions_dummy_randsub_lowepscenter_cut_all.Add(t_pions_dummy_prompt_lowepscenter
 t_pions_dummy_randsub_lowepsleft_cut_all.Add(t_pions_dummy_prompt_lowepsleft_cut_all, t_pions_dummy_random_lowepsleft_cut_all, 1, -1)
 t_pions_dummy_randsub_midepscenter_cut_all.Add(t_pions_dummy_prompt_midepscenter_cut_all, t_pions_dummy_random_midepscenter_cut_all, 1, -1)
 t_pions_dummy_randsub_midepsleft_cut_all.Add(t_pions_dummy_prompt_midepsleft_cut_all, t_pions_dummy_random_midepsleft_cut_all, 1, -1)
-t_pions_dummy_randsub_midepsright_cut_all.Add(t_pions_dummy_prompt_midepsright_cut_all, t_pions_dummy_random_midepsright_cut_all, 1, -1)
+#t_pions_dummy_randsub_midepsright_cut_all.Add(t_pions_dummy_prompt_midepsright_cut_all, t_pions_dummy_random_midepsright_cut_all, 1, -1)
 t_pions_dummy_randsub_highepsright_cut_all.Add(t_pions_dummy_prompt_highepsright_cut_all, t_pions_dummy_random_highepsright_cut_all, 1, -1)
 t_pions_dummy_randsub_highepscenter_cut_all.Add(t_pions_dummy_prompt_highepscenter_cut_all, t_pions_dummy_random_highepscenter_cut_all, 1, -1)
 t_pions_dummy_randsub_highepsleft_cut_all.Add(t_pions_dummy_prompt_highepsleft_cut_all, t_pions_dummy_random_highepsleft_cut_all, 1, -1)
@@ -775,12 +756,12 @@ phi_vs_t_dummy_randsub_lowepscenter_cut_all.Add(phi_vs_t_dummy_prompt_lowepscent
 phi_vs_t_dummy_randsub_lowepsleft_cut_all.Add(phi_vs_t_dummy_prompt_lowepsleft_cut_all, phi_vs_t_dummy_random_lowepsleft_cut_all, 1, -1)
 phi_vs_t_dummy_randsub_midepscenter_cut_all.Add(phi_vs_t_dummy_prompt_midepscenter_cut_all, phi_vs_t_dummy_random_midepscenter_cut_all, 1, -1)
 phi_vs_t_dummy_randsub_midepsleft_cut_all.Add(phi_vs_t_dummy_prompt_midepsleft_cut_all, phi_vs_t_dummy_random_midepsleft_cut_all, 1, -1)
-phi_vs_t_dummy_randsub_midepsright_cut_all.Add(phi_vs_t_dummy_prompt_midepsright_cut_all, phi_vs_t_dummy_random_midepsright_cut_all, 1, -1)
+#phi_vs_t_dummy_randsub_midepsright_cut_all.Add(phi_vs_t_dummy_prompt_midepsright_cut_all, phi_vs_t_dummy_random_midepsright_cut_all, 1, -1)
 phi_vs_t_dummy_randsub_highepsright_cut_all.Add(phi_vs_t_dummy_prompt_highepsright_cut_all, phi_vs_t_dummy_random_highepsright_cut_all, 1, -1)
 phi_vs_t_dummy_randsub_highepscenter_cut_all.Add(phi_vs_t_dummy_prompt_highepscenter_cut_all, phi_vs_t_dummy_random_highepscenter_cut_all, 1, -1)
 phi_vs_t_dummy_randsub_highepsleft_cut_all.Add(phi_vs_t_dummy_prompt_highepsleft_cut_all, phi_vs_t_dummy_random_highepsleft_cut_all, 1, -1)
 print(("integral of dummy after rand sub (left):  ", t_pions_dummy_randsub_midepsleft_cut_all.Integral(0,nbins_loweps)))
-print(("integral of dummy after rand sub (right):  ", t_pions_dummy_randsub_midepsright_cut_all.Integral(0,nbins_loweps)))
+#print(("integral of dummy after rand sub (right):  ", t_pions_dummy_randsub_midepsright_cut_all.Integral(0,nbins_loweps)))
 print(("integral of loweps dummy after rand sub:  ", t_pions_dummy_randsub_lowepscenter_cut_all.Integral(0,nbins_loweps)))
 
 print("######################################")
@@ -794,19 +775,19 @@ t_pions_data_dummysub_lowepscenter_cut_all.Add(t_pions_data_randsub_lowepscenter
 t_pions_data_dummysub_lowepsleft_cut_all.Add(t_pions_data_randsub_lowepsleft_cut_all, t_pions_dummy_randsub_lowepsleft_cut_all, 1, -1)
 t_pions_data_dummysub_midepscenter_cut_all.Add(t_pions_data_randsub_midepscenter_cut_all, t_pions_dummy_randsub_midepscenter_cut_all, 1, -1)
 t_pions_data_dummysub_midepsleft_cut_all.Add(t_pions_data_randsub_midepsleft_cut_all, t_pions_dummy_randsub_midepsleft_cut_all, 1, -1)
-t_pions_data_dummysub_midepsright_cut_all.Add(t_pions_data_randsub_midepsright_cut_all, t_pions_dummy_randsub_midepsright_cut_all, 1, -1)
+#t_pions_data_dummysub_midepsright_cut_all.Add(t_pions_data_randsub_midepsright_cut_all, t_pions_dummy_randsub_midepsright_cut_all, 1, -1)
 t_pions_data_dummysub_highepsright_cut_all.Add(t_pions_data_randsub_highepsright_cut_all, t_pions_dummy_randsub_highepsright_cut_all, 1, -1)
 t_pions_data_dummysub_highepscenter_cut_all.Add(t_pions_data_randsub_highepscenter_cut_all, t_pions_dummy_randsub_highepscenter_cut_all, 1, -1)
 t_pions_data_dummysub_highepsleft_cut_all.Add(t_pions_data_randsub_highepsleft_cut_all, t_pions_dummy_randsub_highepsleft_cut_all, 1, -1)
 print(("integral after dummy sub left:  ", t_pions_data_dummysub_midepsleft_cut_all.Integral(0,nbins_loweps)))
-print(("integral after dummy sub right:  ", t_pions_data_dummysub_midepsright_cut_all.Integral(0,nbins_loweps)))
+#print(("integral after dummy sub right:  ", t_pions_data_dummysub_midepsright_cut_all.Integral(0,nbins_loweps)))
 print(("integral after loweps dummy sub:  ", t_pions_data_dummysub_lowepscenter_cut_all.Integral(0,nbins_loweps)))
 
 phi_vs_t_data_dummysub_lowepscenter_cut_all.Add(phi_vs_t_data_randsub_lowepscenter_cut_all, phi_vs_t_dummy_randsub_lowepscenter_cut_all, 1, -1)
 phi_vs_t_data_dummysub_lowepsleft_cut_all.Add(phi_vs_t_data_randsub_lowepsleft_cut_all, phi_vs_t_dummy_randsub_lowepsleft_cut_all, 1, -1)
 phi_vs_t_data_dummysub_midepscenter_cut_all.Add(phi_vs_t_data_randsub_midepscenter_cut_all, phi_vs_t_dummy_randsub_midepscenter_cut_all, 1, -1)
 phi_vs_t_data_dummysub_midepsleft_cut_all.Add(phi_vs_t_data_randsub_midepsleft_cut_all, phi_vs_t_dummy_randsub_midepsleft_cut_all, 1, -1)
-phi_vs_t_data_dummysub_midepsright_cut_all.Add(phi_vs_t_data_randsub_midepsright_cut_all, phi_vs_t_dummy_randsub_midepsright_cut_all, 1, -1)
+#phi_vs_t_data_dummysub_midepsright_cut_all.Add(phi_vs_t_data_randsub_midepsright_cut_all, phi_vs_t_dummy_randsub_midepsright_cut_all, 1, -1)
 phi_vs_t_data_dummysub_highepsright_cut_all.Add(phi_vs_t_data_randsub_highepsright_cut_all, phi_vs_t_dummy_randsub_highepsright_cut_all, 1, -1)
 phi_vs_t_data_dummysub_highepscenter_cut_all.Add(phi_vs_t_data_randsub_highepscenter_cut_all, phi_vs_t_dummy_randsub_highepscenter_cut_all, 1, -1)
 phi_vs_t_data_dummysub_highepsleft_cut_all.Add(phi_vs_t_data_randsub_highepsleft_cut_all, phi_vs_t_dummy_randsub_highepsleft_cut_all, 1, -1)
@@ -822,7 +803,7 @@ print("####################################\n")
 t_pions_data_dummysub_loweps_cut_all.Add(t_pions_data_dummysub_lowepscenter_cut_all, t_pions_data_dummysub_lowepsleft_cut_all, 1, 1)
 
 t_pions_data_dummysub_mideps_cut_all.Add(t_pions_data_dummysub_midepscenter_cut_all, t_pions_data_dummysub_midepsleft_cut_all, 1, 1)
-t_pions_data_dummysub_mideps_cut_all.Add(t_pions_data_dummysub_midepsright_cut_all,)
+#t_pions_data_dummysub_mideps_cut_all.Add(t_pions_data_dummysub_midepsright_cut_all,)
 print(("integral of left, center, right after adding:  ", t_pions_data_dummysub_midepsleft_cut_all.Integral(0,nbins_loweps), t_pions_data_dummysub_midepscenter_cut_all.Integral(0,nbins_loweps), t_pions_data_dummysub_midepsright_cut_all.Integral(0,nbins_loweps)))
 print(("integral after adding:  ", t_pions_data_dummysub_mideps_cut_all.Integral(0,nbins_loweps)))
 
@@ -834,7 +815,7 @@ phi_vs_t_data_dummysub_loweps_cut_all.Add(phi_vs_t_data_dummysub_lowepscenter_cu
 #phi_vs_t_data_dummysub_loweps_cut_all.Add(phi_vs_t_data_dummysub_lowepsleft_cut_all)
 
 phi_vs_t_data_dummysub_mideps_cut_all.Add(phi_vs_t_data_dummysub_midepscenter_cut_all, phi_vs_t_data_dummysub_midepsleft_cut_all, 1, 1)
-phi_vs_t_data_dummysub_mideps_cut_all.Add(phi_vs_t_data_dummysub_midepsright_cut_all,)
+#phi_vs_t_data_dummysub_mideps_cut_all.Add(phi_vs_t_data_dummysub_midepsright_cut_all,)
 
 phi_vs_t_data_dummysub_higheps_cut_all.Add(phi_vs_t_data_dummysub_highepsright_cut_all)
 phi_vs_t_data_dummysub_higheps_cut_all.Add(phi_vs_t_data_dummysub_highepscenter_cut_all)
@@ -861,8 +842,12 @@ print("####################################\n")
 #tbin_pions_max = [104,113,132,151,176,250]
 
 # 7 t-bins
-tbin_pions_min = [81,105,114,133,152,176,205]
-tbin_pions_max = [104,113,132,151,175,204,250]
+#tbin_pions_min = [81,105,114,133,152,176,205]
+#tbin_pions_max = [104,113,132,151,175,204,250]
+
+#7 bins for the Q5p00 W2p95 setting
+tbin_pions_min = [63,95,114,133,152,176,205]
+tbin_pions_max = [94,113,132,151,175,204,250]
 
 dN_data_pions_lowe = np.array([array.array('d', [0.0])] * len(tbin_pions_min))
 dN_data_pions_mide = np.array([array.array('d', [0.0])] * len(tbin_pions_min))

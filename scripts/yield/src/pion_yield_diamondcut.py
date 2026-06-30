@@ -45,12 +45,6 @@ if len(sys.argv)-1!=8:
     sys.exit(1)
 
 ##################################################################################################################################################
-# Set ploting ranges for histograms
-QHist_low = 4.7
-QHist_high = 7.3
-WHist_low = 2.95
-WHist_high = 3.45
-
 ##################################################################################################################################################
 # Input params - run number and max number of events
 PHY_SETTING = sys.argv[1]
@@ -88,6 +82,25 @@ setting_name = "_".join(PHY_SETTING.split("_")[:2])
 physet_dir_name = "%s_std" % (setting_name)
 SIMCPATH = "/volatile/hallc/c-pionlt/%s/OUTPUT/Analysis/SIMC/%s/" % (USER, physet_dir_name)
 
+if(physet_dir_name == "Q6p00_W3p19"):
+    # Set ploting ranges for histograms
+    QHist_low = 4.7
+    QHist_high = 7.3
+    WHist_low = 2.95
+    WHist_high = 3.45
+elif(physet_dir_name == "Q5p00_W2p95"):
+    # Set ploting ranges for histograms
+    QHist_low = 4.0
+    QHist_high = 6.0
+    WHist_low = 2.1
+    WHist_high = 3.1
+else:
+    print("please set the ploting range for the diamond!\n")
+    # Set ploting ranges for histograms
+    QHist_low = 0.0
+    QHist_high = 10.0
+    WHist_low = 1
+    WHist_high = 4
 #################################################################################################################################################
 
 # Output PDF File Name
@@ -443,11 +456,25 @@ W_end = W_projection.GetXaxis().GetBinUpEdge(W_end_bin)
 print(f"Q2 distribution starts at: {Q2_start}, ends at: {Q2_end}")
 print(f"W distribution starts at: {W_start}, ends at: {W_end}")
 
-# Hardcoded vertices for the diamond cut
-vertex1 = [5.897, 3.18]  # bottom-left
-vertex2 = [5.1, 3.35]  # top-left
-vertex3 = [6.05, 3.2]  # top-right
-vertex4 = [6.92, 3.02]  # bottom-right
+if(physet_dir_name == "Q6p00_W3p19"):
+    # Hardcoded vertices for the diamond cut
+    vertex1 = [5.897, 3.18]  # bottom-left
+    vertex2 = [5.1, 3.35]  # top-left
+    vertex3 = [6.05, 3.2]  # top-right
+    vertex4 = [6.92, 3.02]  # bottom-right
+elif(physet_dir_name == "Q5p00_W2p95"):
+    # Hardcoded vertices for the diamond cut
+    vertex1 = [4.901, 2.935]  # bottom-left
+    vertex2 = [4.300, 3.085]  # top-left
+    vertex3 = [5.020, 2.965]  # top-right
+    vertex4 = [5.775, 2.785]  # bottom-right
+else: 
+    print("tell me what diamond to draw!!!!!\nDrawing default!!!!\n")
+    # Hardcoded vertices for the diamond cut
+    vertex1 = [4.901, 2.935]  # bottom-left
+    vertex2 = [4.300, 3.085]  # top-left
+    vertex3 = [5.020, 2.965]  # top-right
+    vertex4 = [5.775, 2.785]  # bottom-right
 
 # Print vertices
 print("Vertices of the populated area:")

@@ -73,6 +73,13 @@ elif PHY_SETTING == "Q5p00_W2p95":
     pol = +1
     theta_c = +0.000
     ntbins = 7
+elif PHY_SETTING == "Q6p00_W3p19":
+    loweps = "0.179"
+    mideps = "0.299"
+    higheps = "0.394"
+    pol = +1
+    theta_c = +0.000
+    ntbins = 8
 else:
     print("!!!!! Please declare low/mid/high epsilon values of you physics setting !!!!!")
 
@@ -254,31 +261,31 @@ print(f"Average weighted loweps yields saved to the path: {combined_weighted_low
 combined_weighted_mideps_yields = "%s/LTSep_CSVs/avg_kinematics_csv/%s/%s_pion_physics_mideps_avg_yields.csv" % (UTILPATH, physet_dir_name, PHY_SETTING)
 
 # Filter the DataFrame for specific Physics_Setting values
-filtered_data_yield_mideps_right_df = data_yield_df[data_yield_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_right"]
+#filtered_data_yield_mideps_right_df = data_yield_df[data_yield_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_right"]
 filtered_data_yield_mideps_center_df = data_yield_df[data_yield_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_center"]
 filtered_data_yield_mideps_left_df = data_yield_df[data_yield_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_left"]
-filtered_simc_yield_mideps_right_df = simc_yield_df[simc_yield_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_right"]
+#filtered_simc_yield_mideps_right_df = simc_yield_df[simc_yield_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_right"]
 filtered_simc_yield_mideps_center_df = simc_yield_df[simc_yield_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_center"]
 filtered_simc_yield_mideps_left_df = simc_yield_df[simc_yield_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_left"]
 
 # Merge filtered DataFrames on binning keys
-merged_mideps_right_df = pd.merge(filtered_data_yield_mideps_right_df, filtered_simc_yield_mideps_right_df, on=key_yield_cols, suffixes=('_mideps_right_data', '_mideps_right_simc'))
+#merged_mideps_right_df = pd.merge(filtered_data_yield_mideps_right_df, filtered_simc_yield_mideps_right_df, on=key_yield_cols, suffixes=('_mideps_right_data', '_mideps_right_simc'))
 merged_mideps_center_df = pd.merge(filtered_data_yield_mideps_center_df, filtered_simc_yield_mideps_center_df, on=key_yield_cols, suffixes=('_mideps_center_data', '_mideps_center_simc'))
 merged_mideps_left_df = pd.merge(filtered_data_yield_mideps_left_df, filtered_simc_yield_mideps_left_df, on=key_yield_cols, suffixes=('_mideps_left_data', '_mideps_left_simc'))
 
 # Calculate Physics_Yield ratio for high-ε center
 # RIGHT
-merged_mideps_right_df["physics_yield"] = merged_mideps_right_df["physics_yield"].clip(lower=0)
-merged_mideps_right_df["simc_yield"] = merged_mideps_right_df["simc_yield"].clip(lower=0)
-merged_mideps_right_df["ratio_mideps_right"] = merged_mideps_right_df["physics_yield"] / merged_mideps_right_df["simc_yield"]
-merged_mideps_right_df["ratio_mideps_right"] = merged_mideps_right_df["ratio_mideps_right"].replace(np.nan, 0)
-merged_mideps_right_df["ratio_mideps_right"] = merged_mideps_right_df["ratio_mideps_right"].replace([np.inf, -np.inf], 0)
-merged_mideps_right_df["ratio_error_mideps_right"] = merged_mideps_right_df["ratio_mideps_right"] * np.sqrt(
-    (merged_mideps_right_df["physics_yield_error"] / merged_mideps_right_df["physics_yield"].replace(0, np.nan))**2 +
-    (merged_mideps_right_df["simc_yield_error"] / merged_mideps_right_df["simc_yield"].replace(0, np.nan))**2
-)
-merged_mideps_right_df["ratio_error_mideps_right"] = merged_mideps_right_df["ratio_error_mideps_right"].replace(np.nan, 1000)
-merged_mideps_right_df["ratio_error_mideps_right"] = np.abs(merged_mideps_right_df["ratio_error_mideps_right"])
+#merged_mideps_right_df["physics_yield"] = merged_mideps_right_df["physics_yield"].clip(lower=0)
+#merged_mideps_right_df["simc_yield"] = merged_mideps_right_df["simc_yield"].clip(lower=0)
+#merged_mideps_right_df["ratio_mideps_right"] = merged_mideps_right_df["physics_yield"] / merged_mideps_right_df["simc_yield"]
+#merged_mideps_right_df["ratio_mideps_right"] = merged_mideps_right_df["ratio_mideps_right"].replace(np.nan, 0)
+#merged_mideps_right_df["ratio_mideps_right"] = merged_mideps_right_df["ratio_mideps_right"].replace([np.inf, -np.inf], 0)
+#merged_mideps_right_df["ratio_error_mideps_right"] = merged_mideps_right_df["ratio_mideps_right"] * np.sqrt(
+#    (merged_mideps_right_df["physics_yield_error"] / merged_mideps_right_df["physics_yield"].replace(0, np.nan))**2 +
+#    (merged_mideps_right_df["simc_yield_error"] / merged_mideps_right_df["simc_yield"].replace(0, np.nan))**2
+#)
+#merged_mideps_right_df["ratio_error_mideps_right"] = merged_mideps_right_df["ratio_error_mideps_right"].replace(np.nan, 1000)
+#merged_mideps_right_df["ratio_error_mideps_right"] = np.abs(merged_mideps_right_df["ratio_error_mideps_right"])
 
 # CENTER
 merged_mideps_center_df["physics_yield"] = merged_mideps_center_df["physics_yield"].clip(lower=0)
@@ -307,8 +314,9 @@ merged_mideps_left_df["ratio_error_mideps_left"] = merged_mideps_left_df["ratio_
 merged_mideps_left_df["ratio_error_mideps_left"] = np.abs(merged_mideps_left_df["ratio_error_mideps_left"])
 
 # Merge all three (right, center, left) on bin keys only (t, phi bins)
-merged_temp_mideps_df = pd.merge(merged_mideps_right_df, merged_mideps_center_df, on=bin_yield_keys, suffixes=('_mideps_right', '_mideps_center'))
-merged_avg_mideps_df = pd.merge(merged_temp_mideps_df, merged_mideps_left_df, on=bin_yield_keys, suffixes=('', '_mideps_left'))
+merged_temp_mideps_df = pd.merge(merged_mideps_left_df, merged_mideps_center_df, on=bin_yield_keys, suffixes=('_mideps_left', '_mideps_center'))
+merged_avg_mideps_df = merged_temp_mideps_df
+#merged_avg_mideps_df = pd.merge(merged_temp_mideps_df, merged_mideps_right_df, on=bin_yield_keys, suffixes=('', '_mideps_right'))
 
 # Drop duplicated Physics_Setting columns if they exist
 for col in merged_avg_mideps_df.columns:
@@ -318,12 +326,12 @@ merged_avg_mideps_df.insert(0, "Physics_Setting", f"{PHY_SETTING}_mideps")
 
 # Perform error-weighted average for merged center and left
 def error_weighted_ratio_mideps(row):
-    y1, e1 = row["ratio_mideps_right"], row["ratio_error_mideps_right"]
+    y1, e1 = row["ratio_mideps_left"], row["ratio_error_mideps_left"]
     y2, e2 = row["ratio_mideps_center"], row["ratio_error_mideps_center"]
-    y3, e3 = row["ratio_mideps_left"], row["ratio_error_mideps_left"]
+    #y3, e3 = row["ratio_mideps_right"], row["ratio_error_mideps_right"]
     # Compute weights (inverse variance)
-    weights = 1 / np.array([e1**2, e2**2, e3**2])
-    ratios = np.array([y1, y2, y3])
+    weights = 1 / np.array([e1**2, e2**2]) #, e3**2
+    ratios = np.array([y1, y2]) #, y3
     weighted_data_ratio = np.sum(ratios * weights) / np.sum(weights)
     weighted_data_ratio_err = np.sqrt(1 / np.sum(weights))
     # Weighted average and propagated error
@@ -465,7 +473,7 @@ simc_avgkin_df.columns = simc_avgkin_df.columns.str.strip()  # clean up headers
 # Filter the DataFrame for specific Physics_Setting values from Data
 filtered_data_avgkin_loweps_center_df = data_avgkin_df[data_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_loweps_center"]
 filtered_data_avgkin_loweps_left_df = data_avgkin_df[data_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_loweps_left"]
-filtered_data_avgkin_mideps_right_df = data_avgkin_df[data_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_right"]
+#filtered_data_avgkin_mideps_right_df = data_avgkin_df[data_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_right"]
 filtered_data_avgkin_mideps_center_df = data_avgkin_df[data_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_center"]
 filtered_data_avgkin_mideps_left_df = data_avgkin_df[data_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_left"]
 filtered_data_avgkin_higheps_right_df = data_avgkin_df[data_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_higheps_right"]
@@ -474,7 +482,7 @@ filtered_data_avgkin_higheps_left_df = data_avgkin_df[data_avgkin_df["Physics_Se
 # Filter the DataFrame for specific Physics_Setting values from SimC
 filtered_simc_avgkin_loweps_center_df = simc_avgkin_df[simc_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_loweps_center"]
 filtered_simc_avgkin_loweps_left_df = simc_avgkin_df[simc_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_loweps_left"]
-filtered_simc_avgkin_mideps_right_df = simc_avgkin_df[simc_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_right"]
+#filtered_simc_avgkin_mideps_right_df = simc_avgkin_df[simc_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_right"]
 filtered_simc_avgkin_mideps_center_df = simc_avgkin_df[simc_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_center"]
 filtered_simc_avgkin_mideps_left_df = simc_avgkin_df[simc_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_left"]
 filtered_simc_avgkin_higheps_right_df = simc_avgkin_df[simc_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_higheps_right"]
@@ -489,14 +497,17 @@ def data_add_suffix(df, suffix):
     return df.rename(columns={col: f"{col}_{suffix}" for col in df.columns if col not in bin_avgkin_keys})
 loweps_center  = data_add_suffix(filtered_data_avgkin_loweps_center_df,  "loweps_center")
 loweps_left    = data_add_suffix(filtered_data_avgkin_loweps_left_df,    "loweps_left")
-mideps_right  = data_add_suffix(filtered_data_avgkin_mideps_right_df,  "mideps_right")
+#mideps_right  = data_add_suffix(filtered_data_avgkin_mideps_right_df,  "mideps_right")
 mideps_center = data_add_suffix(filtered_data_avgkin_mideps_center_df, "mideps_center")
 mideps_left   = data_add_suffix(filtered_data_avgkin_mideps_left_df,   "mideps_left")
 higheps_right  = data_add_suffix(filtered_data_avgkin_higheps_right_df,  "higheps_right")
 higheps_center = data_add_suffix(filtered_data_avgkin_higheps_center_df, "higheps_center")
 higheps_left   = data_add_suffix(filtered_data_avgkin_higheps_left_df,   "higheps_left")
 # Merge all on bin keys
+    #.merge(mideps_right,  on=bin_avgkin_keys, how='outer') \
 merged_data_all = loweps_center.merge(loweps_left, on=bin_avgkin_keys, how='outer') \
+    .merge(mideps_center, on=bin_avgkin_keys, how='outer') \
+    .merge(mideps_left,   on=bin_avgkin_keys, how='outer') \
     .merge(higheps_right,  on=bin_avgkin_keys, how='outer') \
     .merge(higheps_center, on=bin_avgkin_keys, how='outer') \
     .merge(higheps_left,   on=bin_avgkin_keys, how='outer')
@@ -505,11 +516,14 @@ merged_data_all = loweps_center.merge(loweps_left, on=bin_avgkin_keys, how='oute
 # Perform error-weighted average for merged data
 def error_weighted_avgkin_data(row):
     vars = ["avg_Q2", "avg_W"]
-    suffixes = ["loweps_center", "loweps_left", "mideps_right", "mideps_center", "mideps_left" "higheps_right", "higheps_center", "higheps_left"]
+    #suffixes = ["loweps_center", "loweps_left", "mideps_right", "mideps_center", "mideps_left", "higheps_right", "higheps_center", "higheps_left"]
+    suffixes = ["loweps_center", "loweps_left", "mideps_center", "mideps_left", "higheps_right", "higheps_center", "higheps_left"]
     result = {}
     for var in vars:
         values = [row[f"{var}_{sfx}"] for sfx in suffixes]
         errors = [row[f"{var}_err_{sfx}"] for sfx in suffixes]
+        print("\nValues\n", values)
+        print("\nErrors\n", errors)
         weights = 1 / np.square(errors)
         weighted_avg = np.sum(np.array(values) * weights) / np.sum(weights)
         weighted_avg_err = np.sqrt(1 / np.sum(weights))
@@ -542,14 +556,16 @@ def simc_add_suffix(df, suffix):
     return df.rename(columns={col: f"{col}_{suffix}" for col in df.columns if col not in bin_avgkin_keys})
 loweps_center  = simc_add_suffix(filtered_simc_avgkin_loweps_center_df,  "loweps_center")
 loweps_left    = simc_add_suffix(filtered_simc_avgkin_loweps_left_df,    "loweps_left")
-mideps_right  = simc_add_suffix(filtered_simc_avgkin_mideps_right_df,  "mideps_right")
+#mideps_right  = simc_add_suffix(filtered_simc_avgkin_mideps_right_df,  "mideps_right")
 mideps_center = simc_add_suffix(filtered_simc_avgkin_mideps_center_df, "mideps_center")
 mideps_left   = simc_add_suffix(filtered_simc_avgkin_mideps_left_df,   "mideps_left")
 higheps_right  = simc_add_suffix(filtered_simc_avgkin_higheps_right_df,  "higheps_right")
 higheps_center = simc_add_suffix(filtered_simc_avgkin_higheps_center_df, "higheps_center")
 higheps_left   = simc_add_suffix(filtered_simc_avgkin_higheps_left_df,   "higheps_left")
-# Merge all on bin keys
+# Merge all on bin keys #.merge(mideps_right,  on=bin_avgkin_keys, how='outer') \
 merged_simc_all = loweps_center.merge(loweps_left, on=bin_avgkin_keys, how='outer') \
+    .merge(mideps_center, on=bin_avgkin_keys, how='outer') \
+    .merge(mideps_left,  on=bin_avgkin_keys, how='outer') \
     .merge(higheps_right,  on=bin_avgkin_keys, how='outer') \
     .merge(higheps_center, on=bin_avgkin_keys, how='outer') \
     .merge(higheps_left,   on=bin_avgkin_keys, how='outer')
@@ -558,11 +574,13 @@ merged_simc_all = loweps_center.merge(loweps_left, on=bin_avgkin_keys, how='oute
 # Perform error-weighted average for merged simc
 def error_weighted_avgkin_simc(row):
     vars = ["avg_Q2", "avg_W"]
-    suffixes = ["loweps_center", "loweps_left", "mideps_right", "mideps_center", "mideps_left", "higheps_right", "higheps_center", "higheps_left"]
+    #suffixes = ["loweps_center", "loweps_left", "mideps_right", "mideps_center", "mideps_left", "higheps_right", "higheps_center", "higheps_left"]
+    suffixes = ["loweps_center", "loweps_left", "mideps_center", "mideps_left", "higheps_right", "higheps_center", "higheps_left"]
     result = {}
     for var in vars:
         values = [row[f"{var}_{sfx}"] for sfx in suffixes]
         errors = [row[f"{var}_err_{sfx}"] for sfx in suffixes]
+        #if (errors)
         weights = 1 / np.square(errors)
         weighted = np.sum(np.array(values) * weights) / np.sum(weights)
         weighted_err = np.sqrt(1 / np.sum(weights))
@@ -819,7 +837,7 @@ with open(list_settings_pion, "w") as f:
     tmx = final_avgkin_df["t_max"].max()
     nbin = 0
     # List of (eps value, description) for looping
-    epsilons = [loweps, higheps]
+    epsilons = [loweps, mideps, higheps]
     for idx, eps in enumerate(epsilons, 1):
         line = (
             f"{int(pol):+3d}" + " " * 3 +

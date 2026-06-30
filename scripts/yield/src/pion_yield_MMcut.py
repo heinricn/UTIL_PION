@@ -220,6 +220,20 @@ if setting_name == "Q3p85_W2p62_t0p21":
     # Pion Absorption Correction
     pion_absorption_correction = 0.9654
     pion_absorption_correction_error = 0.00005
+elif setting_name == "Q5p00_W2p95":
+    #RF cut Efficiency
+    RF_efficiency = 1.0
+    RF_efficiency_error = 0.0
+    # Pion Absorption Correction
+    pion_absorption_correction = 0.98417
+    pion_absorption_correction_error = 0.00314
+elif setting_name == "Q6p00_W3p19":
+    #RF cut Efficiency
+    RF_efficiency = 1.0
+    RF_efficiency_error = 0.0
+    # Pion Absorption Correction
+    pion_absorption_correction = 0.98829
+    pion_absorption_correction_error = 0.00314
 else:
     print("!!!!!\n Need to provide RF Eff and Absortion Corr for %s\n!!!!!" % (setting_name))
     RF_efficiency = 1.0
@@ -229,7 +243,7 @@ else:
     print("Assuming RF Eff = 1.0 +/- 0.0 and Pion Absorption Corr = 1.0 +/- 0.0 \n")
     
 row_data = []
-
+Total_uncorrected_charge_sum = 0
 # Print charge values for each run
 for index, row in filtered_data_df.iterrows():
     data_charge = row['Corrected_Charge'] 
@@ -259,6 +273,7 @@ for index, row in filtered_data_df.iterrows():
     data_product = (data_charge * pion_absorption_correction * data_hms_tracking_efficiency * data_shms_tracking_efficiency * RF_efficiency * hms_Cer_detector_efficiency * hms_Cal_detector_efficiency * data_hms_hodo_3_of_4_efficiency * data_shms_hodo_3_of_4_efficiency * data_shms_aero_detector_efficiency * data_edtm_livetime_Corr * data_Boiling_factor * data_coinblocking_factor)
     data_product_error = data_product * (math.sqrt((data_charge_error/data_charge)** 2 +  (pion_absorption_correction_error/pion_absorption_correction)**2 + (data_hms_tracking_efficiency_error/data_hms_tracking_efficiency)** 2 + (data_shms_tracking_efficiency_error/data_shms_tracking_efficiency)** 2 + (RF_efficiency_error/RF_efficiency)**2 + (data_edtm_livetime_Corr_error/data_edtm_livetime_Corr)** 2 + (hms_Cer_detector_efficiency_error/hms_Cer_detector_efficiency)** 2 + (hms_Cal_detector_efficiency_error/hms_Cal_detector_efficiency)** 2 + (data_hms_hodo_3_of_4_efficiency_error/data_hms_hodo_3_of_4_efficiency)** 2 + (data_shms_hodo_3_of_4_efficiency_error/data_shms_hodo_3_of_4_efficiency)**2 + (data_shms_aero_detector_efficiency_error/data_shms_aero_detector_efficiency)**2 + (data_Boiling_factor_error/data_Boiling_factor)** 2 + (data_coinblocking_factor_error/data_coinblocking_factor)**2)) 
 
+    Total_uncorrected_charge_sum += data_charge
     total_data_effective_charge_sum += data_product
     total_data_effective_charge_error_sum += (data_product_error)** 2
 
@@ -267,6 +282,8 @@ for index, row in filtered_data_df.iterrows():
     row_data.append({'Run_Number':row["Run_Number"], 'charge':data_charge, 'charge_error':data_charge_error, 'pion_absorption_correction':pion_absorption_correction, 'HMS_Tracking_Eff':data_hms_tracking_efficiency, 'HMS_Tracking_Eff_error':data_hms_tracking_efficiency_error, 'SHMS_Tracking_Eff':data_shms_tracking_efficiency, 'SHMS_Tracking_Eff_error':data_shms_tracking_efficiency_error, 'RF_Eff':RF_efficiency, 'RF_Eff_error':RF_efficiency_error, 'HMS_Cer_Detector_Eff':hms_Cer_detector_efficiency, 'HMS_Cer_Detector_Eff_error':hms_Cer_detector_efficiency_error, 'HMS_Cal_Detector_Eff':hms_Cal_detector_efficiency, 'HMS_Cal_Detector_Eff_error':hms_Cal_detector_efficiency_error, 'HMS_Hodo_3_4_Eff':data_hms_hodo_3_of_4_efficiency, 'HMS_Hodo_3_4_Eff_error':data_hms_hodo_3_of_4_efficiency_error, 'SHMS_Hodo_3_4_Eff':data_shms_hodo_3_of_4_efficiency, 'SHMS_Hodo_3_4_Eff_error':data_shms_hodo_3_of_4_efficiency_error, 'SHMS Aerogel Eff':data_shms_aero_detector_efficiency, 'SHMS Aerogel Eff_error':data_shms_aero_detector_efficiency_error, 'EDTM_Live_Time':data_edtm_livetime_Corr, 'EDTM_Live_Time_error':data_edtm_livetime_Corr_error, 'Boiling_factor':data_Boiling_factor, 'Boiling_factor_error':data_Boiling_factor_error, 'Coin_Blocking':data_coinblocking_factor, 'Coin_Blocking_error':data_coinblocking_factor_error, 'effective_charge':data_product, 'effective_charge_error':data_product_error})
 
 print("-"*40)
+print("\nUncorrected Charge Sum: ", Total_uncorrected_charge_sum)
+print("Corrected Charge Sum: ", total_data_effective_charge_sum)
 
 total_data_effective_charge = total_data_effective_charge_sum
 total_data_effective_charge_error = math.sqrt(total_data_effective_charge_error_sum)
@@ -274,7 +291,7 @@ total_data_effective_charge_error = math.sqrt(total_data_effective_charge_error_
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 row_dummy = []
-
+Total_uncorrected_dummy_charge_sum = 0
 for index, row in filtered_dummy_df.iterrows():
     dummy_charge = row['Corrected_Charge'] 
     dummy_charge_error = row['Corrected_Charge_ERROR']
@@ -301,6 +318,7 @@ for index, row in filtered_dummy_df.iterrows():
     dummy_product = (dummy_charge * dummy_hms_tracking_efficiency * dummy_shms_tracking_efficiency * RF_efficiency * hms_Cer_detector_efficiency * hms_Cal_detector_efficiency * dummy_hms_hodo_3_of_4_efficiency * dummy_shms_hodo_3_of_4_efficiency * dummy_edtm_livetime_Corr * dummy_shms_aero_detector_efficiency * dummy_coinblocking_factor)
     dummy_product_error = dummy_product * (math.sqrt(((dummy_charge_error/dummy_charge) ** 2 + dummy_hms_tracking_efficiency_error/dummy_hms_tracking_efficiency) ** 2 + (dummy_shms_tracking_efficiency_error/dummy_shms_tracking_efficiency) ** 2 + (RF_efficiency_error/RF_efficiency) **2 + (dummy_edtm_livetime_Corr_error/dummy_edtm_livetime_Corr)** 2 + (hms_Cer_detector_efficiency_error/hms_Cer_detector_efficiency) ** 2 + (hms_Cal_detector_efficiency_error/hms_Cal_detector_efficiency) ** 2 + (dummy_hms_hodo_3_of_4_efficiency_error/dummy_hms_hodo_3_of_4_efficiency) ** 2 + (dummy_shms_hodo_3_of_4_efficiency_error/dummy_shms_hodo_3_of_4_efficiency) ** 2 + (dummy_shms_aero_detector_efficiency_error/dummy_shms_aero_detector_efficiency) ** 2 + (dummy_coinblocking_factor_error/dummy_coinblocking_factor)**2))
 
+    Total_uncorrected_dummy_charge_sum += dummy_charge
     total_dummy_effective_charge_sum += dummy_product
     total_dummy_effective_charge_error_sum += (dummy_product_error)** 2
 
@@ -309,6 +327,9 @@ for index, row in filtered_dummy_df.iterrows():
     row_dummy.append({'Run_Number':row["Run_Number"], 'charge':dummy_charge, 'charge_error':dummy_charge_error, 'HMS_Tracking_Eff':dummy_hms_tracking_efficiency, 'HMS_Tracking_Eff_error':dummy_hms_tracking_efficiency_error, 'SHMS_Tracking_Eff':dummy_shms_tracking_efficiency, 'SHMS_Tracking_Eff_error':dummy_shms_tracking_efficiency_error, 'RF_Eff':RF_efficiency, 'RF_Eff_error':RF_efficiency_error, 'HMS_Cer_Detector_Eff':hms_Cer_detector_efficiency, 'HMS_Cer_Detector_Eff_error':hms_Cer_detector_efficiency_error, 'HMS_Cal_Detector_Eff':hms_Cal_detector_efficiency, 'HMS_Cal_Detector_Eff_error':hms_Cal_detector_efficiency_error, 'HMS_Hodo_3_4_Eff':dummy_hms_hodo_3_of_4_efficiency, 'HMS_Hodo_3_4_Eff_error':dummy_hms_hodo_3_of_4_efficiency_error, 'SHMS_Hodo_3_4_Eff':dummy_shms_hodo_3_of_4_efficiency, 'SHMS_Hodo_3_4_Eff_error':dummy_shms_hodo_3_of_4_efficiency_error, 'SHMS Aerogel Eff':dummy_shms_aero_detector_efficiency, 'SHMS Aerogel Eff_error':dummy_shms_aero_detector_efficiency_error, 'EDTM_Live_Time':dummy_edtm_livetime_Corr, 'EDTM_Live_Time_error':dummy_edtm_livetime_Corr_error, 'Boiling_factor':'NA', 'Boiling_factor_error':'NA', 'Coin_Blocking':dummy_coinblocking_factor, 'Coin_Blocking_error':dummy_coinblocking_factor_error, 'effective_charge':dummy_product, 'effective_charge_error':dummy_product_error})
 
 print("-"*40)
+print("\nUncorrected Dummy Charge Sum: ", Total_uncorrected_dummy_charge_sum)
+print("Corrected Dummy Charge Sum: ", total_dummy_effective_charge_sum)
+
 
 # Dummy Target Thickness Correction
 #dummy_target_corr = 4.8579 # KaonLT
@@ -364,53 +385,57 @@ print("-"*40)
 
 ###################################################################################################################################################
 nbins_p = 1000
+MM_hist_min = 0.0
+MM_hist_max = 2.0
+MM_cut_bin_low  = ma.ceil(MM_Cut_low*(MM_hist_max/nbins_p))
+MM_cut_bin_high = ma.floor(MM_Cut_high*(MM_hist_max/nbins_p))
 
 # Defining Histograms for Pions
 # Histograms having Cuts (Acceptance)
-P_kin_MMpi_pions_data_accpt_cut_all = ROOT.TH1D("P_kin_MMpi_pions_data_accpt_cut_all", "MIssing Mass data (dummysub_accpt_cut_all); MM_{pi}; Counts", nbins_p, 0, 2.2)
+P_kin_MMpi_pions_data_accpt_cut_all = ROOT.TH1D("P_kin_MMpi_pions_data_accpt_cut_all", "MIssing Mass data (dummysub_accpt_cut_all); MM_{pi}; Counts", nbins_p, MM_hist_min, MM_hist_max)
 
 # Histograms Having Cuts (Acceptance + PID + RF + Prompt Selection) Data
-P_kin_MMpi_pions_data_prompt_cut_all = ROOT.TH1D("P_kin_MMpi_pions_data_prompt_cut_all", "MIssing Mass data (prompt_cut_all); MM_{pi}; Counts", nbins_p, 0, 2.2)
+P_kin_MMpi_pions_data_prompt_cut_all = ROOT.TH1D("P_kin_MMpi_pions_data_prompt_cut_all", "MIssing Mass data (prompt_cut_all); MM_{pi}; Counts", nbins_p, MM_hist_min, MM_hist_max)
 
 # Histograms Having Cuts (Acceptance + PID + RF + Random Selection) Data
-P_kin_MMpi_pions_data_random_cut_all = ROOT.TH1D("P_kin_MMpi_pions_data_random_cut_all", "MIssing Mass data (random_cut_all); MM_{pi}; Counts", nbins_p, 0, 2.2)
+P_kin_MMpi_pions_data_random_cut_all = ROOT.TH1D("P_kin_MMpi_pions_data_random_cut_all", "MIssing Mass data (random_cut_all); MM_{pi}; Counts", nbins_p, MM_hist_min, MM_hist_max)
 
 # Histograms Having Cuts (Acceptance + PID + RF + Prompt Selection) Dummy
-P_kin_MMpi_pions_dummy_prompt_cut_all = ROOT.TH1D("P_kin_MMpi_pions_dummy_prompt_cut_all", "MIssing Mass dummy (prompt_cut_all); MM_{pi}; Counts", nbins_p, 0, 2.2)
+P_kin_MMpi_pions_dummy_prompt_cut_all = ROOT.TH1D("P_kin_MMpi_pions_dummy_prompt_cut_all", "MIssing Mass dummy (prompt_cut_all); MM_{pi}; Counts", nbins_p, MM_hist_min, MM_hist_max)
 
 # Histograms Having Cuts (Acceptance + PID + RF + Random Selection) Dummy
-P_kin_MMpi_pions_dummy_random_cut_all = ROOT.TH1D("P_kin_MMpi_pions_dummy_random_cut_all", "MIssing Mass dummy (random_cut_all); MM_{pi}; Counts", nbins_p, 0, 2.2)
+P_kin_MMpi_pions_dummy_random_cut_all = ROOT.TH1D("P_kin_MMpi_pions_dummy_random_cut_all", "MIssing Mass dummy (random_cut_all); MM_{pi}; Counts", nbins_p, MM_hist_min, MM_hist_max)
 
 # Histograms having Cuts (Acceptance + PID + RF + RandSub) Data
-P_kin_MMpi_pions_randsub_data_cut_all = ROOT.TH1D("P_kin_MMpi_pions_randsub_data_cut_all", "MIssing Mass data (randsub_cut_all); MM_{pi}; Counts", nbins_p, 0, 2.2)
+P_kin_MMpi_pions_randsub_data_cut_all = ROOT.TH1D("P_kin_MMpi_pions_randsub_data_cut_all", "MIssing Mass data (randsub_cut_all); MM_{pi}; Counts", nbins_p, MM_hist_min, MM_hist_max)
 
 # Histograms having Cuts (Acceptance + PID + RF + RandSub) Dummy
-P_kin_MMpi_pions_randsub_dummy_cut_all = ROOT.TH1D("P_kin_MMpi_pions_randsub_dummy_cut_all", "MIssing Mass dummy (randsub_cut_all); MM_{pi}; Counts", nbins_p, 0, 2.2)
+P_kin_MMpi_pions_randsub_dummy_cut_all = ROOT.TH1D("P_kin_MMpi_pions_randsub_dummy_cut_all", "MIssing Mass dummy (randsub_cut_all); MM_{pi}; Counts", nbins_p, MM_hist_min, MM_hist_max)
 
 # Histograms having Cuts (Acceptance + PID + RF + RandSub + DummySub)
-P_kin_MMpi_pions_dummysub_data_cut_all = ROOT.TH1D("P_kin_MMpi_pions_dummysub_data_cut_all", "MIssing Mass data (dummysub_cut_all); MM_{pi}; Counts", nbins_p, 0, 2.2)
+P_kin_MMpi_pions_dummysub_data_cut_all = ROOT.TH1D("P_kin_MMpi_pions_dummysub_data_cut_all", "MIssing Mass data (dummysub_cut_all); MM_{pi}; Counts", nbins_p, MM_hist_min, MM_hist_max)
 
 # Histograms having Cuts (Acceptance + PID + RF + RandSub + Norm) Data
-P_kin_MMpi_pions_normrandsub_data_cut_all = ROOT.TH1D("P_kin_MMpi_pions_normrandsub_data_cut_all", "MIssing Mass data (datasub_cut_all); MM_{pi}; Counts", nbins_p, 0, 2.2)
+P_kin_MMpi_pions_normrandsub_data_cut_all = ROOT.TH1D("P_kin_MMpi_pions_normrandsub_data_cut_all", "MIssing Mass data (datasub_cut_all); MM_{pi}; Counts", nbins_p, MM_hist_min, MM_hist_max)
 
 # Histograms having Cuts (Acceptance + PID + RF + RandSub + Norm) Dummy
-P_kin_MMpi_pions_normrandsub_dummy_cut_all = ROOT.TH1D("P_kin_MMpi_pions_normrandsub_dummy_cut_all", "MIssing Mass data (dummysub_cut_all); MM_{pi}; Counts", nbins_p, 0, 2.2)
+P_kin_MMpi_pions_normrandsub_dummy_cut_all = ROOT.TH1D("P_kin_MMpi_pions_normrandsub_dummy_cut_all", "MIssing Mass data (dummysub_cut_all); MM_{pi}; Counts", nbins_p, MM_hist_min, MM_hist_max)
 
 # Histograms having Cuts (Acceptance + PID + RF + Prompt Selection) Norm Dummy Subtraction Data
-P_kin_MMpi_pions_normdummysub_data_cut_all = ROOT.TH1D("P_kin_MMpi_pions_normdummysub_data_cut_all", "MIssing Mass data (dummysub_cut_all); MM_{pi}; Counts", nbins_p, 0, 2.2)
+P_kin_MMpi_pions_normdummysub_data_cut_all = ROOT.TH1D("P_kin_MMpi_pions_normdummysub_data_cut_all", "MIssing Mass data (dummysub_cut_all); MM_{pi}; Counts", nbins_p, MM_hist_min, MM_hist_max)
 
 # SIMC Histograms with Cuts
-MMpi_pions_simc_cut_all = ROOT.TH1D("MMpi_pions_simc_cut_all", "MIssing Mass SIMC (cut_all); MM_{pi}; Counts", nbins_p, 0, 2.2)
+MMpi_pions_simc_cut_all = ROOT.TH1D("MMpi_pions_simc_cut_all", "MIssing Mass SIMC (cut_all); MM_{pi}; Counts", nbins_p, MM_hist_min, MM_hist_max)
 
 # Histograms for Error Calculations
-P_kin_secondary_pmiss_pions_data_prompt_cut_all_error = ROOT.TH1D("P_kin_secondary_pmiss_pions_data_prompt_cut_all_error", "pmiss Distribution; pmiss; Counts", nbins_p, 0.0, 2.0) 
-P_kin_secondary_pmiss_pions_dummy_prompt_cut_all_error = ROOT.TH1D("P_kin_secondary_pmiss_pions_dummy_prompt_cut_all_error", "pmiss Distribution; pmiss; Counts", nbins_p, 0.0, 2.0)
-P_kin_secondary_pmiss_pions_data_random_cut_all_error = ROOT.TH1D("P_kin_secondary_pmiss_pions_data_random_cut_all_error", "pmiss Distribution; pmiss; Counts", nbins_p, 0.0, 2.0) 
-P_kin_secondary_pmiss_pions_dummy_random_cut_all_error = ROOT.TH1D("P_kin_secondary_pmiss_pions_dummy_random_cut_all_error", "pmiss Distribution; pmiss; Counts", nbins_p, 0.0, 2.0)
-P_kin_secondary_pmiss_pions_randsub_data_cut_all_error = ROOT.TH1D("P_kin_secondary_pmiss_pions_randsub_data_cut_all_error", "pmiss Distribution; pmiss; Counts", nbins_p, 0.0, 2.0)
-P_kin_secondary_pmiss_pions_randsub_dummy_cut_all_error = ROOT.TH1D("P_kin_secondary_pmiss_pions_randsub_dummy_cut_all_error", "pmiss Distribution; pmiss; Counts", nbins_p, 0.0, 2.0)
-pmiss_pions_simc_cut_all_error = ROOT.TH1D("pmiss_pions_simc_cut_all_error", "pmiss Distribution; pmiss; Counts", nbins_p, 0.0, 2.0)
-pmiss_pions_simc_cut_all_norm_error = ROOT.TH1D("pmiss_pions_simc_cut_all_norm_error", "pmiss Distribution; pmiss; Counts", nbins_p, 0.0, 2.0)
+P_kin_secondary_pmiss_pions_data_prompt_cut_all_error = ROOT.TH1D("P_kin_secondary_pmiss_pions_data_prompt_cut_all_error", "pmiss Distribution; pmiss; Counts", nbins_p, MM_hist_min, MM_hist_max) 
+P_kin_secondary_pmiss_pions_dummy_prompt_cut_all_error = ROOT.TH1D("P_kin_secondary_pmiss_pions_dummy_prompt_cut_all_error", "pmiss Distribution; pmiss; Counts", nbins_p, MM_hist_min, MM_hist_max)
+P_kin_secondary_pmiss_pions_data_random_cut_all_error = ROOT.TH1D("P_kin_secondary_pmiss_pions_data_random_cut_all_error", "pmiss Distribution; pmiss; Counts", nbins_p, MM_hist_min, MM_hist_max) 
+P_kin_secondary_pmiss_pions_dummy_random_cut_all_error = ROOT.TH1D("P_kin_secondary_pmiss_pions_dummy_random_cut_all_error", "pmiss Distribution; pmiss; Counts", nbins_p, MM_hist_min, MM_hist_max)
+P_kin_secondary_pmiss_pions_randsub_data_cut_all_error = ROOT.TH1D("P_kin_secondary_pmiss_pions_randsub_data_cut_all_error", "pmiss Distribution; pmiss; Counts", nbins_p, MM_hist_min, MM_hist_max)
+P_kin_secondary_pmiss_pions_randsub_dummy_cut_all_error = ROOT.TH1D("P_kin_secondary_pmiss_pions_randsub_dummy_cut_all_error", "pmiss Distribution; pmiss; Counts", nbins_p, MM_hist_min, MM_hist_max)
+pmiss_pions_simc_cut_all_error = ROOT.TH1D("pmiss_pions_simc_cut_all_error", "pmiss Distribution; pmiss; Counts", nbins_p, MM_hist_min, MM_hist_max)
+pmiss_pions_simc_cut_all_norm_error = ROOT.TH1D("pmiss_pions_simc_cut_all_norm_error", "pmiss Distribution; pmiss; Counts", nbins_p, MM_hist_min, MM_hist_max)
 
 ##########################################################################################################################################################################################################
 
@@ -487,12 +512,17 @@ P_kin_secondary_pmiss_pions_data_random_cut_all_error.Scale(1.0/nWindows)
 P_kin_MMpi_pions_randsub_data_cut_all.Add(P_kin_MMpi_pions_data_prompt_cut_all, P_kin_MMpi_pions_data_random_cut_all, 1, -1)
 P_kin_secondary_pmiss_pions_randsub_data_cut_all_error.Add(P_kin_secondary_pmiss_pions_data_prompt_cut_all_error, P_kin_secondary_pmiss_pions_data_random_cut_all_error, 1, -1)
 P_kin_MMpi_pions_normrandsub_data_cut_all.Add(P_kin_MMpi_pions_data_prompt_cut_all, P_kin_MMpi_pions_data_random_cut_all, 1, -1)
-
+randSubInt = P_kin_MMpi_pions_randsub_data_cut_all.Integral(MM_cut_bin_low,MM_cut_bin_high)
+print("\nTotal Events No Dummy Sub: ", randSubInt)
+print("\n\n")
 P_kin_MMpi_pions_dummy_random_cut_all.Scale(1.0/nWindows)
 P_kin_secondary_pmiss_pions_dummy_random_cut_all_error.Scale(1.0/nWindows)
 P_kin_MMpi_pions_randsub_dummy_cut_all.Add(P_kin_MMpi_pions_dummy_prompt_cut_all, P_kin_MMpi_pions_dummy_random_cut_all, 1, -1)
 P_kin_secondary_pmiss_pions_randsub_dummy_cut_all_error.Add(P_kin_secondary_pmiss_pions_dummy_prompt_cut_all_error, P_kin_secondary_pmiss_pions_dummy_random_cut_all_error, 1, -1)
 P_kin_MMpi_pions_normrandsub_dummy_cut_all.Add(P_kin_MMpi_pions_dummy_prompt_cut_all, P_kin_MMpi_pions_dummy_random_cut_all, 1, -1)
+DummyrandSubInt = P_kin_MMpi_pions_randsub_dummy_cut_all.Integral(MM_cut_bin_low,MM_cut_bin_high)
+print("\nTotal Events Dummy: ", DummyrandSubInt)
+print("\n\n")
 
 print("######################################")
 print("###### Random substraction done ######")
@@ -506,6 +536,10 @@ P_kin_MMpi_pions_normrandsub_data_cut_all.Scale(normfac_data)
 # Dummy Normalization
 P_kin_MMpi_pions_normrandsub_dummy_cut_all.Scale(normfac_dummy)
 
+print("\nIntegral Data After Scaling: ", P_kin_MMpi_pions_normrandsub_data_cut_all.Integral(MM_cut_bin_low,MM_cut_bin_high))
+print("\nIntegral Dummy After Scaling: ", P_kin_MMpi_pions_normrandsub_dummy_cut_all.Integral(MM_cut_bin_low,MM_cut_bin_high))
+print("\n\n")
+
 # SIMC Normalization
 MMpi_pions_simc_cut_all.Scale(normfac_simc)
 pmiss_pions_simc_cut_all_norm_error.Scale(normfac_simc)
@@ -515,6 +549,9 @@ pmiss_pions_simc_cut_all_norm_error.Scale(normfac_simc)
 # Dummy Subtraction
 P_kin_MMpi_pions_dummysub_data_cut_all.Add(P_kin_MMpi_pions_randsub_data_cut_all, P_kin_MMpi_pions_randsub_dummy_cut_all, 1, -1)
 P_kin_MMpi_pions_normdummysub_data_cut_all.Add(P_kin_MMpi_pions_normrandsub_data_cut_all, P_kin_MMpi_pions_normrandsub_dummy_cut_all, 1, -1)
+DummySubInt = P_kin_MMpi_pions_normdummysub_data_cut_all.Integral(MM_cut_bin_low,MM_cut_bin_high)
+print("\nIntegral after Dummy Sub: ", DummySubInt)
+print("\n\n")
 
 print("####################################")
 print("###### Dummy subtraction done ######")
@@ -526,11 +563,11 @@ print("####################################\n")
 dN_data_MMP = array.array('d', [0.0])
 dN_simc_MMP = array.array('d', [0.0])
 
-N_data_MMP = P_kin_MMpi_pions_normdummysub_data_cut_all.IntegralAndError(1,nbins_p,dN_data_MMP,"")
-N_simc_MMP = MMpi_pions_simc_cut_all.IntegralAndError(1,nbins_p,dN_simc_MMP,"")
+N_data_MMP = P_kin_MMpi_pions_normdummysub_data_cut_all.IntegralAndError(MM_cut_bin_low,MM_cut_bin_high,dN_data_MMP,"")
+N_simc_MMP = MMpi_pions_simc_cut_all.IntegralAndError(MM_cut_bin_low,MM_cut_bin_high,dN_simc_MMP,"nbins_p")
 
-N_data_MMPi = P_kin_MMpi_pions_normdummysub_data_cut_all.Integral(math.floor((0.9/2.2)*nbins_p), math.floor((1.05/2.2)*nbins_p))
-N_simc_MMPi = MMpi_pions_simc_cut_all.Integral(math.floor((0.9/2.2)*nbins_p), math.floor((1.05/2.2)*nbins_p))
+N_data_MMPi = P_kin_MMpi_pions_normdummysub_data_cut_all.Integral(MM_cut_bin_low,MM_cut_bin_high)
+N_simc_MMPi = MMpi_pions_simc_cut_all.Integral(MM_cut_bin_low,MM_cut_bin_high)
 MMpiSimcRatio = N_data_MMPi/N_simc_MMP
 
 # Physics Yield Calculations
@@ -545,10 +582,10 @@ dN_dummy_error = array.array('d', [0.0])
 dN_simc_error = array.array('d', [0.0])
 dN_simc_norm_error = array.array('d', [0.0])
 
-N_data = P_kin_secondary_pmiss_pions_randsub_data_cut_all_error.IntegralAndError(1,nbins_p,dN_data_error,"")
-N_dummy = P_kin_secondary_pmiss_pions_randsub_dummy_cut_all_error.IntegralAndError(1,nbins_p,dN_dummy_error,"")
-N_simc = pmiss_pions_simc_cut_all_error.IntegralAndError(1,nbins_p,dN_simc_error,"")
-N_simc_norm = pmiss_pions_simc_cut_all_norm_error.IntegralAndError(1,nbins_p,dN_simc_norm_error,"")
+N_data = P_kin_secondary_pmiss_pions_randsub_data_cut_all_error.IntegralAndError(MM_cut_bin_low,MM_cut_bin_high,dN_data_error,"")
+N_dummy = P_kin_secondary_pmiss_pions_randsub_dummy_cut_all_error.IntegralAndError(MM_cut_bin_low,MM_cut_bin_high,dN_dummy_error,"")
+N_simc = pmiss_pions_simc_cut_all_error.IntegralAndError(MM_cut_bin_low,MM_cut_bin_high,dN_simc_error,"")
+N_simc_norm = pmiss_pions_simc_cut_all_norm_error.IntegralAndError(MM_cut_bin_low,MM_cut_bin_high,dN_simc_norm_error,"")
 
 # Data/SIMC Ratio Calculations with errors
 N_data_norm = N_data / total_data_effective_charge
@@ -657,12 +694,12 @@ b_mean_err_MMpi_simc = tmp_b_mean_MMpi_simc[1]
 tmp_b_mean_MMpi_data = fit_gaussian(P_kin_MMpi_pions_normdummysub_data_cut_all,0.90, 1.0, "data")
 b_mean_MMpi_data = tmp_b_mean_MMpi_data[0]
 b_mean_err_MMpi_data = tmp_b_mean_MMpi_data[1]
-MMpi_pions_simc_cut_all.GetXaxis().SetRangeUser(0.0, 2.2)
+MMpi_pions_simc_cut_all.GetXaxis().SetRangeUser(MM_hist_min, MM_hist_max)
 MMpi_pions_simc_cut_all.SetLineColor(kRed)
 MMpi_pions_simc_cut_all.SetMarkerColor(kRed)
 MMpi_pions_simc_cut_all.Scale(MMpiSimcRatio)
 MMpi_pions_simc_cut_all.Draw("E1")
-P_kin_MMpi_pions_normdummysub_data_cut_all.GetXaxis().SetRangeUser(0.0, 2.2)
+P_kin_MMpi_pions_normdummysub_data_cut_all.GetXaxis().SetRangeUser(MM_hist_min, MM_hist_max)
 P_kin_MMpi_pions_normdummysub_data_cut_all.SetLineColor(kBlue)
 P_kin_MMpi_pions_normdummysub_data_cut_all.SetMarkerColor(kBlue)
 P_kin_MMpi_pions_normdummysub_data_cut_all.Draw("same, E1")
@@ -690,11 +727,11 @@ for c1_delta_text in c1_delta_text_lines:
        c1_delta_text.SetTextColor(ROOT.kBlue)  # Setting text color to red
     c1_delta_text.Draw()
 c1_delta.cd(3)
-MMpi_pions_simc_cut_all.GetXaxis().SetRangeUser(0.0, 2.2)
+MMpi_pions_simc_cut_all.GetXaxis().SetRangeUser(MM_hist_min, MM_hist_max)
 MMpi_pions_simc_cut_all.SetLineColor(kRed)
 MMpi_pions_simc_cut_all.SetMarkerColor(kRed)
 MMpi_pions_simc_cut_all.Draw("hist")
-P_kin_MMpi_pions_normdummysub_data_cut_all.GetXaxis().SetRangeUser(0.0, 2.2)
+P_kin_MMpi_pions_normdummysub_data_cut_all.GetXaxis().SetRangeUser(MM_hist_min, MM_hist_max)
 P_kin_MMpi_pions_normdummysub_data_cut_all.SetLineColor(kBlue)
 P_kin_MMpi_pions_normdummysub_data_cut_all.SetMarkerColor(kBlue)
 P_kin_MMpi_pions_normdummysub_data_cut_all.Draw("same, hist")

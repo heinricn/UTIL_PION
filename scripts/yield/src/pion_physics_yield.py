@@ -57,7 +57,7 @@ DUMMY_RUN_LIST = sys.argv[6]
 CSV_FILE = sys.argv[7]
 
 # Important variables for script
-ntbins = 7
+ntbins = 8
 
 ################################################################################################################################################
 '''
@@ -309,6 +309,20 @@ if setting_name == "Q3p85_W2p62_t0p21":
     # Pion Absorption Correction
     pion_absorption_correction = 0.9654
     pion_absorption_correction_error = 0.00005
+elif setting_name == "Q5p00_W2p95":
+    #RF cut Efficiency
+    RF_efficiency = 1.0
+    RF_efficiency_error = 0.0
+    # Pion Absorption Correction
+    pion_absorption_correction = 0.98417
+    pion_absorption_correction_error = 0.00314
+elif setting_name == "Q6p00_W3p19":
+    #RF cut Efficiency
+    RF_efficiency = 1.0
+    RF_efficiency_error = 0.0
+    # Pion Absorption Correction
+    pion_absorption_correction = 0.98829
+    pion_absorption_correction_error = 0.00314
 else:
     print("!!!!!\n Need to provide RF Eff and Absortion Corr for %s\n!!!!!" % (setting_name))
     RF_efficiency = 1.0
@@ -549,8 +563,8 @@ nbins = 200
 
 hist_config = {
     "MMpi":    ("Missing Mass Distribution (Cut_All); MM_{\pi}; Counts", nbins, 0.8, 1.2),
-    "Q2":      ("Q^{2} Distribution (Cut_All); Q^{2}; Counts", nbins, 2.0, 5.0),
-    "W":       ("W Distribution (Cut_All); W; Counts", nbins, 2.0, 3.0),
+    "Q2":      ("Q^{2} Distribution (Cut_All); Q^{2}; Counts", nbins, 4.0, 8.0),
+    "W":       ("W Distribution (Cut_All); W; Counts", nbins, 2.0, 5.0),
     "epsilon": ("Epsilon Distribution (Cut_All); #epsilon; Counts", nbins, 0.0, 1.0),
     "theta":   ("Theta Distribution (Cut_All); #theta; Counts", nbins, 0.0, 0.5),
 }

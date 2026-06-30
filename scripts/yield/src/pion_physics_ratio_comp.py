@@ -287,6 +287,20 @@ if setting_name == "Q3p85_W2p62_t0p21":
     # Pion Absorption Correction
     pion_absorption_correction = 0.9654
     pion_absorption_correction_error = 0.00005
+elif setting_name == "Q5p00_W2p95":
+    #RF cut Efficiency
+    RF_efficiency = 1.0
+    RF_efficiency_error = 0.0
+    # Pion Absorption Correction
+    pion_absorption_correction = 0.98417
+    pion_absorption_correction_error = 0.00314
+elif setting_name == "Q6p00_W3p19":
+    #RF cut Efficiency
+    RF_efficiency = 1.0
+    RF_efficiency_error = 0.0
+    # Pion Absorption Correction
+    pion_absorption_correction = 0.98829
+    pion_absorption_correction_error = 0.00314
 else:
     print("!!!!!\n Need to provide RF Eff and Absortion Corr for %s\n!!!!!" % (setting_name))
     RF_efficiency = 1.0

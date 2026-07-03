@@ -82,7 +82,6 @@ elif PHY_SETTING == "Q6p00_W3p19":
     ntbins = 8
 else:
     print("!!!!! Please declare low/mid/high epsilon values of you physics setting !!!!!")
-
 # Section fo theta_cm calculation
 # Define constants (masses in GeV, pi)
 mp = 0.93827231    # Proton mass
@@ -129,6 +128,7 @@ REPLAYPATH=lt.REPLAYPATH
 UTILPATH=lt.UTILPATH
 ANATYPE=lt.ANATYPE
 OUTPATH=lt.OUTPATH
+VOLATILEPATH=lt.VOLATILEPATH
 
 # Extract the first three words from PHY_SETTING for the CSV file name
 setting_name = "_".join(PHY_SETTING.split("_")[:3])
@@ -228,6 +228,12 @@ merged_avg_loweps_df.insert(0, "Physics_Setting", f"{PHY_SETTING}_loweps")
 def error_weighted_ratio_loweps(row):
     y1, e1 = row["ratio_loweps_center"], row["ratio_error_loweps_center"]
     y2, e2 = row["ratio_loweps_left"], row["ratio_error_loweps_left"]
+    
+    # Handle zero or very small errors to avoid division by zero
+    min_error = 1e-10  # Minimum error threshold
+    e1 = max(e1, min_error)
+    e2 = max(e2, min_error)
+    
     # Compute weights (inverse variance)
     weights = 1 / np.array([e1**2, e2**2])
     ratios = np.array([y1, y2])
@@ -260,47 +266,46 @@ print(f"Average weighted loweps yields saved to the path: {combined_weighted_low
 # Define the output path
 combined_weighted_mideps_yields = "%s/LTSep_CSVs/avg_kinematics_csv/%s/%s_pion_physics_mideps_avg_yields.csv" % (UTILPATH, physet_dir_name, PHY_SETTING)
 
+# Load the CSV file
+data_yield_df = pd.read_csv(data_yield_csv)
+data_yield_df.columns = data_yield_df.columns.str.strip()  # clean up headers
+simc_yield_df = pd.read_csv(simc_yield_csv)
+simc_yield_df.columns = simc_yield_df.columns.str.strip()  # clean up headers
+
 # Filter the DataFrame for specific Physics_Setting values
-#filtered_data_yield_mideps_right_df = data_yield_df[data_yield_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_right"]
 filtered_data_yield_mideps_center_df = data_yield_df[data_yield_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_center"]
 filtered_data_yield_mideps_left_df = data_yield_df[data_yield_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_left"]
-#filtered_simc_yield_mideps_right_df = simc_yield_df[simc_yield_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_right"]
 filtered_simc_yield_mideps_center_df = simc_yield_df[simc_yield_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_center"]
 filtered_simc_yield_mideps_left_df = simc_yield_df[simc_yield_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_left"]
 
+# Define binning keys
+bin_yield_keys = ["tbin_number", "t_min", "t_max", "phibin_number", "phi_min", "phi_max"]
+key_yield_cols = ["Physics_Setting"] + bin_yield_keys
+
 # Merge filtered DataFrames on binning keys
-#merged_mideps_right_df = pd.merge(filtered_data_yield_mideps_right_df, filtered_simc_yield_mideps_right_df, on=key_yield_cols, suffixes=('_mideps_right_data', '_mideps_right_simc'))
 merged_mideps_center_df = pd.merge(filtered_data_yield_mideps_center_df, filtered_simc_yield_mideps_center_df, on=key_yield_cols, suffixes=('_mideps_center_data', '_mideps_center_simc'))
 merged_mideps_left_df = pd.merge(filtered_data_yield_mideps_left_df, filtered_simc_yield_mideps_left_df, on=key_yield_cols, suffixes=('_mideps_left_data', '_mideps_left_simc'))
 
-# Calculate Physics_Yield ratio for high-ε center
-# RIGHT
-#merged_mideps_right_df["physics_yield"] = merged_mideps_right_df["physics_yield"].clip(lower=0)
-#merged_mideps_right_df["simc_yield"] = merged_mideps_right_df["simc_yield"].clip(lower=0)
-#merged_mideps_right_df["ratio_mideps_right"] = merged_mideps_right_df["physics_yield"] / merged_mideps_right_df["simc_yield"]
-#merged_mideps_right_df["ratio_mideps_right"] = merged_mideps_right_df["ratio_mideps_right"].replace(np.nan, 0)
-#merged_mideps_right_df["ratio_mideps_right"] = merged_mideps_right_df["ratio_mideps_right"].replace([np.inf, -np.inf], 0)
-#merged_mideps_right_df["ratio_error_mideps_right"] = merged_mideps_right_df["ratio_mideps_right"] * np.sqrt(
-#    (merged_mideps_right_df["physics_yield_error"] / merged_mideps_right_df["physics_yield"].replace(0, np.nan))**2 +
-#    (merged_mideps_right_df["simc_yield_error"] / merged_mideps_right_df["simc_yield"].replace(0, np.nan))**2
-#)
-#merged_mideps_right_df["ratio_error_mideps_right"] = merged_mideps_right_df["ratio_error_mideps_right"].replace(np.nan, 1000)
-#merged_mideps_right_df["ratio_error_mideps_right"] = np.abs(merged_mideps_right_df["ratio_error_mideps_right"])
-
-# CENTER
+# Calculate Physics_Yield ratio for low-ε center
 merged_mideps_center_df["physics_yield"] = merged_mideps_center_df["physics_yield"].clip(lower=0)
 merged_mideps_center_df["simc_yield"] = merged_mideps_center_df["simc_yield"].clip(lower=0)
 merged_mideps_center_df["ratio_mideps_center"] = merged_mideps_center_df["physics_yield"] / merged_mideps_center_df["simc_yield"]
 merged_mideps_center_df["ratio_mideps_center"] = merged_mideps_center_df["ratio_mideps_center"].replace(np.nan, 0)
-merged_mideps_center_df["ratio_mideps_center"] = merged_mideps_center_df["ratio_mideps_center"].replace([np.inf, -np.inf], 0)
 merged_mideps_center_df["ratio_error_mideps_center"] = merged_mideps_center_df["ratio_mideps_center"] * np.sqrt(
     (merged_mideps_center_df["physics_yield_error"] / merged_mideps_center_df["physics_yield"].replace(0, np.nan))**2 +
     (merged_mideps_center_df["simc_yield_error"] / merged_mideps_center_df["simc_yield"].replace(0, np.nan))**2
 )
+merged_mideps_center_df["ratio_mideps_center"] = merged_mideps_center_df["ratio_mideps_center"].replace([np.inf, -np.inf], 0)
 merged_mideps_center_df["ratio_error_mideps_center"] = merged_mideps_center_df["ratio_error_mideps_center"].replace(np.nan, 1000)
 merged_mideps_center_df["ratio_error_mideps_center"] = np.abs(merged_mideps_center_df["ratio_error_mideps_center"])
+# Print the results for low-ε center
+#print("\n--- Low-ε Center Ratios ---")
+#for _, row in merged_mideps_center_df.iterrows():
+#    print(f"{row['Physics_Setting']} | t=({row['t_min']}, {row['t_max']}) | phi=({row['phi_min']}, {row['phi_max']}) | "
+#          f"ratio = {row['ratio_mideps_center']:.4f} | error = {row['ratio_error_mideps_center']:.4f}")
 
-# LEFT
+
+# Calculate Physics_Yield ratio for low-ε left
 merged_mideps_left_df["physics_yield"] = merged_mideps_left_df["physics_yield"].clip(lower=0)
 merged_mideps_left_df["simc_yield"] = merged_mideps_left_df["simc_yield"].clip(lower=0)
 merged_mideps_left_df["ratio_mideps_left"] = merged_mideps_left_df["physics_yield"] / merged_mideps_left_df["simc_yield"]
@@ -312,26 +317,35 @@ merged_mideps_left_df["ratio_error_mideps_left"] = merged_mideps_left_df["ratio_
 )
 merged_mideps_left_df["ratio_error_mideps_left"] = merged_mideps_left_df["ratio_error_mideps_left"].replace(np.nan, 1000)
 merged_mideps_left_df["ratio_error_mideps_left"] = np.abs(merged_mideps_left_df["ratio_error_mideps_left"])
+# Print the results for low-ε left
+#print("\n--- Low-ε Left Ratios ---")
+#for _, row in merged_mideps_left_df.iterrows():
+#    print(f"{row['Physics_Setting']} | t=({row['t_min']}, {row['t_max']}) | phi=({row['phi_min']}, {row['phi_max']}) | "
+#          f"ratio = {row['ratio_mideps_left']:.4f} | error = {row['ratio_error_mideps_left']:.4f}")
+    
 
-# Merge all three (right, center, left) on bin keys only (t, phi bins)
-merged_temp_mideps_df = pd.merge(merged_mideps_left_df, merged_mideps_center_df, on=bin_yield_keys, suffixes=('_mideps_left', '_mideps_center'))
-merged_avg_mideps_df = merged_temp_mideps_df
-#merged_avg_mideps_df = pd.merge(merged_temp_mideps_df, merged_mideps_right_df, on=bin_yield_keys, suffixes=('', '_mideps_right'))
+# Merge center and left results on bin keys
+merged_avg_mideps_df = pd.merge(merged_mideps_center_df, merged_mideps_left_df, on=bin_yield_keys, suffixes=('_mideps_center', '_mideps_left'))
 
 # Drop duplicated Physics_Setting columns if they exist
 for col in merged_avg_mideps_df.columns:
-    if "Physics_Setting" in col:
-        merged_avg_mideps_df.drop(columns=col, inplace=True)
+    if "Physics_Setting" in col:merged_avg_mideps_df.drop(columns=col, inplace=True)
+# Add unified Physics_Setting label
 merged_avg_mideps_df.insert(0, "Physics_Setting", f"{PHY_SETTING}_mideps")
 
 # Perform error-weighted average for merged center and left
 def error_weighted_ratio_mideps(row):
-    y1, e1 = row["ratio_mideps_left"], row["ratio_error_mideps_left"]
-    y2, e2 = row["ratio_mideps_center"], row["ratio_error_mideps_center"]
-    #y3, e3 = row["ratio_mideps_right"], row["ratio_error_mideps_right"]
+    y1, e1 = row["ratio_mideps_center"], row["ratio_error_mideps_center"]
+    y2, e2 = row["ratio_mideps_left"], row["ratio_error_mideps_left"]
+    
+    # Handle zero or very small errors to avoid division by zero
+    min_error = 1e-10  # Minimum error threshold
+    e1 = max(e1, min_error)
+    e2 = max(e2, min_error)
+    
     # Compute weights (inverse variance)
-    weights = 1 / np.array([e1**2, e2**2]) #, e3**2
-    ratios = np.array([y1, y2]) #, y3
+    weights = 1 / np.array([e1**2, e2**2])
+    ratios = np.array([y1, y2])
     weighted_data_ratio = np.sum(ratios * weights) / np.sum(weights)
     weighted_data_ratio_err = np.sqrt(1 / np.sum(weights))
     # Weighted average and propagated error
@@ -346,8 +360,8 @@ avg_mideps_results = merged_avg_mideps_df.apply(error_weighted_ratio_mideps, axi
 merged_avg_mideps_df = pd.concat([merged_avg_mideps_df, avg_mideps_results], axis=1)
 
 # Select final output columns
-final_ratio_mideps_df = merged_avg_mideps_df[
-    ["Physics_Setting"] + bin_yield_keys +
+final_ratio_mideps_df = merged_avg_mideps_df[[
+    "Physics_Setting"] + bin_yield_keys +
     ["avg_ratio", "avg_ratio_error"
 ]]
 
@@ -355,7 +369,7 @@ final_ratio_mideps_df = merged_avg_mideps_df[
 final_ratio_mideps_df.to_csv(combined_weighted_mideps_yields, index=False)
 
 print(f"Average weighted mideps yields saved to the path: {combined_weighted_mideps_yields}")
-print("-"*40)
+
 
 #-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -430,6 +444,13 @@ def error_weighted_ratio_higheps(row):
     y1, e1 = row["ratio_higheps_right"], row["ratio_error_higheps_right"]
     y2, e2 = row["ratio_higheps_center"], row["ratio_error_higheps_center"]
     y3, e3 = row["ratio_higheps_left"], row["ratio_error_higheps_left"]
+    
+    # Handle zero or very small errors to avoid division by zero
+    min_error = 1e-10  # Minimum error threshold
+    e1 = max(e1, min_error)
+    e2 = max(e2, min_error)
+    e3 = max(e3, min_error)
+    
     # Compute weights (inverse variance)
     weights = 1 / np.array([e1**2, e2**2, e3**2])
     ratios = np.array([y1, y2, y3])
@@ -464,6 +485,7 @@ print("-"*40)
 # Define the output path
 combined_weighted_kinematics = "%s/LTSep_CSVs/avg_kinematics_csv/%s/%s_pion_physics_avg_kinematics.csv" % (UTILPATH, physet_dir_name, PHY_SETTING)
 
+
 # Load the CSV file
 data_avgkin_df = pd.read_csv(data_avgkin_csv)
 data_avgkin_df.columns = data_avgkin_df.columns.str.strip()  # clean up headers
@@ -473,7 +495,7 @@ simc_avgkin_df.columns = simc_avgkin_df.columns.str.strip()  # clean up headers
 # Filter the DataFrame for specific Physics_Setting values from Data
 filtered_data_avgkin_loweps_center_df = data_avgkin_df[data_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_loweps_center"]
 filtered_data_avgkin_loweps_left_df = data_avgkin_df[data_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_loweps_left"]
-#filtered_data_avgkin_mideps_right_df = data_avgkin_df[data_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_right"]
+filtered_data_avgkin_mideps_right_df = data_avgkin_df[data_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_right"]
 filtered_data_avgkin_mideps_center_df = data_avgkin_df[data_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_center"]
 filtered_data_avgkin_mideps_left_df = data_avgkin_df[data_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_left"]
 filtered_data_avgkin_higheps_right_df = data_avgkin_df[data_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_higheps_right"]
@@ -482,7 +504,7 @@ filtered_data_avgkin_higheps_left_df = data_avgkin_df[data_avgkin_df["Physics_Se
 # Filter the DataFrame for specific Physics_Setting values from SimC
 filtered_simc_avgkin_loweps_center_df = simc_avgkin_df[simc_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_loweps_center"]
 filtered_simc_avgkin_loweps_left_df = simc_avgkin_df[simc_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_loweps_left"]
-#filtered_simc_avgkin_mideps_right_df = simc_avgkin_df[simc_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_right"]
+filtered_simc_avgkin_mideps_right_df = simc_avgkin_df[simc_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_right"]
 filtered_simc_avgkin_mideps_center_df = simc_avgkin_df[simc_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_center"]
 filtered_simc_avgkin_mideps_left_df = simc_avgkin_df[simc_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_mideps_left"]
 filtered_simc_avgkin_higheps_right_df = simc_avgkin_df[simc_avgkin_df["Physics_Setting"] == f"{PHY_SETTING}_higheps_right"]
@@ -497,15 +519,15 @@ def data_add_suffix(df, suffix):
     return df.rename(columns={col: f"{col}_{suffix}" for col in df.columns if col not in bin_avgkin_keys})
 loweps_center  = data_add_suffix(filtered_data_avgkin_loweps_center_df,  "loweps_center")
 loweps_left    = data_add_suffix(filtered_data_avgkin_loweps_left_df,    "loweps_left")
-#mideps_right  = data_add_suffix(filtered_data_avgkin_mideps_right_df,  "mideps_right")
+mideps_right  = data_add_suffix(filtered_data_avgkin_mideps_right_df,  "mideps_right")
 mideps_center = data_add_suffix(filtered_data_avgkin_mideps_center_df, "mideps_center")
 mideps_left   = data_add_suffix(filtered_data_avgkin_mideps_left_df,   "mideps_left")
 higheps_right  = data_add_suffix(filtered_data_avgkin_higheps_right_df,  "higheps_right")
 higheps_center = data_add_suffix(filtered_data_avgkin_higheps_center_df, "higheps_center")
 higheps_left   = data_add_suffix(filtered_data_avgkin_higheps_left_df,   "higheps_left")
 # Merge all on bin keys
-    #.merge(mideps_right,  on=bin_avgkin_keys, how='outer') \
 merged_data_all = loweps_center.merge(loweps_left, on=bin_avgkin_keys, how='outer') \
+    .merge(mideps_right,  on=bin_avgkin_keys, how='outer') \
     .merge(mideps_center, on=bin_avgkin_keys, how='outer') \
     .merge(mideps_left,   on=bin_avgkin_keys, how='outer') \
     .merge(higheps_right,  on=bin_avgkin_keys, how='outer') \
@@ -516,20 +538,26 @@ merged_data_all = loweps_center.merge(loweps_left, on=bin_avgkin_keys, how='oute
 # Perform error-weighted average for merged data
 def error_weighted_avgkin_data(row):
     vars = ["avg_Q2", "avg_W"]
-    #suffixes = ["loweps_center", "loweps_left", "mideps_right", "mideps_center", "mideps_left", "higheps_right", "higheps_center", "higheps_left"]
-    suffixes = ["loweps_center", "loweps_left", "mideps_center", "mideps_left", "higheps_right", "higheps_center", "higheps_left"]
+    suffixes = ["loweps_center", "loweps_left", "mideps_right", "mideps_center", "mideps_left", "higheps_right", "higheps_center", "higheps_left"]
     result = {}
     for var in vars:
         values = [row[f"{var}_{sfx}"] for sfx in suffixes]
         errors = [row[f"{var}_err_{sfx}"] for sfx in suffixes]
-        print("\nValues\n", values)
-        print("\nErrors\n", errors)
+        
+        # Handle zero or very small errors to avoid division by zero
+        errors = np.array(errors)
+        min_error = 1e-10  # Minimum error threshold
+        errors = np.where(errors <= min_error, min_error, errors)
+        
         weights = 1 / np.square(errors)
         weighted_avg = np.sum(np.array(values) * weights) / np.sum(weights)
         weighted_avg_err = np.sqrt(1 / np.sum(weights))
         result[f"data_{var}"] = weighted_avg
         result[f"data_{var}_err"] = weighted_avg_err
     # theta_cm Calculation
+    Eb_loweps = row["Beam_Energy_loweps_center"]
+    Eb_mideps = row["Beam_Energy_mideps_center"]
+    Eb_higheps = row["Beam_Energy_higheps_center"]
     tm = row["t_central"]
     q2 = float(result["data_avg_Q2"])
     w = float(result["data_avg_W"])
@@ -545,7 +573,13 @@ def error_weighted_avgkin_data(row):
     tmin = -((e1cm - e3cm)**2 - (p1cm - p3cm)**2)
     thetacm = 2 * math.asin(math.sqrt((tm - tmin) / (4 * p1cm * p3cm)))
     thetacm_deg = thetacm * 180 / math.pi  # Convert to degrees
+    low_eps = 1/(1 + 2 * (q2 + omega**2)/(4 * Eb_loweps * (Eb_loweps-omega) - q2))
+    mid_eps = 1/(1 + 2 * (q2 + omega**2)/(4 * Eb_mideps * (Eb_mideps-omega) - q2))
+    high_eps = 1/(1 + 2 * (q2 + omega**2)/(4 * Eb_higheps * (Eb_higheps-omega) - q2))
     result["theta_cm"] = thetacm_deg
+    result["epsilon_low"] = low_eps
+    result["epsilon_mid"] = mid_eps
+    result["epsilon_high"] = high_eps
     result["Beam_Energy_loweps"] = row["Beam_Energy_loweps_center"]
     result["Beam_Energy_mideps"] = row["Beam_Energy_mideps_center"]
     result["Beam_Energy_higheps"] = row["Beam_Energy_higheps_center"]
@@ -556,31 +590,35 @@ def simc_add_suffix(df, suffix):
     return df.rename(columns={col: f"{col}_{suffix}" for col in df.columns if col not in bin_avgkin_keys})
 loweps_center  = simc_add_suffix(filtered_simc_avgkin_loweps_center_df,  "loweps_center")
 loweps_left    = simc_add_suffix(filtered_simc_avgkin_loweps_left_df,    "loweps_left")
-#mideps_right  = simc_add_suffix(filtered_simc_avgkin_mideps_right_df,  "mideps_right")
+mideps_right  = simc_add_suffix(filtered_simc_avgkin_mideps_right_df,  "mideps_right")
 mideps_center = simc_add_suffix(filtered_simc_avgkin_mideps_center_df, "mideps_center")
 mideps_left   = simc_add_suffix(filtered_simc_avgkin_mideps_left_df,   "mideps_left")
 higheps_right  = simc_add_suffix(filtered_simc_avgkin_higheps_right_df,  "higheps_right")
 higheps_center = simc_add_suffix(filtered_simc_avgkin_higheps_center_df, "higheps_center")
 higheps_left   = simc_add_suffix(filtered_simc_avgkin_higheps_left_df,   "higheps_left")
-# Merge all on bin keys #.merge(mideps_right,  on=bin_avgkin_keys, how='outer') \
+# Merge all on bin keys
 merged_simc_all = loweps_center.merge(loweps_left, on=bin_avgkin_keys, how='outer') \
+    .merge(mideps_right,  on=bin_avgkin_keys, how='outer') \
     .merge(mideps_center, on=bin_avgkin_keys, how='outer') \
-    .merge(mideps_left,  on=bin_avgkin_keys, how='outer') \
+    .merge(mideps_left,   on=bin_avgkin_keys, how='outer') \
     .merge(higheps_right,  on=bin_avgkin_keys, how='outer') \
     .merge(higheps_center, on=bin_avgkin_keys, how='outer') \
     .merge(higheps_left,   on=bin_avgkin_keys, how='outer')
 #print(list(merged_data_all.columns))
 
-# Perform error-weighted average for merged simc
 def error_weighted_avgkin_simc(row):
     vars = ["avg_Q2", "avg_W"]
-    #suffixes = ["loweps_center", "loweps_left", "mideps_right", "mideps_center", "mideps_left", "higheps_right", "higheps_center", "higheps_left"]
-    suffixes = ["loweps_center", "loweps_left", "mideps_center", "mideps_left", "higheps_right", "higheps_center", "higheps_left"]
+    suffixes = ["loweps_center", "loweps_left", "mideps_right", "mideps_center", "mideps_left", "higheps_right", "higheps_center", "higheps_left"]
     result = {}
     for var in vars:
         values = [row[f"{var}_{sfx}"] for sfx in suffixes]
         errors = [row[f"{var}_err_{sfx}"] for sfx in suffixes]
-        #if (errors)
+        
+        # Handle zero or very small errors to avoid division by zero
+        errors = np.array(errors)
+        min_error = 1e-10  # Minimum error threshold
+        errors = np.where(errors <= min_error, min_error, errors)
+        
         weights = 1 / np.square(errors)
         weighted = np.sum(np.array(values) * weights) / np.sum(weights)
         weighted_err = np.sqrt(1 / np.sum(weights))
@@ -605,7 +643,7 @@ final_combined_df.insert(0, "Physics_Setting", f"{PHY_SETTING}")
 
 # Reorder columns for final output
 final_avgkin_df = final_combined_df[[
-    "Physics_Setting", "Beam_Energy_loweps", "Beam_Energy_mideps", "Beam_Energy_higheps", "total_tbins", 
+    "Physics_Setting", "Beam_Energy_loweps", "Beam_Energy_mideps", "Beam_Energy_higheps", "epsilon_low", "epsilon_mid", "epsilon_high", "total_tbins",
     "tbin_number", "t_min", "t_max", "t_central", "total_phibins", "phi_central", "theta_cm",
     "data_avg_Q2", "data_avg_Q2_err",
     "data_avg_W", "data_avg_W_err",
@@ -625,7 +663,7 @@ loweps_df["phi_avg"] = (loweps_df["phi_min"] + loweps_df["phi_max"]) / 2
 loweps_tbins = loweps_df[["t_min", "t_max"]].drop_duplicates().reset_index(drop=True)
 
 # Setup plot grid
-fig_loweps, axs_loweps = plt.subplots(3, 3, figsize=(20, 10), sharey=False)  # sharey=False to show individual y-ticks
+fig_loweps, axs_loweps = plt.subplots(3, 3, figsize=(20, 20), sharey=False)  # sharey=False to show individual y-ticks
 axs_loweps = axs_loweps.flatten()
 
 # First subplot: physics setting text
@@ -634,7 +672,7 @@ axs_loweps[0].text(0.5, 0.5, f"Physics Setting:\n{PHY_SETTING}_loweps",
                    ha='center', va='center', fontsize=18, fontweight='bold',
                    transform=axs_loweps[0].transAxes)
 
-# Plot the 5 t-bins
+# Plot the 6 t-bins
 for t_idx in range(min(ntbins, len(loweps_tbins))):
     t_min = loweps_tbins.loc[t_idx, "t_min"]
     t_max = loweps_tbins.loc[t_idx, "t_max"]
@@ -647,20 +685,57 @@ for t_idx in range(min(ntbins, len(loweps_tbins))):
     ax.set_title(f"$t$: [{t_min:.2f} - {t_max:.2f}]")
     ax.set_xlabel("ϕ (deg)")
     ax.set_xlim(0, 360)
-    ax.set_ylim(0.0, max(1.5, t_df["avg_ratio"].max() + 0.4))
+#    ax.set_ylim(0.0, max(1.5, t_df["avg_ratio"].max() + 0.4))
+    ax.set_ylim(0.5, 1.5)
     ax.set_ylabel("Avg Data/SIMC Ratio")
     ax.tick_params(axis='y', which='both', labelleft=True)  # ensure y-tick labels are shown
 
 # Adjust layout and save
 plt.tight_layout()
 
-# Plotting Section fot higheps
+# Plotting section for mid epsilon
+mideps_df = pd.read_csv(combined_weighted_mideps_yields)
+mideps_df["phi_avg"] = (mideps_df["phi_min"] + mideps_df["phi_max"]) / 2
+mideps_tbins = mideps_df[["t_min", "t_max"]].drop_duplicates().reset_index(drop=True)
+
+# Setup plot grid
+fig_mideps, axs_mideps = plt.subplots(3, 3, figsize=(20, 20), sharey=False)  # sharey=False to show individual y-ticks
+axs_mideps = axs_mideps.flatten()
+
+# First subplot: physics setting text
+axs_mideps[0].axis('off')
+axs_mideps[0].text(0.5, 0.5, f"Physics Setting:\n{PHY_SETTING}_mideps",
+                   ha='center', va='center', fontsize=18, fontweight='bold',
+                   transform=axs_mideps[0].transAxes)
+
+# Plot the 6 t-bins
+for t_idx in range(min(ntbins, len(mideps_tbins))):
+    t_min = mideps_tbins.loc[t_idx, "t_min"]
+    t_max = mideps_tbins.loc[t_idx, "t_max"]
+    t_df = mideps_df[(mideps_df["t_min"] == t_min) & (mideps_df["t_max"] == t_max)]
+
+    ax = axs_mideps[t_idx + 1]
+    ax.errorbar(t_df["phi_avg"], t_df["avg_ratio"], yerr=t_df["avg_ratio_error"],
+                fmt='o', color='blue', capsize=4, label='Data/SIMC')
+    ax.axhline(1.0, color='red', linestyle='--', linewidth=2)
+    ax.set_title(f"$t$: [{t_min:.2f} - {t_max:.2f}]")
+    ax.set_xlabel("ϕ (deg)")
+    ax.set_xlim(0, 360)
+#    ax.set_ylim(0.0, max(1.5, t_df["avg_ratio"].max() + 0.4))
+    ax.set_ylim(0.5, 1.5)
+    ax.set_ylabel("Avg Data/SIMC Ratio")
+    ax.tick_params(axis='y', which='both', labelleft=True)  # ensure y-tick labels are shown
+
+# Adjust layout and save
+plt.tight_layout()
+
+# Plotting Section for high epsilon
 higheps_df = pd.read_csv(combined_weighted_higheps_yields)
 higheps_df["phi_avg"] = (higheps_df["phi_min"] + higheps_df["phi_max"]) / 2
 higheps_tbins = higheps_df[["t_min", "t_max"]].drop_duplicates().reset_index(drop=True)
 
 # Setup plot grid
-fig_higheps, axs_higheps = plt.subplots(3, 3, figsize=(20, 10), sharey=False)  # sharey=False to show individual y-ticks
+fig_higheps, axs_higheps = plt.subplots(3, 3, figsize=(20, 20), sharey=False)  # sharey=False to show individual y-ticks
 axs_higheps = axs_higheps.flatten()
 
 # First subplot: physics setting text
@@ -669,7 +744,7 @@ axs_higheps[0].text(0.5, 0.5, f"Physics Setting:\n{PHY_SETTING}_higheps",
                    ha='center', va='center', fontsize=18, fontweight='bold',
                    transform=axs_higheps[0].transAxes)
 
-# Plot the 5 t-bins
+# Plot the 6 t-bins
 for t_idx in range(min(ntbins, len(higheps_tbins))):
     t_min = higheps_tbins.loc[t_idx, "t_min"]
     t_max = higheps_tbins.loc[t_idx, "t_max"]
@@ -682,19 +757,23 @@ for t_idx in range(min(ntbins, len(higheps_tbins))):
     ax.set_title(f"$t$: [{t_min:.2f} - {t_max:.2f}]")
     ax.set_xlabel("ϕ (deg)")
     ax.set_xlim(0, 360)
-    ax.set_ylim(0.0, max(1.5, t_df["avg_ratio"].max() + 0.4))
+#    ax.set_ylim(0.0, max(1.5, t_df["avg_ratio"].max() + 0.4))
+    ax.set_ylim(0.5, 1.5)
     ax.set_ylabel("Avg Data/SIMC Ratio")
     ax.tick_params(axis='y', which='both', labelleft=True)  # ensure y-tick labels are shown
 
 # Adjust layout and save
 plt.tight_layout()
 
-ratio_pdf = f"{OUTPATH}/{PHY_SETTING}_{MaxEvent}_ProdCoin_Pion_Analysis_avgkin_avgyield_Distributions.pdf"
+ratio_pdf = "%s/UTIL_PION/OUTPUT/Analysis/PionLT/avg_kin/%s/%s_%s_ProdCoin_Pion_Analysis_avgkin_avgyield_Distributions.pdf" % (REPLAYPATH, physet_dir_name, PHY_SETTING, MaxEvent)
 # Save both plots into one PDF
 with PdfPages(ratio_pdf) as pdf:
     # Save loweps figure
     pdf.savefig(fig_loweps)
     plt.close(fig_loweps)  # Close after saving to free memory
+    # Save mideps figure
+    pdf.savefig(fig_mideps)
+    plt.close(fig_mideps)  # Close after saving to free memory
     # Save higheps figure
     pdf.savefig(fig_higheps)
     plt.close(fig_higheps)  # Close after saving
@@ -711,7 +790,7 @@ higheps_val = int(higheps.replace('.', '')[1:])
 #print(f"Q value: {q_name_val}, Loweps value: {loweps_val}, Higheps value: {higheps_val}")
 
 # Input file for loweps data
-avgkin_dat = "%s/LTSep_CSVs/ltsep_input_csv/%s/%s_avek_%s.dat" % (UTILPATH, physet_dir_name, PHY_SETTING, q_name_val)
+avgkin_dat = "%s/UTIL_PION/LTSep_CSVs/ltsep_input_csv/%s/%s_avek_%s.dat" % (REPLAYPATH, physet_dir_name, PHY_SETTING, q_name_val)
 with open(avgkin_dat, "w") as f:
     for idx, row in final_avgkin_df.iterrows():
         # Build the line as: Q2   (3 spaces) Q2err   (3 spaces) W   (3) Werr   (3) theta   (3) tbin_number
@@ -732,11 +811,10 @@ with open(avgkin_dat, "w") as f:
 print(f"Saved input avgkin_dat file to: {avgkin_dat}")
 print("-"*40)
 
-
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # input file with ratios for loweps
-avgratio_loweps_dat = "%s/LTSep_CSVs/ltsep_input_csv/%s/%s_aver_pi_%s_%s.dat" % (UTILPATH, physet_dir_name, PHY_SETTING, q_name_val, loweps_val)
+avgratio_loweps_dat = "%s/LTSEP_ANALYSIS/LTSep_CSVs/ltsep_input_csv/%s/%s_aver_pi_%s_%s0.dat" % (REPLAYPATH, physet_dir_name, PHY_SETTING, q_name_val, loweps_val)
 # Read the CSV file into a DataFrame
 with open(avgratio_loweps_dat, "w") as f:
     for idx, row in final_ratio_loweps_df.iterrows():
@@ -752,8 +830,8 @@ with open(avgratio_loweps_dat, "w") as f:
         f.write(line)
 print(f"Saved input avgkin_loweps_dat file to: {avgratio_loweps_dat}")
 
-# input file with ratios for loweps
-avgratio_mideps_dat = "%s/LTSep_CSVs/ltsep_input_csv/%s/%s_aver_pi_%s_%s.dat" % (UTILPATH, physet_dir_name, PHY_SETTING, q_name_val, mideps_val)
+# input file with ratios for mideps
+avgratio_mideps_dat = "%s/LTSEP_ANALYSIS/LTSep_CSVs/ltsep_input_csv/%s/%s_aver_pi_%s_%s0.dat" % (REPLAYPATH, physet_dir_name, PHY_SETTING, q_name_val, mideps_val)
 # Read the CSV file into a DataFrame
 with open(avgratio_mideps_dat, "w") as f:
     for idx, row in final_ratio_mideps_df.iterrows():
@@ -769,9 +847,8 @@ with open(avgratio_mideps_dat, "w") as f:
         f.write(line)
 print(f"Saved input avgkin_mideps_dat file to: {avgratio_mideps_dat}")
 
-
 # input file with ratios for higheps
-avgratio_higheps_dat = "%s/LTSep_CSVs/ltsep_input_csv/%s/%s_aver_pi_%s_%s.dat" % (UTILPATH, physet_dir_name, PHY_SETTING, q_name_val, higheps_val)
+avgratio_higheps_dat = "%s/LTSEP_ANALYSIS/LTSep_CSVs/ltsep_input_csv/%s/%s_aver_pi_%s_%s0.dat" % (REPLAYPATH, physet_dir_name, PHY_SETTING, q_name_val, higheps_val)
 # Read the CSV file into a DataFrame
 with open(avgratio_higheps_dat, "w") as f:
     for idx, row in final_ratio_higheps_df.iterrows():
@@ -792,7 +869,7 @@ print("-"*40)
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Create input file for tbin interval
-tbin_interval_dat = "%s/LTSep_CSVs/ltsep_input_csv/%s/%s_t_bin_interval" % (UTILPATH, physet_dir_name, PHY_SETTING)
+tbin_interval_dat = "%s/LTSEP_ANALYSIS/LTSep_CSVs/ltsep_input_csv/%s/%s_t_bin_interval" % (REPLAYPATH, physet_dir_name, PHY_SETTING)
 # Simple extraction and conversion of Q value
 q_str = PHY_SETTING.split('_')[0]  # 'Q3p85'
 q_val = float(q_str[1:].replace('p', '.'))  # Remove 'Q', replace 'p' with '', then convert to int
@@ -817,7 +894,7 @@ print("-"*40)
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Create input file for Ebeam file
-Eb_pion_dat = "%s/LTSep_CSVs/ltsep_input_csv/%s/%s_Eb_pion.dat" % (UTILPATH, physet_dir_name, PHY_SETTING)
+Eb_pion_dat = "%s/LTSEP_ANALYSIS/LTSep_CSVs/ltsep_input_csv/%s/%s_Eb_pion.dat" % (REPLAYPATH, physet_dir_name, PHY_SETTING)
 # Extract beam energy values
 loweps_beam_energy = final_avgkin_df.iloc[0]["Beam_Energy_loweps"] * 1000
 mideps_beam_energy = final_avgkin_df.iloc[0]["Beam_Energy_mideps"] * 1000
@@ -831,7 +908,7 @@ print(f"Saved input Eb_pion22_dat file to: {Eb_pion_dat}")
 
 
 # Creating list of settings for LTSep analysis
-list_settings_pion = "%s/LTSep_CSVs/ltsep_input_csv/%s/%s_list_settings_pion" % (UTILPATH, physet_dir_name, PHY_SETTING)
+list_settings_pion = "%s/LTSEP_ANALYSIS/LTSep_CSVs/ltsep_input_csv/%s/%s_list_settings_pion" % (REPLAYPATH, physet_dir_name, PHY_SETTING)
 with open(list_settings_pion, "w") as f:
     tmn = final_avgkin_df["t_min"].min()
     tmx = final_avgkin_df["t_max"].max()

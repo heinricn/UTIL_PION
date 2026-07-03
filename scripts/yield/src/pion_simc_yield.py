@@ -81,6 +81,12 @@ setting_name = "_".join(PHY_SETTING.split("_")[:2])
 physet_dir_name = "%s_std" % (setting_name)
 SIMCPATH = "/volatile/hallc/c-pionlt/%s/OUTPUT/Analysis/SIMC/%s/" % (USER, physet_dir_name)
 
+if(setting_name == "Q5p00_W2p95"):
+    ntbins = 7
+elif(setting_name == "Q6p00_W3p19"):
+    ntbins = 8
+else:
+    print("You should probably add your settings number of t bins to this script!!!!\n")
 #################################################################################################################################################
 
 # Output PDF File Name

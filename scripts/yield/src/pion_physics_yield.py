@@ -57,7 +57,7 @@ DUMMY_RUN_LIST = sys.argv[6]
 CSV_FILE = sys.argv[7]
 
 # Important variables for script
-ntbins = 8
+ntbins = 7
 
 ################################################################################################################################################
 '''
@@ -86,6 +86,12 @@ TBINCSVPATH = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/t
 setting_name = "_".join(PHY_SETTING.split("_")[:2])
 physet_dir_name = "%s_std" % (setting_name)
 
+if(setting_name == "Q5p00_W2p95"):
+    ntbins = 7
+elif(setting_name == "Q6p00_W3p19"):
+    ntbins = 8
+else:
+    print("You should probably add your settings number of t bins to this script!!!!\n")
 #################################################################################################################################################
 
 # Output PDF File Name

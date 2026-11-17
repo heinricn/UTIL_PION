@@ -104,16 +104,16 @@ def define_hgcer_hole_boundary(
 
     for theta in theta_arr:
         r_boundary = 0.0
-        print("\n\ntheta:", theta,"\n")
+        print("\ntheta:", theta)
         # Radial search with fine step size
         r = 0.0
         dr = min(dx, dy) / 2  # Fine resolution for accurate boundary
         #print("dr: ",dr)
 
         while r <= max_dr:
-            print("r is: ", r)
-            x_pt = x0 + r * np.cos(-theta)
-            y_pt = y0 + r * np.sin(-theta)
+            #print("r is: ", r)
+            x_pt = x0 + r * np.cos(theta)
+            y_pt = y0 + r * np.sin(theta)
 
             # Find bin indices using searchsorted for accuracy
             i = findBin(x, x_pt) 
@@ -140,8 +140,8 @@ def define_hgcer_hole_boundary(
 
         # Store boundary point
         if r_boundary > 0:
-            x_pt = x0 + r_boundary * np.cos(theta)
-            y_pt = y0 + r_boundary * np.sin(theta)
+            x_pt = x0 + r_boundary * np.cos(-theta)
+            y_pt = y0 + r_boundary * np.sin(-theta)
             r_pts.append(r_boundary)
             x_pts.append(x_pt)
             y_pts.append(y_pt)
@@ -163,8 +163,8 @@ def define_hgcer_hole_boundary(
         )
 
         theta_smooth = np.linspace(0, 2 * np.pi, len(r_smooth), endpoint=False)
-        x_pts = x0 + r_smooth * np.cos(theta_smooth)
-        y_pts = y0 + r_smooth * np.sin(theta_smooth)
+        x_pts = x0 + r_smooth * np.cos(-theta_smooth)
+        y_pts = y0 + r_smooth * np.sin(-theta_smooth)
     outpoints = [x_pts,y_pts]
     return np.array(outpoints)
 
@@ -220,6 +220,64 @@ def bilinear_interp(x, y, z, x_pt, y_pt):
     )
 
     return z_interp
+
+def loadHole(HoleCsv): #simple function, pas string with path to file and returns the x,y coords of the HGC hole
+    x = []
+    y = []
+    with open (HoleCsv) as f:
+        for line in f:
+            x.append(float(line[:line.find(",")]))
+            y.append(float(line[line.find(",")+1:]))
+    out = [x,y]
+    print("\nHole loaded")
+    print("Hole length: ", len(x),"\n")
+    return np.array(out)
+
+def point_in_polygon(
+    x: np.ndarray,
+    y: np.ndarray,
+    polygon: np.ndarray,
+) -> np.ndarray:
+    """
+
+    Parameters
+    ----------
+    x : np.ndarray
+        Array of x coordinates of the points to test.
+    y : np.ndarray
+        Array of y coordinates of the points to test.
+    polygon : np.ndarray
+        Array of shape (2, N) representing the vertices of the polygon.
+
+    Returns
+    -------
+    np.ndarray
+        Boolean array indicating whether each point is inside the polygon.
+
+    """
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+    polygon = np.asarray(polygon, dtype=float)
+
+    if x.shape != y.shape:
+        raise ValueError("x and y must have the same shape.")
+
+    if polygon.ndim != 2 or polygon.shape[1] != 2:
+        raise ValueError("polygon must have shape (N, 2).")
+    if polygon.shape[0] < 3:
+        raise ValueError("polygon must contain at least three points.")
+
+    inside = np.zeros_like(x, dtype=bool)
+    x1, y1 = polygon[-1]
+    for x2, y2 in polygon:
+        cond = (y1 > y) != (y2 > y)
+        denom = y2 - y1
+        denom = np.where(denom == 0.0, np.nan, denom)
+        xinters = (x2 - x1) * (y - y1) / denom + x1
+        toggle = cond & (x < xinters)
+        inside ^= np.nan_to_num(toggle, nan=False)
+        x1, y1 = x2, y2
+    return inside
 
 
 ##################################################################################################################################################
@@ -319,16 +377,30 @@ RandomWindows[3] = PromptPeak + (BunchSpacing/2) + CoinOffset + (nSkip*BunchSpac
 
 # Making HGC hole cut polygon
 hgcHoleVert = 8 #number of verticies
-#arrays of the verticies in the polygon in clockwise order
 hgcHoleX = [-13.0,-4.0,2.0,6.0,15.0,5.0,1.0,-2.0] 
-hgcHoleX = np.asarray(hgcHoleX, dtype=float) #force the data type to be double*
+#hgcHoleX = np.asarray(hgcHoleX, dtype=float) #force the data type to be double*
 hgcHoleY = [1.0,4.0,8.0,5.0,0.0,-3.0,-7.0,-4.0]
+#hgcHoleY = np.asarray(hgcHoleY, dtype=float)#arrays of the verticies in the polygon in clockwise order
+
+FITHOLE = False
+if (not FITHOLE):
+    NewHole = loadHole("holeBoundry_40.csv")
+    hgcHoleX = NewHole[0]
+    hgcHoleY = NewHole[1]    
+    hgcHoleVert = len(hgcHoleX)
+
+hgcHoleX = np.asarray(hgcHoleX, dtype=float) #force the data type to be double*
 hgcHoleY = np.asarray(hgcHoleY, dtype=float)
 
+print("read HGC hole:")
+print(hgcHoleX)
+print(hgcHoleY)
+print(hgcHoleVert)
 hgcHolePoly = ROOT.TGeoPolygon(hgcHoleVert) #constructer
 hgcHolePoly.SetXY(hgcHoleX, hgcHoleY) #define verticies
 hgcHolePoly.FinishPolygon() #bake the polygon
-FITHOLE = True
+
+
 
 ##############################################################################################################################################
 ROOT.gROOT.SetBatch(ROOT.kTRUE) # Set ROOT to batch mode explicitly, does not splash anything to screen
@@ -649,8 +721,13 @@ for event in Cut_Pion_Events_Accpt_Data_tree:
     P_NGC_xy_npe_pions_accpt_cut_all.Fill(event.P_ngcer_yAtCer,event.P_ngcer_xAtCer,event.P_ngcer_npeSum)
     P_RFTime_vs_gtr_dp_pions_accpt_cut_all.Fill(event.P_RF_Dist, event.P_gtr_dp)
 
+HGCholeCut = True
+outHole = 0
+inHole = 0
+tot = 0
 # Fill Accpt + Prompt Cut Hitograms
 for event in Cut_Pion_Events_Prompt_Data_tree:
+    tot=tot+1
     HMS_PID_Cut = (event.H_cer_npeSum > H_cer_npeSum_cut_value) & (event.H_cal_etottracknorm > H_cal_etottracknorm_cut_value)
 #    SHMS_PID_Cut = (event.P_aero_npeSum > P_aero_npeSum_cut_value)
     SHMS_PID_Cut = (event.P_RF_Dist > P_RF_Dist_low_cut_value) & (event.P_RF_Dist < P_RF_Dist_high_cut_value) & (event.P_aero_npeSum > P_aero_npeSum_cut_value) & (event.P_hgcer_npeSum > P_hgcer_npeSum_cut_value)
@@ -659,11 +736,14 @@ for event in Cut_Pion_Events_Prompt_Data_tree:
         hgcPoint = [event.P_hgcer_xAtCer, event.P_hgcer_yAtCer]
         hgcPoint = np.asarray(hgcPoint, dtype=float)
         HGCholeCut = not hgcHolePoly.Contains(hgcPoint)
-    else:
-        HGCholeCut = True
-    
-    P_HGC_xy_pions_prompt_cut_nal.Fill(event.P_hgcer_xAtCer,event.P_hgcer_yAtCer)
+        #HGCholeCut = point_in_polygon(event.P_hgcer_xAtCer, event.P_hgcer_yAtCer, NewHole)
+        #print("Ran Hole Cut")
+    if HGCholeCut:
+        P_HGC_xy_pions_prompt_cut_nal.Fill(event.P_hgcer_xAtCer,event.P_hgcer_yAtCer)
+    if (HMS_PID_Cut & SHMS_PID_Cut) and (not HGCholeCut):
+        inHole = inHole + 1
     if (HMS_PID_Cut & SHMS_PID_Cut & HGCholeCut):
+        outHole = outHole + 1
         H_gtr_beta_pions_data_prompt_cut_all.Fill(event.H_gtr_beta)
         H_cal_etottracknorm_pions_data_prompt_cut_all.Fill(event.H_cal_etottracknorm)
         H_cer_npeSum_pions_data_prompt_cut_all.Fill(event.H_cer_npeSum)
@@ -701,7 +781,7 @@ for event in Cut_Pion_Events_Prompt_Data_tree:
         P_NGC_xy_npe_pions_prompt_cut_all.Fill(event.P_ngcer_yAtCer,event.P_ngcer_xAtCer,event.P_ngcer_npeSum)
         P_RFTime_vs_gtr_dp_pions_prompt_cut_all.Fill(event.P_RF_Dist, event.P_gtr_dp)
 
-
+print("\n======================\nPrompt events total: ", tot, "\nPrompt Events inhole: ", inHole, "\nPrompt events outhole: ", outHole,"\n==================\n")
 # Fill Accpt + Random Cut Hitograms
 for event in Cut_Pion_Events_Random_Data_tree:
     HMS_PID_Cut = (event.H_cer_npeSum > H_cer_npeSum_cut_value) & (event.H_cal_etottracknorm > H_cal_etottracknorm_cut_value)
@@ -711,8 +791,8 @@ for event in Cut_Pion_Events_Random_Data_tree:
         hgcPoint = [event.P_hgcer_xAtCer, event.P_hgcer_yAtCer]
         hgcPoint = np.asarray(hgcPoint, dtype=float)
         HGCholeCut = not hgcHolePoly.Contains(hgcPoint)
-    else:
-        HGCholeCut = True
+        #HGCholeCut = point_in_polygon(event.P_hgcer_xAtCer, event.P_hgcer_yAtCer, NewHole)
+    
     if (HMS_PID_Cut & SHMS_PID_Cut & HGCholeCut):
         H_gtr_beta_pions_data_random_cut_all.Fill(event.H_gtr_beta)
         H_cal_etottracknorm_pions_data_random_cut_all.Fill(event.H_cal_etottracknorm)
@@ -788,37 +868,33 @@ xarray = []
 yarray = []
 zarray = [[0]*P_HGC_xy_pions_prompt_cut_nal.GetNbinsX()]*P_HGC_xy_pions_prompt_cut_nal.GetNbinsY()
 #make efficency plot
-for ibin in range(1,P_HGC_xy_pions_prompt_cut_nal.GetNbinsX()+1):
-    tempx = ((40/80)*ibin)-20.5 #this bit is hard coded, sry
-    xarray.append(tempx)
-    for jbin in range(1,P_HGC_xy_pions_prompt_cut_nal.GetNbinsY()+1):
-        tempy = ((40/80)*jbin)-20.5
-        yarray.append(tempy)
-        #print()
-        if not (P_HGC_xy_pions_prompt_cut_nal.GetBinContent(ibin, jbin) == 0):
-            #print(P_HGC_xy_pions_prompt_cut_all.GetBinContent(ibin, jbin))
-            eff = (P_HGC_xy_pions_prompt_cut_all.GetBinContent(ibin, jbin))/P_HGC_xy_pions_prompt_cut_nal.GetBinContent(ibin, jbin)
-            zarray[ibin-1][jbin-1] = eff
-            P_HGC_xy_eff_pions_prompt_cut_all.Fill(tempx, tempy, eff)
-        #else:
-        #    eff = 1
-        #    P_HGC_xy_eff_pions_prompt_cut_all.Fill(tempx, tempy, eff)
-        #    zarray[ibin-1][jbin-1] = eff
-if (FITHOLE):
-    #np.set_printoptions(threshold=np.inf)
-    xarray = np.asarray(xarray, dtype=float)
-    yarray = np.asarray(yarray, dtype=float)
-    zarray = np.asarray(zarray, dtype=float)
-#    print("x:")
-#    print(xarray)
-#    print("y:")
-#    print(yarray)
-#    print("z:")
-#    print(zarray)
+eff = P_HGC_xy_pions_prompt_cut_nal.Clone()
+eff.Reset()
+for i in range(1, eff.GetNbinsX()+1):
+    for j in range(1, eff.GetNbinsY()+1):
+        ndid = P_HGC_xy_pions_prompt_cut_all.GetBinContent(i, j)
+        nshould = P_HGC_xy_pions_prompt_cut_nal.GetBinContent(i, j)
+        #                       yarray.append(tempy)
+        if nshould > 0:
+            eff_val = ndid / nshould
+            eff.SetBinContent(i, j, eff_val)
 
-    NewHole = define_hgcer_hole_boundary(xarray,yarray,zarray,1.0,1.0,0.7,10.0,360,0.5)
+      
+xarray = np.array([eff.GetXaxis().GetBinCenter(i) for i in range(1, eff.GetNbinsX()+1)]) # shape [Nx]
+yarray = np.array([eff.GetYaxis().GetBinCenter(j) for j in range(1, eff.GetNbinsY()+1)]) # shape [Ny]
+#zarray = 
+#for i in range(1,eff.GetNbinsX()+1)
+#    for j in range(1,eff.GetNbinsY()+1)
+#        xray[i][j] = 
+zarray = np.array([[eff.GetBinContent(i, j) for j in range(1, eff.GetNbinsY()+1)] for i in range(1, eff.GetNbinsX()+1)]) # shape [Nx, Ny]
+
+if (FITHOLE):
+    NewHole = define_hgcer_hole_boundary(xarray,yarray,zarray,1.0,1.9,0.4,10.0,360,1.5)
+    with open("holeBoundry.csv", "w") as f:
+        for i in range(0, len(NewHole[0])):
+            f.write("{},{}\n".format(NewHole[0][i],NewHole[1][i]))
     print("Fited x,y values for the new hole:")
-    print(NewHole)
+    #print(NewHole)
 
 print("Histograms filled")
 
@@ -1466,12 +1542,14 @@ c1_pid6 = TCanvas("c1_pid6", "Detector XY Distributions", 100, 0, 1400, 1400)
 c1_pid6.Divide(2,3)
 c1_pid6.cd(1)
 gPad.SetLogz()
+HGC_proj_yx_pions_cut_all.GetZaxis().SetRangeUser(0,100)
 HGC_proj_yx_pions_cut_all.Draw("COLZ")
 hgcHolePoly.Draw("same")
 c1_pid6.cd(2)
 #gPad.SetLogz()
 #HGC_proj_yx_pions_cut_all.Draw("COLZ")
-HGC_proj_yx_pions_eff_cut_all.Draw("COLZ")
+#HGC_proj_yx_pions_eff_cut_all.Draw("COLZ")
+eff.Draw("COLZ")
 drawHole(NewHole)
 #P_HGC_xy_pions_prompt_cut_all.Draw("COLZ")
 hgcHolePoly.Draw("same")

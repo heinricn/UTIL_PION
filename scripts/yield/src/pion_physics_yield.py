@@ -81,6 +81,7 @@ EFF_CSV     = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/efficiencies
 MMCUT_CSV   = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/mm_offset_cut_csv" % (USER)
 DCUT_CSV    = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/diamond_cut_csv" % (USER)
 TBINCSVPATH = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/t_binning_csv" % (USER)
+TSHIFT_CSV   = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/t_shift" % (USER)
 
 # Extract the first three words from PHY_SETTING for the CSV file name
 setting_name = "_".join(PHY_SETTING.split("_")[:2])
@@ -107,6 +108,7 @@ eff_csv_file = "%s/%s.csv" % (EFF_CSV, CSV_FILE)
 mmcut_csv_file = "%s/%s/%s_mm_offsets_cuts_parameters.csv" % (MMCUT_CSV, physet_dir_name, setting_name)
 dcut_csv_file = "%s/%s/%s_diamond_cut_parameters.csv" % (DCUT_CSV, physet_dir_name, setting_name)
 tbin_csv_file  = "%s/%s/%s_tbinning_yields_pions.csv" % (TBINCSVPATH, physet_dir_name, setting_name)
+tshift_csv_file = "%s/%s/%s_toffsets.csv" % (TSHIFT_CSV, physet_dir_name, setting_name)
 
 ###################################################################################################################################################
 
@@ -171,6 +173,18 @@ except (FileNotFoundError, ValueError, KeyError) as e:
     print(f"Error: {e}")
     sys.exit(1)
 
+try:
+    with open(tshift_csv_file, mode='r') as csv_file:
+        csv_reader = csv.DictReader(csv_file)
+        for row in csv_reader:
+            if row[csv_reader.fieldnames[0]].strip() == PHY_SETTING:
+                t_Offset = float(row["t_shift"])
+except (FileNotFoundError, ValueError, KeyError) as e:
+    print(f"Error reading t_shift values from {tshift_csv_file}: {e}")
+    print("This probably means that you did not make it, which must be done manually!\nSetting Offsets to zero!\n")
+    t_Offset = 0
+
+print("t_offset = ",t_Offset)
 # Print the assigned values
 #print(f"MMpi_Offset = {MMpi_Offset:.6f}")
 #print(f"MMpi_Cut_lowvalue = {MMpi_Cut_lowvalue}")
@@ -188,7 +202,7 @@ t_min_values = tbin_df['t_min'].values
 t_max_values = tbin_df['t_max'].values
 
 # Define the cuts using a loop
-tbin_cuts = [lambda event, i=i: (t_min_values[i] <= -event.MandelT <= t_max_values[i]) for i in range(ntbins)]
+tbin_cuts = [lambda event, i=i: (t_min_values[i] <= -event.MandelT + t_Offset <= t_max_values[i]) for i in range(ntbins)]
 
 # Print the t-binning cuts with 3 decimal places
 print("\n t-binning cuts:")

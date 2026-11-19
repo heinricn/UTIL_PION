@@ -28,6 +28,7 @@ import scipy
 import scipy.integrate as integrate
 import matplotlib.pyplot as plt
 import sys, math, os, subprocess, csv
+import awkward as ak
 
 ##################################################################################################################################################
 
@@ -62,11 +63,25 @@ REPLAYPATH=lt.REPLAYPATH
 UTILPATH=lt.UTILPATH
 ANATYPE=lt.ANATYPE
 OUTPATH=lt.OUTPATH
+HOLEPATH="/u/group/c-pionlt/USERS/heinricn/hallc_replay_lt/UTIL_PION/scripts/pid/src/holeBoundry_60.csv" 
 
 proc_root = lt.setup_ana()
 c = proc_root[0] # Cut object
 tree = proc_root[1] # Dictionary of branches
 strDict = proc_root[2] # Dictionary of cuts as strings
+
+###############################################################################################################################################
+
+def loadHole(HoleCsv): #simple function, pass string with path to file and returns a fully constructed Root Polygon for doing HGC hole cut. - NH
+    x = []
+    y = []
+    print("Attempting to open hole cut cevs at: ", HoleCsv)
+    with open (HoleCsv) as f:
+        for line in f:
+            x.append(float(line[:line.find(",")]))
+            y.append(float(line[line.find(",")+1:]))
+
+    return [x,y]
 
 ###############################################################################################################################################
 
@@ -90,7 +105,75 @@ def coin_pions():
     Cut_COIN_Pions_all_tmp = [c.add_cut(arr, "coin_epi_cut_all_RF") for arr in NoCut_COIN_Pions]
     Cut_COIN_Pions_prompt_tmp = [c.add_cut(arr, "coin_epi_cut_prompt_RF") for arr in NoCut_COIN_Pions]
     Cut_COIN_Pions_rand_tmp = [c.add_cut(arr, "coin_epi_cut_rand_RF") for arr in NoCut_COIN_Pions]
+    
+    iXname = 0
+    iYname = 0 
+    for i in range(len(COIN_Pion_Data_Header)):
+        if COIN_Pion_Data_Header[i] == "P_hgcer_xAtCer":
+            iXname = i
+        if COIN_Pion_Data_Header[i] == "P_hgcer_yAtCer":
+            iYname = i
+    #print("pre hole cut:")
+    #print(Cut_COIN_Pions_prompt_tmp)      
+    HGChole = loadHole(HOLEPATH)
+    hgcHoleX = np.asarray(HGChole[0], dtype=float) #force the data type to be double*
+    hgcHoleY = np.asarray(HGChole[1], dtype=float)
+    HoleLen = len(hgcHoleX)
+    hgcHolePoly = ROOT.TGeoPolygon(HoleLen) #constructer
+    print("initializing hole. Number of verticies in Hole: ", HoleLen)
+    hgcHolePoly.SetXY(hgcHoleX, hgcHoleY) #define verticies
+    hgcHolePoly.FinishPolygon() #bake the polygon
+    #temp = [[]]*len(COIN_Pion_Data_Header)
+    temp = []
+    for event in range(0,len(Cut_COIN_Pions_prompt_tmp[iXname])):
+        px = Cut_COIN_Pions_prompt_tmp[iXname][event]
+        py = Cut_COIN_Pions_prompt_tmp[iYname][event]
+        hgcPoint = np.array([px,py],dtype=float)
+        #hgcPoint = np.asarray(hgcPoint, dtype=float)
+        #if(abs(px) < 2 and abs(py) < 2):
+        #    print("potential event in hole: ", px, ", ", py)
+        #    print("hgcPoint: ", hgcPoint)
+        #    print(hgcHolePoly.Contains(hgcPoint))
+        if hgcHolePoly.Contains(hgcPoint):
+            temp.append(event)
+    #print("length before removal: ", len(Cut_COIN_Pions_prompt_tmp[iXname]))
+    print("number entries to remove: ", len(temp))
+    
+    if len(temp) != 0: 
+        for Iarr in range(len(Cut_COIN_Pions_prompt_tmp)):
+            ti = Cut_COIN_Pions_prompt_tmp[Iarr][:temp[0]]
+            for i in range(1,len(temp)):
+                tj = Cut_COIN_Pions_prompt_tmp[Iarr][temp[i-1]+1:temp[i]]
+                ti = ak.concatenate([ti, tj],0)
+            tj = Cut_COIN_Pions_prompt_tmp[Iarr][temp[len(temp)-1]+1:]
+            Cut_COIN_Pions_prompt_tmp[Iarr] = ak.concatenate([ti, tj],0)
 
+    #print("new length of array: ", len(Cut_COIN_Pions_prompt_tmp[iXname]))
+
+    temp = []
+    for event in range(0,len(Cut_COIN_Pions_rand_tmp[iXname])):
+        px = Cut_COIN_Pions_rand_tmp[iXname][event]
+        py = Cut_COIN_Pions_rand_tmp[iYname][event]
+        hgcPoint = [px,py]
+        hgcPoint = np.asarray(hgcPoint, dtype=float)
+        #if(abs(px) < 2 and abs(py) < 2):
+        #    print("potential event in hole: ", px, ", ", py)
+        #    print("hgcPoint: ", hgcPoint)
+        if hgcHolePoly.Contains(hgcPoint):
+        #if (px < 2) and (px > -2):
+            temp.append(event)
+    #print("length before removal: ", len(Cut_COIN_Pions_rand_tmp[iXname]))
+    print("number entries to remove: ", len(temp))
+    
+    if len(temp) != 0: 
+        for Iarr in range(len(Cut_COIN_Pions_rand_tmp)):
+            ti = Cut_COIN_Pions_rand_tmp[Iarr][:temp[0]]
+            for i in range(1,len(temp)):
+                tj = Cut_COIN_Pions_rand_tmp[Iarr][temp[i-1]+1:temp[i]]
+                ti = ak.concatenate([ti, tj],0)
+            tj = Cut_COIN_Pions_rand_tmp[Iarr][temp[len(temp)-1]+1:]
+            Cut_COIN_Pions_rand_tmp[Iarr] = ak.concatenate([ti, tj],0)
+    
     # Transpose to create event-wise records
     Uncut_COIN_Pions = list(zip(*NoCut_COIN_Pions))
     Cut_COIN_Pions_accpt = list(zip(*Cut_COIN_Pions_accpt_tmp))

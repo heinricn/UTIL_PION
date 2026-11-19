@@ -814,7 +814,7 @@ print("-"*40)
 #------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # input file with ratios for loweps
-avgratio_loweps_dat = "%s/LTSEP_ANALYSIS/LTSep_CSVs/ltsep_input_csv/%s/%s_aver_pi_%s_%s0.dat" % (REPLAYPATH, physet_dir_name, PHY_SETTING, q_name_val, loweps_val)
+avgratio_loweps_dat = "%s/LTSEP_ANALYSIS/LTSep_CSVs/ltsep_input_csv/%s/%s_aver_pi_%s_%s.dat" % (REPLAYPATH, physet_dir_name, PHY_SETTING, q_name_val, loweps_val)
 # Read the CSV file into a DataFrame
 with open(avgratio_loweps_dat, "w") as f:
     for idx, row in final_ratio_loweps_df.iterrows():
@@ -831,7 +831,7 @@ with open(avgratio_loweps_dat, "w") as f:
 print(f"Saved input avgkin_loweps_dat file to: {avgratio_loweps_dat}")
 
 # input file with ratios for mideps
-avgratio_mideps_dat = "%s/LTSEP_ANALYSIS/LTSep_CSVs/ltsep_input_csv/%s/%s_aver_pi_%s_%s0.dat" % (REPLAYPATH, physet_dir_name, PHY_SETTING, q_name_val, mideps_val)
+avgratio_mideps_dat = "%s/LTSEP_ANALYSIS/LTSep_CSVs/ltsep_input_csv/%s/%s_aver_pi_%s_%s.dat" % (REPLAYPATH, physet_dir_name, PHY_SETTING, q_name_val, mideps_val)
 # Read the CSV file into a DataFrame
 with open(avgratio_mideps_dat, "w") as f:
     for idx, row in final_ratio_mideps_df.iterrows():
@@ -848,7 +848,7 @@ with open(avgratio_mideps_dat, "w") as f:
 print(f"Saved input avgkin_mideps_dat file to: {avgratio_mideps_dat}")
 
 # input file with ratios for higheps
-avgratio_higheps_dat = "%s/LTSEP_ANALYSIS/LTSep_CSVs/ltsep_input_csv/%s/%s_aver_pi_%s_%s0.dat" % (REPLAYPATH, physet_dir_name, PHY_SETTING, q_name_val, higheps_val)
+avgratio_higheps_dat = "%s/LTSEP_ANALYSIS/LTSep_CSVs/ltsep_input_csv/%s/%s_aver_pi_%s_%s.dat" % (REPLAYPATH, physet_dir_name, PHY_SETTING, q_name_val, higheps_val)
 # Read the CSV file into a DataFrame
 with open(avgratio_higheps_dat, "w") as f:
     for idx, row in final_ratio_higheps_df.iterrows():

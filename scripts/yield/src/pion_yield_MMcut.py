@@ -78,6 +78,7 @@ ANATYPE=lt.ANATYPE
 OUTPATH=lt.OUTPATH
 RUNLISTPATH = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_BATCH/InputRunLists/PionLT_2021_2022" % (USER)
 EFF_CSV     = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/efficiencies" % (USER)
+HOLEPATH="/u/group/c-pionlt/USERS/heinricn/hallc_replay_lt/UTIL_PION/scripts/pid/src/holeBoundry_60.csv"
 
 # Define paths SIMC
 # Extract the first three words from PHY_SETTING for the CSV file name
@@ -108,6 +109,19 @@ HMS_Acceptance = lambda event: (event.hsdelta >= -8.0) & (event.hsdelta <= 8.0) 
 SHMS_Acceptance = lambda event: (event.ssdelta >= -10.0) & (event.ssdelta <= 20.0) & (event.ssxpfp >= -0.06) & (event.ssxpfp <= 0.06) & (event.ssypfp >= -0.04) & (event.ssypfp <= 0.04)
 #SHMS_Aero_Cut = lambda event: (event.paero_x_det > -55.0) & (event.paero_x_det < 55.0) & (event.paero_y_det > -50) & (event.paero_y_det < 50) # Aerogel tray n = 1.030
 SHMS_Aero_Cut = lambda event: (event.paero_x_det > -45.0) & (event.paero_x_det < 45.0) & (event.paero_y_det > -30) & (event.paero_y_det < 30) # Aerogel tray n = 1.011
+
+###############################################################################################################################################
+
+def loadHole(HoleCsv): #simple function, pass string with path to file and returns a fully constructed Root Polygon for doing HGC hole cut. - NH
+    x = []
+    y = []
+    print("Attempting to open hole cut cevs at: ", HoleCsv)
+    with open (HoleCsv) as f:
+        for line in f:
+            x.append(float(line[:line.find(",")]))
+            y.append(float(line[line.find(",")+1:]))
+
+    return [x,y]
 
 ###############################################################################################################################################
 
@@ -493,9 +507,21 @@ for event in Cut_Pion_Events_Random_Dummy_tree:
         P_kin_secondary_pmiss_pions_dummy_random_cut_all_error.Fill(event.pmiss)
 #    ibin += 1
 
+HGChole = loadHole(HOLEPATH)
+hgcHoleX = np.asarray(HGChole[0], dtype=float) #force the data type to be double*
+hgcHoleY = np.asarray(HGChole[1], dtype=float)
+HoleLen = len(hgcHoleX)
+hgcHolePoly = ROOT.TGeoPolygon(HoleLen) #constructer
+print("initializing hole. Number of verticies in Hole: ", HoleLen)
+hgcHolePoly.SetXY(hgcHoleX, hgcHoleY) #define verticies
+hgcHolePoly.FinishPolygon() #bake the polygon
+
 # Fill histograms from SIMC ROOT File
 for event in Uncut_Pion_Events_SIMC_tree:
-    if HMS_Acceptance(event) & SHMS_Acceptance(event) & SHMS_Aero_Cut(event):
+    hgcXatCer = event.ssxfp + event.ssxpfp*(156.27) #the z position of the SHMS HGC relative to the focal plane
+    hgcYatCer = event.ssyfp + event.ssypfp*(156.27)
+    hgcPoint = np.array([hgcXatCer,hgcYatCer],dtype=float)
+    if HMS_Acceptance(event) & SHMS_Acceptance(event) & SHMS_Aero_Cut(event) & (not hgcHolePoly.Contains(hgcPoint)):
             MMpi_pions_simc_cut_all.Fill(event.missmass, event.Weight)
             pmiss_pions_simc_cut_all_error.Fill(event.Pm, event.Weight)
             pmiss_pions_simc_cut_all_norm_error.Fill(event.Pm, event.Weight)

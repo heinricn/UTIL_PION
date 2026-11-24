@@ -76,6 +76,7 @@ OUTPATH=lt.OUTPATH
 RUNLISTPATH = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_BATCH/InputRunLists/PionLT_2021_2022" % (USER)
 MMCUT_CSV   = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/mm_offset_cut_csv" % (USER)
 EFF_CSV     = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/efficiencies" % (USER)
+HOLEPATH    = "/u/group/c-pionlt/USERS/heinricn/hallc_replay_lt/UTIL_PION/scripts/pid/src/holeBoundry_60.csv"
 
 # Extract the first three words from PHY_SETTING for the CSV file name
 setting_name = "_".join(PHY_SETTING.split("_")[:2])
@@ -125,6 +126,21 @@ HMS_Acceptance = lambda event: (event.hsdelta >= -8.0) & (event.hsdelta <= 8.0) 
 SHMS_Acceptance = lambda event: (event.ssdelta >= -10.0) & (event.ssdelta <= 20.0) & (event.ssxpfp >= -0.06) & (event.ssxpfp <= 0.06) & (event.ssypfp >= -0.04) & (event.ssypfp <= 0.04)
 #SHMS_Aero_Cut = lambda event: (event.paero_x_det > -55.0) & (event.paero_x_det < 55.0) & (event.paero_y_det > -50) & (event.paero_y_det < 50) # Aerogel tray n = 1.030
 SHMS_Aero_Cut = lambda event: (event.paero_x_det > -45.0) & (event.paero_x_det < 45.0) & (event.paero_y_det > -30) & (event.paero_y_det < 30) # Aerogel tray n = 1.011
+
+###############################################################################################################################################
+
+def loadHole(HoleCsv): #simple function, pass string with path to file and returns a fully constructed Root Polygon for doing HGC hole cut. - NH
+    x = []
+    y = []
+    print("Attempting to open hole cut cevs at: ", HoleCsv)
+    with open (HoleCsv) as f:
+        for line in f:
+            x.append(float(line[:line.find(",")]))
+            y.append(float(line[line.find(",")+1:]))
+
+    return [x,y]
+
+################################################################################################################################################
 
 # Read the MMpi cut values from the CSV file
 try:
@@ -362,9 +378,21 @@ for event in Cut_Pion_Events_Random_Dummy_tree:
         Q2_vs_W_pions_dummy_random_cut_all.Fill(event.Q2, event.W)
 #    ibin += 1
 
+HGChole = loadHole(HOLEPATH)
+hgcHoleX = np.asarray(HGChole[0], dtype=float) #force the data type to be double*
+hgcHoleY = np.asarray(HGChole[1], dtype=float)
+HoleLen = len(hgcHoleX)
+hgcHolePoly = ROOT.TGeoPolygon(HoleLen) #constructer
+print("initializing hole. Number of verticies in Hole: ", HoleLen)
+hgcHolePoly.SetXY(hgcHoleX, hgcHoleY) #define verticies
+hgcHolePoly.FinishPolygon() #bake the polygon
+
 # Fill histograms from SIMC ROOT File
 for event in Uncut_Pion_Events_SIMC_tree:
-    if HMS_Acceptance(event) & SHMS_Acceptance(event) & SHMS_Aero_Cut(event) & SIMC_MMpi_Cut(event):        
+    hgcXatCer = event.ssxfp + event.ssxpfp*(156.27) #the z position of the SHMS HGC relative to the focal plane
+    hgcYatCer = event.ssyfp + event.ssypfp*(156.27)
+    hgcPoint = np.array([hgcXatCer,hgcYatCer],dtype=float)
+    if HMS_Acceptance(event) & SHMS_Acceptance(event) & SHMS_Aero_Cut(event) & SIMC_MMpi_Cut(event) & (not hgcHolePoly.Contains(hgcPoint)):        
             Q2_pions_simc_cut_all.Fill(event.Q2, event.Weight)
             W_pions_simc_cut_all.Fill(event.W, event.Weight)
             Q2_vs_W_pions_simc_cut_all.Fill(event.Q2, event.W, event.Weight)

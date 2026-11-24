@@ -75,6 +75,7 @@ OUTPATH=lt.OUTPATH
 MMCUT_CSV   = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/mm_offset_cut_csv" % (USER)
 DCUT_CSV    = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/diamond_cut_csv" % (USER)
 TBINCSVPATH = "/u/group/c-pionlt/USERS/%s/hallc_replay_lt/UTIL_PION/LTSep_CSVs/t_binning_csv" % (USER)
+HOLEPATH    = "/u/group/c-pionlt/USERS/heinricn/hallc_replay_lt/UTIL_PION/scripts/pid/src/holeBoundry_60.csv"
 
 # Extract the first three words from PHY_SETTING for the CSV file name
 setting_name = "_".join(PHY_SETTING.split("_")[:2])
@@ -88,6 +89,20 @@ elif(setting_name == "Q6p00_W3p19"):
 else:
     print("You should probably add your settings number of t bins to this script!!!!\n")
 #################################################################################################################################################
+
+def loadHole(HoleCsv): #simple function, pass string with path to file and returns a fully constructed Root Polygon for doing HGC hole cut. - NH
+    x = []
+    y = []
+    print("Attempting to open hole cut cevs at: ", HoleCsv)
+    with open (HoleCsv) as f:
+        for line in f:
+            x.append(float(line[:line.find(",")]))
+            y.append(float(line[line.find(",")+1:]))
+
+    return [x,y]
+
+###############################################################################################################################################
+
 
 # Output PDF File Name
 print("Running as %s on %s, hallc_replay_lt path assumed as %s" % (USER, HOST, REPLAYPATH))
@@ -327,9 +342,21 @@ Uncut_Pion_Events_SIMC_tree = infile_SIMC.Get("h10")
 
 ###################################################################################################################################################
 
+HGChole = loadHole(HOLEPATH)
+hgcHoleX = np.asarray(HGChole[0], dtype=float) #force the data type to be double*
+hgcHoleY = np.asarray(HGChole[1], dtype=float)
+HoleLen = len(hgcHoleX)
+hgcHolePoly = ROOT.TGeoPolygon(HoleLen) #constructer
+print("initializing hole. Number of verticies in Hole: ", HoleLen)
+hgcHolePoly.SetXY(hgcHoleX, hgcHoleY) #define verticies
+hgcHolePoly.FinishPolygon() #bake the polygon
+
 # Fill the histograms with the data
 for event in Uncut_Pion_Events_SIMC_tree:
-    if HMS_Acceptance(event) and SHMS_Acceptance(event) and SHMS_Aero_Cut(event) and SIMC_MMpi_Cut(event) and Diamond_Cut(event):
+    hgcXatCer = event.ssxfp + event.ssxpfp*(156.27) #the z position of the SHMS HGC relative to the focal plane
+    hgcYatCer = event.ssyfp + event.ssypfp*(156.27)
+    hgcPoint = np.array([hgcXatCer,hgcYatCer],dtype=float)
+    if HMS_Acceptance(event) and SHMS_Acceptance(event) and SHMS_Aero_Cut(event) and SIMC_MMpi_Cut(event) and Diamond_Cut(event) and (not hgcHolePoly.Contains(hgcPoint)):
         for tbin_cut, (tmin, tmax) in zip(tbin_cuts, zip(t_min_values, t_max_values)):
             if tbin_cut(event):
                 # Fill Q² and W (once per t-bin)
